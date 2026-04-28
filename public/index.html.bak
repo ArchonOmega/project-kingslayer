@@ -35,7 +35,6 @@
       overflow-x: hidden;
     }
 
-    /* ── Scanline overlay ── */
     body::before {
       content: '';
       position: fixed;
@@ -51,7 +50,6 @@
       z-index: 9999;
     }
 
-    /* ── Header ── */
     header {
       border-bottom: 1px solid var(--border);
       padding: 1.5rem 2rem;
@@ -90,7 +88,6 @@
       letter-spacing: 0.15em;
     }
 
-    /* ── Stats bar ── */
     .stats-bar {
       display: flex;
       gap: 1.5rem;
@@ -129,7 +126,6 @@
       background: var(--border);
     }
 
-    /* ── Progress bar ── */
     .progress-wrap {
       padding: 0.75rem 2rem;
       background: var(--bg2);
@@ -161,7 +157,6 @@
       white-space: nowrap;
     }
 
-    /* ── Controls ── */
     .controls {
       padding: 1rem 2rem;
       display: flex;
@@ -233,10 +228,7 @@
       cursor: pointer;
     }
 
-    /* ── Table ── */
-    .table-wrap {
-      padding: 1.5rem 2rem;
-    }
+    .table-wrap { padding: 1.5rem 2rem; }
 
     table {
       width: 100%;
@@ -244,9 +236,7 @@
       font-size: 0.85rem;
     }
 
-    thead tr {
-      border-bottom: 2px solid var(--accent);
-    }
+    thead tr { border-bottom: 2px solid var(--accent); }
 
     th {
       font-family: var(--mono);
@@ -262,8 +252,6 @@
     }
 
     th:hover { color: var(--accent2); }
-    th .sort-arrow { margin-left: 0.25rem; opacity: 0.5; }
-    th.sorted .sort-arrow { opacity: 1; color: var(--accent2); }
 
     tbody tr {
       border-bottom: 1px solid var(--border);
@@ -278,18 +266,9 @@
       opacity: 0.6;
     }
 
-    tbody tr.is-claimed:hover { opacity: 0.8; }
+    td { padding: 0.75rem 1rem; vertical-align: middle; }
 
-    td {
-      padding: 0.75rem 1rem;
-      vertical-align: middle;
-    }
-
-    /* checkbox cell */
-    td.td-check {
-      width: 44px;
-      text-align: center;
-    }
+    td.td-check { width: 44px; text-align: center; }
 
     .check-box {
       width: 20px;
@@ -311,45 +290,14 @@
     .check-box svg { display: none; }
     .check-box.checked svg { display: block; }
 
-    /* region name */
-    td.td-region {
-      font-family: var(--mono);
-      font-weight: 500;
-      color: #fff;
-    }
+    td.td-region { font-family: var(--mono); font-weight: 500; color: #fff; }
+    tr.is-claimed td.td-region { text-decoration: line-through; color: var(--muted); }
 
-    tr.is-claimed td.td-region {
-      text-decoration: line-through;
-      color: var(--muted);
-    }
+    td.td-claimer { color: var(--muted); font-size: 0.78rem; }
+    td.td-claimed-by { font-size: 0.75rem; font-family: var(--mono); color: var(--green); }
 
-    /* claimer */
-    td.td-claimer {
-      color: var(--muted);
-      font-size: 0.78rem;
-    }
+    td.td-date { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); white-space: nowrap; }
 
-    /* claimed-by (who in EVW claimed it) */
-    td.td-claimed-by {
-      font-size: 0.75rem;
-      font-family: var(--mono);
-      color: var(--green);
-    }
-
-    td.td-claimed-by:empty::before {
-      content: '—';
-      color: var(--muted);
-    }
-
-    /* date */
-    td.td-date {
-      font-family: var(--mono);
-      font-size: 0.72rem;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
-    /* link */
     td.td-link a {
       font-family: var(--mono);
       font-size: 0.7rem;
@@ -359,15 +307,8 @@
       border: 1px solid var(--border);
       border-radius: 3px;
       transition: all 0.15s;
-      white-space: nowrap;
     }
 
-    td.td-link a:hover {
-      border-color: var(--accent);
-      background: rgba(200,168,75,0.1);
-    }
-
-    /* priority badge */
     .priority {
       display: inline-block;
       font-family: var(--mono);
@@ -376,22 +317,11 @@
       padding: 0.15rem 0.4rem;
       border-radius: 2px;
       margin-left: 0.5rem;
-      vertical-align: middle;
     }
 
     .priority.high   { background: rgba(192,57,43,0.2);  color: #e74c3c; border: 1px solid rgba(192,57,43,0.4); }
     .priority.med    { background: rgba(230,126,34,0.2); color: #e67e22; border: 1px solid rgba(230,126,34,0.4); }
 
-    /* empty state */
-    .empty-state {
-      text-align: center;
-      padding: 4rem 2rem;
-      color: var(--muted);
-      font-family: var(--mono);
-      font-size: 0.85rem;
-    }
-
-    /* claimed-by editor */
     .claimedby-input {
       background: transparent;
       border: none;
@@ -401,16 +331,8 @@
       font-size: 0.75rem;
       width: 130px;
       outline: none;
-      padding: 0.1rem 0;
     }
 
-    .claimedby-input:focus {
-      border-bottom-color: var(--accent);
-    }
-
-    .claimedby-input::placeholder { color: var(--muted); }
-
-    /* toast */
     #toast {
       position: fixed;
       bottom: 2rem;
@@ -425,23 +347,14 @@
       opacity: 0;
       transform: translateY(10px);
       transition: all 0.3s;
-      pointer-events: none;
       z-index: 1000;
     }
     #toast.show { opacity: 1; transform: translateY(0); }
 
-    /* row count */
-    .row-count {
-      font-family: var(--mono);
-      font-size: 0.7rem;
-      color: var(--muted);
-      padding: 0 2rem 0.5rem;
-    }
+    .row-count { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); padding: 0 2rem 0.5rem; }
 
     @media (max-width: 768px) {
       header { padding: 1rem; }
-      .table-wrap { padding: 1rem; overflow-x: auto; }
-      .controls { padding: 0.75rem 1rem; }
       td.td-claimer, td.td-date { display: none; }
     }
   </style>
@@ -455,27 +368,16 @@
     <div class="header-sub">TARGET ACQUISITION LIST // EUPHORIA REALM CAPTURE</div>
   </div>
   <div class="stats-bar">
-    <div class="stat">
-      <span class="stat-num" id="stat-total">—</span>
-      <span class="stat-label">Targets</span>
-    </div>
+    <div class="stat"><span class="stat-num" id="stat-total">—</span><span class="stat-label">Targets</span></div>
     <div class="stat-divider"></div>
-    <div class="stat">
-      <span class="stat-num green" id="stat-done">0</span>
-      <span class="stat-label">Claimed</span>
-    </div>
+    <div class="stat"><span class="stat-num green" id="stat-done">0</span><span class="stat-label">Claimed</span></div>
     <div class="stat-divider"></div>
-    <div class="stat">
-      <span class="stat-num red" id="stat-remaining">—</span>
-      <span class="stat-label">Remaining</span>
-    </div>
+    <div class="stat"><span class="stat-num red" id="stat-remaining">—</span><span class="stat-label">Remaining</span></div>
   </div>
 </header>
 
 <div class="progress-wrap">
-  <div class="progress-bar">
-    <div class="progress-fill" id="progress-fill" style="width:0%"></div>
-  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
   <div class="progress-text" id="progress-text">0% complete</div>
 </div>
 
@@ -507,17 +409,17 @@
     <thead>
       <tr>
         <th class="td-check"></th>
-        <th data-col="region">Region <span class="sort-arrow">↕</span></th>
-        <th data-col="claimer">Enemy Claimer <span class="sort-arrow">↕</span></th>
+        <th data-col="region">Region</th>
+        <th data-col="claimer">Enemy Claimer</th>
         <th data-col="claimed_by">Claimed By (EVW)</th>
-        <th data-col="timestamp">First Seen <span class="sort-arrow">↕</span></th>
+        <th data-col="timestamp">First Seen</th>
         <th>Teleport</th>
       </tr>
     </thead>
     <tbody id="tbody"></tbody>
   </table>
-  <div class="empty-state" id="empty-state" style="display:none">
-    No targets match your filter. <br>Try adjusting the search or filter.
+  <div class="empty-state" id="empty-state" style="display:none; text-align:center; padding:4rem; color:var(--muted); font-family:var(--mono);">
+    No targets match your filter.
   </div>
 </div>
 
@@ -527,41 +429,46 @@
 // ── DATA ─────────────────────────────────────────────────────
 const TARGETS = [{"region": "Yaupon Plain", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Yaupon%20Plain/81/215/1504", "timestamp": "2026-03-31 14:58:57"}, {"region": "Achroma", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Achroma/121/18/62", "timestamp": "2026-04-16 23:10:53"}, {"region": "Ceneselli", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Ceneselli/130/156/77", "timestamp": "2026-04-20 17:50:03"}, {"region": "Cinnamon Bay", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Cinnamon%20Bay/166/87/21", "timestamp": "2026-04-20 18:13:21"}, {"region": "SoCal", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/SoCal/202/146/27", "timestamp": "2026-04-20 18:50:29"}, {"region": "Fiora", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Fiora/55/170/35", "timestamp": "2026-04-20 19:10:49"}, {"region": "Bluewater Isle", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Bluewater%20Isle/100/117/33", "timestamp": "2026-04-20 19:23:39"}, {"region": "Gold Hollow", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Gold%20Hollow/57/73/28", "timestamp": "2026-04-20 19:27:37"}, {"region": "Nameless", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Nameless/72/210/63", "timestamp": "2026-04-20 20:03:23"}, {"region": "Belle Arti", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Belle%20Arti/100/199/1493", "timestamp": "2026-04-20 20:31:23"}, {"region": "Spiazzo", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Spiazzo/32/87/40", "timestamp": "2026-04-20 20:57:16"}, {"region": "Slitheen", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Slitheen/32/78/2236", "timestamp": "2026-04-20 22:27:21"}, {"region": "KENNEDY", "claimer": "Tyler Seraphim", "slurl": "https://maps.secondlife.com/secondlife/KENNEDY/127/127/26", "timestamp": "2026-04-20 23:46:29"}, {"region": "Coronation Heights", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Coronation%20Heights/83/194/2000", "timestamp": "2026-04-21 00:55:51"}, {"region": "Mesa Island", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Mesa%20Island/230/149/3002", "timestamp": "2026-04-21 02:14:11"}, {"region": "Half Moon Cove", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Half%20Moon%20Cove/30/180/22", "timestamp": "2026-04-21 02:31:40"}, {"region": "Avarice", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Avarice/66/128/3523", "timestamp": "2026-04-21 04:12:17"}, {"region": "Barnes Wallow", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Barnes%20Wallow/133/127/23", "timestamp": "2026-04-21 04:40:56"}, {"region": "Sin City", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Sin%20City/128/128/20", "timestamp": "2026-04-21 04:58:48"}, {"region": "Pahvo", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Pahvo/134/134/44", "timestamp": "2026-04-21 05:06:53"}, {"region": "Crowberry", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Crowberry/128/128/9", "timestamp": "2026-04-21 05:15:29"}, {"region": "Predrow", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Predrow/50/110/2995", "timestamp": "2026-04-21 16:30:03"}, {"region": "Summit Valley", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Summit%20Valley/116/181/3653", "timestamp": "2026-04-21 19:03:30"}, {"region": "Dreamworld", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Dreamworld/94/235/21", "timestamp": "2026-04-21 22:29:41"}, {"region": "Artina", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Artina/99/96/4005", "timestamp": "2026-04-22 00:07:21"}, {"region": "Horizons Yurania", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Horizons%20Yurania/129/147/22", "timestamp": "2026-04-22 00:45:37"}, {"region": "Horizons Ariel", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Horizons%20Ariel/146/112/31", "timestamp": "2026-04-22 04:12:04"}, {"region": "Creach", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Creach/126/129/8", "timestamp": "2026-04-22 04:33:47"}, {"region": "Refraction", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Refraction/187/212/708", "timestamp": "2026-04-22 04:50:09"}, {"region": "Zurn", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Zurn/128/129/8", "timestamp": "2026-04-22 04:58:03"}, {"region": "Riverview Cove", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Riverview%20Cove/189/147/3201", "timestamp": "2026-04-22 05:27:59"}, {"region": "Portia Park", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Portia%20Park/130/128/25", "timestamp": "2026-04-22 06:20:45"}, {"region": "Jitterbug", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Jitterbug/128/125/23", "timestamp": "2026-04-22 06:29:14"}, {"region": "Everdream", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Everdream/121/140/7", "timestamp": "2026-04-22 06:35:26"}, {"region": "Ahimsa", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Ahimsa/66/120/20", "timestamp": "2026-04-22 06:40:05"}, {"region": "Matata", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Matata/136/123/3", "timestamp": "2026-04-22 06:43:02"}, {"region": "tiptoes", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/tiptoes/139/115/21", "timestamp": "2026-04-22 06:49:40"}, {"region": "Obasan Ohayo", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Obasan%20Ohayo/128/128/31", "timestamp": "2026-04-22 06:55:17"}, {"region": "Mystic River", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Mystic%20River/130/239/23", "timestamp": "2026-04-22 07:00:11"}, {"region": "Sinisong2", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Sinisong2/184/163/1000", "timestamp": "2026-04-22 07:06:12"}, {"region": "Eden Bunting", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Eden%20Bunting/123/124/5", "timestamp": "2026-04-22 07:11:17"}, {"region": "Taean", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Taean/140/130/81", "timestamp": "2026-04-22 07:16:48"}, {"region": "Oreo", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Oreo/124/143/21", "timestamp": "2026-04-22 07:23:54"}, {"region": "Zeds Pitch", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Zeds%20Pitch/113/124/42", "timestamp": "2026-04-22 07:31:04"}, {"region": "Glue Trap Maze", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Glue%20Trap%20Maze/154/127/22", "timestamp": "2026-04-22 07:36:59"}, {"region": "Tardfish", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Tardfish/143/139/23", "timestamp": "2026-04-22 07:37:26"}, {"region": "Jorn Province", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Jorn%20Province/14/15/23", "timestamp": "2026-04-22 07:42:22"}, {"region": "Santos", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Santos/82/21/24", "timestamp": "2026-04-22 07:48:31"}, {"region": "Cult Coven", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Cult%20Coven/205/55/32", "timestamp": "2026-04-22 16:23:06"}, {"region": "Loveless BloodMoon", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Loveless%20BloodMoon/234/205/21", "timestamp": "2026-04-22 16:32:01"}, {"region": "SkyBeam", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/SkyBeam/97/135/2501", "timestamp": "2026-04-22 17:22:23"}, {"region": "Ermus", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Ermus/55/171/3198", "timestamp": "2026-04-22 20:03:24"}, {"region": "Kickin Boots", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Kickin%20Boots/154/91/3892", "timestamp": "2026-04-23 05:00:35"}, {"region": "Tobys Bayou", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Tobys%20Bayou/219/244/21", "timestamp": "2026-04-23 05:14:00"}, {"region": "GEL Amusement Park", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/GEL%20Amusement%20Park/20/133/45", "timestamp": "2026-04-23 05:31:39"}, {"region": "SLife", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/SLife/119/162/22", "timestamp": "2026-04-23 06:07:41"}, {"region": "Anthology", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Anthology/183/164/1012", "timestamp": "2026-04-23 07:15:24"}, {"region": "Maitreya Isle", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Maitreya%20Isle/139/175/43", "timestamp": "2026-04-23 11:03:05"}, {"region": "MadPea Base", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/MadPea%20Base/118/141/30", "timestamp": "2026-04-23 16:05:41"}, {"region": "WelcomeHub", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/WelcomeHub/14/218/26", "timestamp": "2026-04-23 18:09:28"}, {"region": "Aii", "claimer": "lilvampy Destiny", "slurl": "https://maps.secondlife.com/secondlife/Aii/153/160/1524", "timestamp": "2026-04-23 19:17:58"}, {"region": "Progeny Lounge", "claimer": "Merukii Resident", "slurl": "https://maps.secondlife.com/secondlife/Progeny%20Lounge/19/113/22", "timestamp": "2026-04-23 19:19:16"}, {"region": "Predrow", "claimer": "Lucifer Seraphim", "slurl": "https://maps.secondlife.com/secondlife/Predrow/53/110/2995", "timestamp": "2026-04-24 04:16:01"}, {"region": "Fuson", "claimer": "Serena5579 Resident", "slurl": "https://maps.secondlife.com/secondlife/Fuson/70/158/3374", "timestamp": "2026-04-24 04:31:07"}, {"region": "Barnes Wallow", "claimer": "theragnarok1 Resident", "slurl": "https://maps.secondlife.com/secondlife/Barnes%20Wallow/133/127/23", "timestamp": "2026-04-24 04:42:01"}, {"region": "Sin City", "claimer": "Lucifer Seraphim", "slurl": "https://maps.secondlife.com/secondlife/Sin%20City/121/132/28", "timestamp": "2026-04-24 05:04:48"}, {"region": "Pahvo", "claimer": "Serena5579 Resident", "slurl": "https://maps.secondlife.com/secondlife/Pahvo/135/135/44", "timestamp": "2026-04-24 05:18:04"}, {"region": "Nameless", "claimer": "Serena5579 Resident", "slurl": "https://maps.secondlife.com/secondlife/Nameless/80/221/65", "timestamp": "2026-04-24 05:35:29"}, {"region": "WelcomeHub", "claimer": "GhostieGrimm Resident", "slurl": "https://maps.secondlife.com/secondlife/WelcomeHub/36/204/26", "timestamp": "2026-04-24 07:06:17"}, {"region": "Maitreya Isle", "claimer": "GhostieGrimm Resident", "slurl": "https://maps.secondlife.com/secondlife/Maitreya%20Isle/126/121/23", "timestamp": "2026-04-24 07:18:58"}, {"region": "Pangea Estates", "claimer": "Aeryn Starchild", "slurl": "https://maps.secondlife.com/secondlife/Pangea%20Estates/209/219/48", "timestamp": "2026-04-24 07:19:28"}, {"region": "Chouchou", "claimer": "Simons0n Resident", "slurl": "https://maps.secondlife.com/secondlife/Chouchou/177/144/21", "timestamp": "2026-04-24 07:41:05"}, {"region": "Ay Caramba", "claimer": "Laezimir Resident", "slurl": "https://maps.secondlife.com/secondlife/Ay%20Caramba/90/61/25", "timestamp": "2026-04-24 09:23:38"}, {"region": "Drakaren", "claimer": "SPara001 Resident", "slurl": "https://maps.secondlife.com/secondlife/Drakaren/68/175/37", "timestamp": "2026-04-24 09:34:01"}, {"region": "Garmu", "claimer": "Jay Nightwish", "slurl": "https://maps.secondlife.com/secondlife/Garmu/120/134/9", "timestamp": "2026-04-24 09:56:46"}, {"region": "Henker", "claimer": "Jay Nightwish", "slurl": "https://maps.secondlife.com/secondlife/Henker/100/130/4", "timestamp": "2026-04-24 10:17:51"}, {"region": "Spellbound Manor", "claimer": "Jay Nightwish", "slurl": "https://maps.secondlife.com/secondlife/Spellbound%20Manor/165/11/1988", "timestamp": "2026-04-24 10:46:13"}, {"region": "Spellbound Manor", "claimer": "Dorian88 Resident", "slurl": "https://maps.secondlife.com/secondlife/Spellbound%20Manor/165/11/1988", "timestamp": "2026-04-24 19:00:11"}, {"region": "Henker", "claimer": "simoncino98 Resident", "slurl": "https://maps.secondlife.com/secondlife/Henker/101/132/6", "timestamp": "2026-04-24 19:11:50"}, {"region": "Maitreya Isle", "claimer": "Dorian88 Resident", "slurl": "https://maps.secondlife.com/secondlife/Maitreya%20Isle/131/135/23", "timestamp": "2026-04-24 19:30:15"}, {"region": "Stokhof", "claimer": "angelllofpassion Resident", "slurl": "https://maps.secondlife.com/secondlife/Stokhof/109/39/46", "timestamp": "2026-04-24 19:46:14"}, {"region": "Stokhof", "claimer": "SadWorid Resident", "slurl": "https://maps.secondlife.com/secondlife/Stokhof/107/55/46", "timestamp": "2026-04-24 19:51:00"}, {"region": "Pangea Estates", "claimer": "SadWorid Resident", "slurl": "https://maps.secondlife.com/secondlife/Pangea%20Estates/143/53/47", "timestamp": "2026-04-24 20:14:56"}, {"region": "NOTORIOUS Kingdom", "claimer": "SadWorid Resident", "slurl": "https://maps.secondlife.com/secondlife/NOTORIOUS%20Kingdom/204/32/2997", "timestamp": "2026-04-24 20:21:21"}, {"region": "Gold Hollow", "claimer": "blenda Twang", "slurl": "https://maps.secondlife.com/secondlife/Gold%20Hollow/47/76/28", "timestamp": "2026-04-24 20:35:35"}, {"region": "Mishiland", "claimer": "blenda Twang", "slurl": "https://maps.secondlife.com/secondlife/Mishiland/27/198/75", "timestamp": "2026-04-24 21:05:10"}, {"region": "GEL Community 21", "claimer": "VowofTruth Resident", "slurl": "https://maps.secondlife.com/secondlife/GEL%20Community%2021/180/194/1658", "timestamp": "2026-04-24 21:35:53"}, {"region": "Desert Moon", "claimer": "Elijah Baby", "slurl": "https://maps.secondlife.com/secondlife/Desert%20Moon/202/41/2028", "timestamp": "2026-04-25 00:25:13"}, {"region": "Spiazzo", "claimer": "Vextein Resident", "slurl": "https://maps.secondlife.com/secondlife/Spiazzo/37/89/40", "timestamp": "2026-04-25 01:50:58"}, {"region": "GABRIEL2", "claimer": "Vaphnova Hexem", "slurl": "https://maps.secondlife.com/secondlife/GABRIEL2/26/145/501", "timestamp": "2026-04-25 09:01:09"}, {"region": "Zaltu", "claimer": "blenda Twang", "slurl": "https://maps.secondlife.com/secondlife/Zaltu/181/225/99", "timestamp": "2026-04-25 19:20:06"}, {"region": "Odyssey", "claimer": "blenda Twang", "slurl": "https://maps.secondlife.com/secondlife/Odyssey/50/232/24", "timestamp": "2026-04-25 19:48:56"}, {"region": "Odyssey", "claimer": "Merukii Resident", "slurl": "https://maps.secondlife.com/secondlife/Odyssey/7/237/21", "timestamp": "2026-04-25 19:56:29"}, {"region": "Horizons Galatea", "claimer": "Renny Puppy", "slurl": "https://maps.secondlife.com/secondlife/Horizons%20Galatea/141/43/23", "timestamp": "2026-04-25 21:12:39"}, {"region": "Tainted Island", "claimer": "Jemerald Resident", "slurl": "https://maps.secondlife.com/secondlife/Tainted%20Island/148/60/1504", "timestamp": "2026-04-26 01:11:32"}, {"region": "Horizons Yurania", "claimer": "theragnarok1 Resident", "slurl": "https://maps.secondlife.com/secondlife/Horizons%20Yurania/129/169/22", "timestamp": "2026-04-26 03:24:57"}, {"region": "Zaltu", "claimer": "Serena5579 Resident", "slurl": "https://maps.secondlife.com/secondlife/Zaltu/186/248/98", "timestamp": "2026-04-26 03:45:45"}, {"region": "Aii", "claimer": "theragnarok1 Resident", "slurl": "https://maps.secondlife.com/secondlife/Aii/153/160/1525", "timestamp": "2026-04-26 05:14:11"}, {"region": "Soho Island", "claimer": "irielove Resident", "slurl": "https://maps.secondlife.com/secondlife/Soho%20Island/225/193/21", "timestamp": "2026-04-26 09:39:49"}, {"region": "Teegle", "claimer": "Aeryn Starchild", "slurl": "https://maps.secondlife.com/secondlife/Teegle/95/148/15", "timestamp": "2026-04-26 09:52:47"}, {"region": "Da Truth", "claimer": "irielove Resident", "slurl": "https://maps.secondlife.com/secondlife/Da%20Truth/142/191/23", "timestamp": "2026-04-26 09:54:37"}, {"region": "Equestrian", "claimer": "Aeryn Starchild", "slurl": "https://maps.secondlife.com/secondlife/Equestrian/168/85/22", "timestamp": "2026-04-26 10:11:37"}, {"region": "Sporbus", "claimer": "irielove Resident", "slurl": "https://maps.secondlife.com/secondlife/Sporbus/168/205/51", "timestamp": "2026-04-26 10:11:49"}, {"region": "Seraphic Shores", "claimer": "irielove Resident", "slurl": "https://maps.secondlife.com/secondlife/Seraphic%20Shores/126/141/21", "timestamp": "2026-04-26 10:18:35"}, {"region": "Transcendence", "claimer": "irielove Resident", "slurl": "https://maps.secondlife.com/secondlife/Transcendence/204/240/21", "timestamp": "2026-04-26 10:35:00"}, {"region": "Paraoro Bay", "claimer": "mattc Clave", "slurl": "https://maps.secondlife.com/secondlife/Paraoro%20Bay/68/151/1200", "timestamp": "2026-04-27 01:20:20"}, {"region": "Horizons Galatea", "claimer": "Lucifer Seraphim", "slurl": "https://maps.secondlife.com/secondlife/Horizons%20Galatea/127/123/30", "timestamp": "2026-04-27 02:42:55"}, {"region": "Succubus", "claimer": "angelllofpassion Resident", "slurl": "https://maps.secondlife.com/secondlife/Succubus/211/77/1007", "timestamp": "2026-04-27 13:25:53"}, {"region": "Vampyre", "claimer": "Semael7 Resident", "slurl": "https://maps.secondlife.com/secondlife/Vampyre/66/226/47", "timestamp": "2026-04-27 13:49:57"}, {"region": "Incubus", "claimer": "Semael7 Resident", "slurl": "https://maps.secondlife.com/secondlife/Incubus/55/95/56", "timestamp": "2026-04-27 14:05:41"}, {"region": "CORE", "claimer": "lilvampy Destiny", "slurl": "https://maps.secondlife.com/secondlife/CORE/145/100/3500", "timestamp": "2026-04-27 15:04:25"}, {"region": "Belphegor", "claimer": "lilvampy Destiny", "slurl": "https://maps.secondlife.com/secondlife/Belphegor/12/37/76", "timestamp": "2026-04-27 15:47:42"}, {"region": "Drakul", "claimer": "AkumaBoo Resident", "slurl": "https://maps.secondlife.com/secondlife/Drakul/79/87/503", "timestamp": "2026-04-27 22:45:10"}, {"region": "Dark Water", "claimer": "AkumaBoo Resident", "slurl": "https://maps.secondlife.com/secondlife/Dark%20Water/209/46/22", "timestamp": "2026-04-27 23:03:22"}, {"region": "Cassandra", "claimer": "AkumaBoo Resident", "slurl": "https://maps.secondlife.com/secondlife/Cassandra/40/38/51", "timestamp": "2026-04-27 23:20:01"}, {"region": "Incubus", "claimer": "Merukii Resident", "slurl": "https://maps.secondlife.com/secondlife/Incubus/54/93/56", "timestamp": "2026-04-28 00:34:51"}, {"region": "Zurn", "claimer": "Raven Shadowcry", "slurl": "https://maps.secondlife.com/secondlife/Zurn/128/129/8", "timestamp": "2026-04-28 03:12:10"}, {"region": "Creach", "claimer": "asema Cyberstar", "slurl": "https://maps.secondlife.com/secondlife/Creach/129/127/8", "timestamp": "2026-04-28 03:16:42"}, {"region": "Mirthwell", "claimer": "Raven Shadowcry", "slurl": "https://maps.secondlife.com/secondlife/Mirthwell/127/128/23", "timestamp": "2026-04-28 03:33:09"}];
 
-// ── STATE ────────────────────────────────────────────────────
-const STORAGE_KEY = 'kingslayer_v1';
-
-function loadState() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-  } catch { return {}; }
-}
-
-function saveState(state) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-}
-
-let state = loadState();
-// state[region] = { claimed: bool, claimedBy: string }
-
+// ── STATE (CLOUD VERSION) ────────────────────────────────────
+let state = {};
 let filter   = 'all';
 let searchQ  = '';
 let sortMode = 'date-asc';
+
+async function loadState() {
+  try {
+    const res = await fetch('/api/targets');
+    state = await res.json();
+    renderTable();
+  } catch (err) { console.error("Cloud load error:", err); }
+}
+
+async function saveState(newState) {
+  try {
+    state = newState;
+    await fetch('/api/targets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(state)
+    });
+  } catch (err) { console.error("Cloud save error:", err); }
+}
 
 // ── HELPERS ──────────────────────────────────────────────────
 function getEntry(region) {
   return state[region] || { claimed: false, claimedBy: '' };
 }
 
-function setEntry(region, data) {
-  state[region] = { ...getEntry(region), ...data };
-  saveState(state);
+async function setEntry(region, data) {
+  const updatedState = { ...state, [region]: { ...getEntry(region), ...data } };
+  await saveState(updatedState);
 }
 
 function updateStats() {
   const total     = TARGETS.length;
   const claimed   = Object.values(state).filter(e => e.claimed).length;
   const remaining = total - claimed;
-  const pct       = Math.round((claimed / total) * 100);
+  const pct       = total > 0 ? Math.round((claimed / total) * 100) : 0;
 
   document.getElementById('stat-total').textContent     = total;
   document.getElementById('stat-done').textContent      = claimed;
@@ -577,7 +484,6 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2200);
 }
 
-// ── PRIORITY (recent = higher priority) ─────────────────────
 function getPriority(ts) {
   if (!ts) return '';
   const d = new Date(ts);
@@ -597,33 +503,22 @@ function priorityLabel(p) {
 // ── RENDER ───────────────────────────────────────────────────
 function getVisible() {
   let list = [...TARGETS];
-
-  // filter
   if (filter === 'pending') list = list.filter(t => !getEntry(t.region).claimed);
   if (filter === 'claimed') list = list.filter(t => getEntry(t.region).claimed);
-
-  // search
   if (searchQ) {
     const q = searchQ.toLowerCase();
-    list = list.filter(t =>
-      t.region.toLowerCase().includes(q) ||
-      (t.claimer || '').toLowerCase().includes(q) ||
-      (getEntry(t.region).claimedBy || '').toLowerCase().includes(q)
-    );
+    list = list.filter(t => t.region.toLowerCase().includes(q) || (t.claimer || '').toLowerCase().includes(q));
   }
-
-  // sort
   list.sort((a, b) => {
     switch (sortMode) {
-      case 'date-asc':     return (a.timestamp||'').localeCompare(b.timestamp||'');
-      case 'date-desc':    return (b.timestamp||'').localeCompare(a.timestamp||'');
-      case 'region-asc':   return a.region.localeCompare(b.region);
-      case 'region-desc':  return b.region.localeCompare(a.region);
-      case 'claimer-asc':  return (a.claimer||'').localeCompare(b.claimer||'');
+      case 'date-asc': return (a.timestamp||'').localeCompare(b.timestamp||'');
+      case 'date-desc': return (b.timestamp||'').localeCompare(a.timestamp||'');
+      case 'region-asc': return a.region.localeCompare(b.region);
+      case 'region-desc': return b.region.localeCompare(a.region);
+      case 'claimer-asc': return (a.claimer||'').localeCompare(b.claimer||'');
       default: return 0;
     }
   });
-
   return list;
 }
 
@@ -634,7 +529,6 @@ function renderTable() {
   const rc      = document.getElementById('row-count');
 
   tbody.innerHTML = '';
-
   if (!visible.length) {
     empty.style.display = 'block';
     rc.textContent = '';
@@ -648,66 +542,41 @@ function renderTable() {
   visible.forEach(t => {
     const entry    = getEntry(t.region);
     const claimed  = entry.claimed;
-    const clBy     = entry.claimedBy || '';
     const priority = claimed ? '' : getPriority(t.timestamp);
-    const rowClass = claimed ? 'is-claimed' : '';
     const dateStr  = t.timestamp ? t.timestamp.slice(0, 10) : '—';
 
     const tr = document.createElement('tr');
-    tr.className = rowClass;
-    tr.dataset.region = t.region;
-
+    tr.className = claimed ? 'is-claimed' : '';
     tr.innerHTML = `
       <td class="td-check">
         <div class="check-box ${claimed ? 'checked' : ''}" data-region="${t.region}">
-          <svg width="12" height="12" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24">
-            <polyline points="20 6 9 17 4 12"/>
-          </svg>
+          <svg width="12" height="12" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
       </td>
-      <td class="td-region">
-        ${t.region}${priorityLabel(priority)}
-      </td>
-      <td class="td-claimer">${t.claimer === 'Unknown' ? '<span style="color:var(--muted)">—</span>' : (t.claimer || '—')}</td>
+      <td class="td-region">${t.region}${priorityLabel(priority)}</td>
+      <td class="td-claimer">${t.claimer}</td>
       <td class="td-claimed-by">
-        <input
-          class="claimedby-input"
-          type="text"
-          placeholder="${claimed ? 'who claimed?' : ''}"
-          value="${clBy}"
-          data-region="${t.region}"
-          ${!claimed ? 'disabled style="display:none"' : ''}
-        >
-        ${!claimed ? '<span style="color:var(--muted);font-size:0.7rem;font-family:var(--mono)">—</span>' : ''}
+        <input class="claimedby-input" type="text" value="${entry.claimedBy || ''}" data-region="${t.region}" ${!claimed ? 'disabled style="display:none"' : ''}>
       </td>
       <td class="td-date">${dateStr}</td>
       <td class="td-link"><a href="${t.slurl}" target="_blank">↗ TP</a></td>
     `;
-
     tbody.appendChild(tr);
   });
 
-  // attach checkbox events
   tbody.querySelectorAll('.check-box').forEach(box => {
-    box.addEventListener('click', e => {
-      e.stopPropagation();
-      const region  = box.dataset.region;
-      const entry   = getEntry(region);
-      const nowClaimed = !entry.claimed;
-      setEntry(region, { claimed: nowClaimed });
-      showToast(nowClaimed ? `✔ ${region} marked as claimed` : `↩ ${region} unclaimed`);
+    box.addEventListener('click', async () => {
+      const region = box.dataset.region;
+      const nowClaimed = !getEntry(region).claimed;
+      await setEntry(region, { claimed: nowClaimed });
+      showToast(nowClaimed ? `✔ ${region} claimed` : `↩ ${region} unclaimed`);
       renderTable();
-      updateStats();
     });
   });
 
-  // attach claimedBy input events
   tbody.querySelectorAll('.claimedby-input').forEach(inp => {
-    inp.addEventListener('input', e => {
-      setEntry(inp.dataset.region, { claimedBy: inp.value });
-    });
-    inp.addEventListener('keydown', e => {
-      if (e.key === 'Enter') { inp.blur(); showToast('Saved!'); }
+    inp.addEventListener('blur', async () => {
+      await setEntry(inp.dataset.region, { claimedBy: inp.value });
     });
   });
 
@@ -724,19 +593,11 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
   });
 });
 
-document.getElementById('search').addEventListener('input', e => {
-  searchQ = e.target.value.trim();
-  renderTable();
-});
-
-document.getElementById('sort-select').addEventListener('change', e => {
-  sortMode = e.target.value;
-  renderTable();
-});
+document.getElementById('search').addEventListener('input', e => { searchQ = e.target.value.trim(); renderTable(); });
+document.getElementById('sort-select').addEventListener('change', e => { sortMode = e.target.value; renderTable(); });
 
 // ── INIT ─────────────────────────────────────────────────────
-renderTable();
-updateStats();
+loadState();
 </script>
 </body>
 </html>
