@@ -3,46 +3,1455 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PROJECT KINGSLAYER</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <title>PROJECT KINGSLAYER // EVW COMMAND</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg:       #080a0e;
+      --bg2:      #0c0f16;
+      --bg3:      #111520;
+      --bg4:      #161b28;
+      --border:   #1c2235;
+      --border2:  #243050;
+      --gold:     #c8a84b;
+      --gold2:    #e8c86a;
+      --gold-dim: #7a6530;
+      --red:      #c0392b;
+      --red2:     #e74c3c;
+      --green:    #1a8a4a;
+      --green2:   #27ae60;
+      --cyan:     #1a9aaa;
+      --cyan2:    #2ec4d6;
+      --text:     #c8cdd8;
+      --text2:    #8892a4;
+      --muted:    #445060;
+      --display:  'Bebas Neue', sans-serif;
+      --mono:     'Share Tech Mono', monospace;
+      --ui:       'Rajdhani', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { height: 100%; }
+
     body {
-      background: #0a0b0d;
-      color: #d4d8e2;
-      font-family: 'Share Tech Mono', monospace;
-      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--ui);
+      font-size: 15px;
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    /* ── Animated grid background ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(200,168,75,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200,168,75,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Scanlines ── */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 2px,
+        rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px
+      );
+      pointer-events: none;
+      z-index: 9998;
+    }
+
+    /* ════════════════════════════════════════
+       SCREENS
+    ════════════════════════════════════════ */
+    .screen { display: none; position: fixed; inset: 0; z-index: 1; overflow: hidden; }
+    .screen.active { display: flex; }
+
+    /* ════════════════════════════════════════
+       AUTH SCREEN
+    ════════════════════════════════════════ */
+    #screen-auth {
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .auth-bg-text {
+      position: absolute;
+      font-family: var(--display);
+      font-size: 22vw;
+      color: rgba(200,168,75,0.03);
+      user-select: none;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .auth-panel {
+      position: relative;
+      width: 420px;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+      padding: 2.5rem;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .auth-logo {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .auth-logo .eyebrow {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--gold-dim);
+      letter-spacing: 0.4em;
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .auth-logo h1 {
+      font-family: var(--display);
+      font-size: 2.8rem;
+      letter-spacing: 0.08em;
+      line-height: 1;
+      color: #fff;
+    }
+
+    .auth-logo h1 em {
+      color: var(--gold);
+      font-style: normal;
+    }
+
+    .auth-logo .sub {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 0.25em;
+      margin-top: 0.4rem;
+      display: block;
+    }
+
+    .auth-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.75rem;
+    }
+
+    .auth-tab {
+      flex: 1;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0.6rem;
+      text-align: center;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      background: none;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+    }
+
+    .auth-tab.active {
+      color: var(--gold);
+      border-bottom-color: var(--gold);
+    }
+
+    .auth-tab:hover:not(.active) { color: var(--text2); }
+
+    .auth-form { display: flex; flex-direction: column; gap: 1rem; }
+    .auth-form.hidden { display: none; }
+
+    .field-group { display: flex; flex-direction: column; gap: 0.35rem; }
+
+    .field-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--text2);
+      text-transform: uppercase;
+    }
+
+    .field-input {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      padding: 0.6rem 0.75rem;
+      outline: none;
+      transition: border-color 0.2s;
+      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+      width: 100%;
+    }
+
+    .field-input:focus { border-color: var(--gold); }
+    .field-input::placeholder { color: var(--muted); }
+
+    .btn-primary {
+      background: var(--gold);
+      color: #000;
+      border: none;
+      font-family: var(--display);
+      font-size: 1.1rem;
+      letter-spacing: 0.15em;
+      padding: 0.65rem 1.5rem;
+      cursor: pointer;
+      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+      transition: all 0.2s;
+      margin-top: 0.5rem;
+    }
+
+    .btn-primary:hover { background: var(--gold2); transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+
+    .auth-message {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      text-align: center;
+      padding: 0.6rem;
+      border-radius: 2px;
+      display: none;
+    }
+
+    .auth-message.error   { color: var(--red2); border: 1px solid rgba(231,76,60,0.3); background: rgba(192,57,43,0.1); display: block; }
+    .auth-message.success { color: var(--green2); border: 1px solid rgba(39,174,96,0.3); background: rgba(26,138,74,0.1); display: block; }
+    .auth-message.info    { color: var(--cyan2); border: 1px solid rgba(46,196,214,0.3); background: rgba(26,154,170,0.1); display: block; }
+
+    /* ════════════════════════════════════════
+       MAIN APP SCREEN
+    ════════════════════════════════════════ */
+    #screen-app {
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      height: 54px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      gap: 1rem;
+      position: relative;
+      z-index: 10;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .topbar-logo {
+      font-family: var(--display);
+      font-size: 1.4rem;
+      letter-spacing: 0.1em;
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    .topbar-logo em { color: var(--gold); font-style: normal; }
+
+    .topbar-divider {
+      width: 1px; height: 24px;
+      background: var(--border);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    .nav-tab {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      padding: 0.35rem 0.9rem;
+      cursor: pointer;
+      border: 1px solid transparent;
+      border-bottom: 2px solid transparent;
+      background: none;
+      transition: all 0.15s;
+      text-transform: uppercase;
+    }
+
+    .nav-tab:hover { color: var(--text2); border-color: var(--border); }
+
+    .nav-tab.active {
+      color: var(--gold);
+      border-color: var(--border);
+      border-bottom-color: var(--gold);
+      background: var(--bg3);
+    }
+
+    .nav-tab.admin-tab { color: var(--red2); }
+    .nav-tab.admin-tab:hover { border-color: rgba(231,76,60,0.3); }
+    .nav-tab.admin-tab.active { color: var(--red2); border-bottom-color: var(--red2); }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-left: auto;
+    }
+
+    .user-info {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--text2);
+      text-align: right;
+    }
+
+    .user-info strong { color: var(--gold); display: block; font-size: 0.72rem; }
+
+    .btn-logout {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      background: none;
+      border: 1px solid var(--border);
+      padding: 0.3rem 0.7rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-transform: uppercase;
+    }
+
+    .btn-logout:hover { color: var(--red2); border-color: var(--red2); }
+
+    /* ── Status bar ── */
+    .statusbar {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      padding: 0 1.5rem;
+      height: 36px;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .stat-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: var(--text2);
+      white-space: nowrap;
+    }
+
+    .stat-pill .num {
+      font-family: var(--display);
+      font-size: 1rem;
+      line-height: 1;
+    }
+
+    .stat-pill .num.gold  { color: var(--gold); }
+    .stat-pill .num.green { color: var(--green2); }
+    .stat-pill .num.red   { color: var(--red2); }
+    .stat-pill .num.cyan  { color: var(--cyan2); }
+
+    .stat-sep { color: var(--border2); }
+
+    .progress-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .progress-bar {
+      flex: 1;
+      max-width: 200px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--green2));
+      border-radius: 2px;
+      transition: width 0.5s ease;
+    }
+
+    .progress-label {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* ── Page panels ── */
+    .page { display: none; flex: 1; overflow: hidden; flex-direction: column; }
+    .page.active { display: flex; }
+
+    /* ── Controls bar ── */
+    .controls-bar {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 180px;
+      max-width: 340px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.65rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      padding: 0.45rem 0.75rem 0.45rem 2rem;
+      outline: none;
+      transition: border-color 0.2s;
+      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+    }
+
+    .search-input:focus { border-color: var(--gold); }
+    .search-input::placeholder { color: var(--muted); }
+
+    .filter-group { display: flex; gap: 0.35rem; }
+
+    .filter-btn {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      padding: 0.35rem 0.8rem;
+      border: 1px solid var(--border);
+      background: var(--bg3);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-transform: uppercase;
+    }
+
+    .filter-btn:hover { color: var(--text2); border-color: var(--border2); }
+    .filter-btn.active { background: var(--gold); color: #000; border-color: var(--gold); }
+
+    .sort-select {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.35rem 0.7rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .row-count {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--muted);
+      margin-left: auto;
+      white-space: nowrap;
+    }
+
+    /* ── Table ── */
+    .table-scroll {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: auto;
+    }
+
+    .table-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .table-scroll::-webkit-scrollbar-track { background: var(--bg2); }
+    .table-scroll::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: var(--bg2);
+    }
+
+    thead tr { border-bottom: 2px solid var(--gold-dim); }
+
+    th {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      padding: 0.6rem 1rem;
+      text-align: left;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+
+    tbody tr:hover { background: var(--bg3); }
+
+    tbody tr.status-claimed { background: rgba(26,138,74,0.06); }
+    tbody tr.status-claimed:hover { background: rgba(26,138,74,0.12); }
+    tbody tr.status-unclaimed { background: rgba(192,57,43,0.04); }
+    tbody tr.status-unclaimed:hover { background: rgba(192,57,43,0.08); }
+
+    td {
+      padding: 0.65rem 1rem;
+      vertical-align: middle;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      padding: 0.2rem 0.55rem;
+      border-radius: 2px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .status-badge.claimed {
+      color: var(--green2);
+      background: rgba(39,174,96,0.12);
+      border: 1px solid rgba(39,174,96,0.25);
+    }
+
+    .status-badge.unclaimed {
+      color: var(--red2);
+      background: rgba(231,76,60,0.12);
+      border: 1px solid rgba(231,76,60,0.25);
+    }
+
+    .status-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .status-badge.claimed .status-dot   { background: var(--green2); box-shadow: 0 0 4px var(--green2); }
+    .status-badge.unclaimed .status-dot { background: var(--red2);   box-shadow: 0 0 4px var(--red2); }
+
+    .td-region {
+      font-family: var(--mono);
+      font-weight: 500;
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    .td-land { color: var(--text2); font-size: 0.82rem; }
+    .td-claimer { color: var(--text2); font-size: 0.8rem; }
+    .td-claimed-by { color: var(--green2); font-family: var(--mono); font-size: 0.78rem; }
+    .td-date { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); white-space: nowrap; }
+
+    .td-link a {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--gold);
+      text-decoration: none;
+      padding: 0.2rem 0.5rem;
+      border: 1px solid var(--border);
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .td-link a:hover {
+      border-color: var(--gold);
+      background: rgba(200,168,75,0.1);
+    }
+
+    /* toggle button for claimed status */
+    .btn-toggle {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      padding: 0.2rem 0.55rem;
+      border: 1px solid var(--border);
+      background: var(--bg3);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .btn-toggle:hover { border-color: var(--gold); color: var(--gold); }
+    .btn-toggle.unclaim:hover { border-color: var(--red2); color: var(--red2); }
+
+    /* empty state */
+    .empty-state {
+      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      text-align: center;
+      gap: 1rem;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.8rem;
+    }
+
+    .empty-state .big { font-family: var(--display); font-size: 3rem; color: var(--border2); }
+
+    /* ════════════════════════════════════════
+       ADMIN PAGE
+    ════════════════════════════════════════ */
+    .admin-grid {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
       gap: 1.5rem;
     }
-    h1 {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 4rem;
+
+    .admin-section-title {
+      font-family: var(--display);
+      font-size: 1.1rem;
       letter-spacing: 0.1em;
+      color: var(--gold);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .pending-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--gold);
+      padding: 0.9rem 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      animation: fadeUp 0.3s ease both;
+    }
+
+    .pending-info { display: flex; flex-direction: column; gap: 0.2rem; }
+
+    .pending-name {
+      font-family: var(--mono);
+      font-size: 0.9rem;
       color: #fff;
     }
-    h1 span { color: #c8a84b; }
-    p { color: #555e72; font-size: 0.85rem; letter-spacing: 0.2em; }
-    .dot {
-      width: 8px; height: 8px;
-      background: #c8a84b;
-      border-radius: 50%;
-      animation: pulse 1.5s infinite;
-      margin: 0 auto;
+
+    .pending-meta {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--muted);
     }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: 0.4; transform: scale(0.8); }
+
+    .pending-actions { display: flex; gap: 0.5rem; }
+
+    .btn-approve {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      padding: 0.35rem 0.85rem;
+      border: 1px solid var(--green2);
+      background: rgba(39,174,96,0.1);
+      color: var(--green2);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-transform: uppercase;
+    }
+
+    .btn-approve:hover { background: rgba(39,174,96,0.25); }
+
+    .btn-reject {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      padding: 0.35rem 0.85rem;
+      border: 1px solid var(--red2);
+      background: rgba(231,76,60,0.1);
+      color: var(--red2);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-transform: uppercase;
+    }
+
+    .btn-reject:hover { background: rgba(231,76,60,0.25); }
+
+    .members-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .members-table th {
+      font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.2em;
+      color: var(--gold); padding: 0.5rem 0.75rem; text-align: left;
+      border-bottom: 1px solid var(--border2); text-transform: uppercase;
+    }
+    .members-table td {
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--mono); font-size: 0.78rem; color: var(--text2);
+    }
+    .members-table tr:hover td { background: var(--bg3); }
+
+    .badge-admin {
+      font-size: 0.6rem; padding: 0.15rem 0.4rem;
+      background: rgba(200,168,75,0.15); color: var(--gold);
+      border: 1px solid rgba(200,168,75,0.3); letter-spacing: 0.1em;
+    }
+
+    .badge-member {
+      font-size: 0.6rem; padding: 0.15rem 0.4rem;
+      background: rgba(46,196,214,0.1); color: var(--cyan2);
+      border: 1px solid rgba(46,196,214,0.25); letter-spacing: 0.1em;
+    }
+
+    /* ════════════════════════════════════════
+       TOAST
+    ════════════════════════════════════════ */
+    #toast {
+      position: fixed;
+      bottom: 1.5rem; right: 1.5rem;
+      background: var(--bg3);
+      border: 1px solid var(--gold);
+      border-left: 3px solid var(--gold);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      padding: 0.7rem 1.1rem;
+      z-index: 9999;
+      opacity: 0;
+      transform: translateX(20px);
+      transition: all 0.3s;
+      pointer-events: none;
+      max-width: 320px;
+    }
+
+    #toast.show { opacity: 1; transform: translateX(0); }
+    #toast.error { border-color: var(--red2); }
+    #toast.success { border-color: var(--green2); }
+
+    /* ── Loader ── */
+    .loader {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.5rem; padding: 3rem;
+      font-family: var(--mono); font-size: 0.75rem; color: var(--muted);
+    }
+
+    .loader-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--gold);
+      animation: blink 1.2s infinite;
+    }
+
+    .loader-dot:nth-child(2) { animation-delay: 0.2s; }
+    .loader-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes blink {
+      0%, 100% { opacity: 0.2; } 50% { opacity: 1; }
+    }
+
+    /* ── Corner decorations ── */
+    .corner-tl, .corner-br {
+      position: absolute;
+      width: 12px; height: 12px;
+      pointer-events: none;
+    }
+
+    .corner-tl {
+      top: 0; left: 0;
+      border-top: 2px solid var(--gold-dim);
+      border-left: 2px solid var(--gold-dim);
+    }
+
+    .corner-br {
+      bottom: 0; right: 0;
+      border-bottom: 2px solid var(--gold-dim);
+      border-right: 2px solid var(--gold-dim);
+    }
+
+    /* pending claim-by inline edit */
+    .inline-edit {
+      background: transparent;
+      border: none;
+      border-bottom: 1px dashed var(--border2);
+      color: var(--green2);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      outline: none;
+      width: 140px;
+      padding: 0.1rem 0;
+    }
+    .inline-edit:focus { border-bottom-color: var(--gold); }
+    .inline-edit::placeholder { color: var(--muted); }
+
+    @media (max-width: 700px) {
+      .topbar { padding: 0 0.75rem; }
+      .td-date, .td-land, .td-claimer { display: none; }
+      .auth-panel { width: 95vw; padding: 1.5rem; }
     }
   </style>
 </head>
 <body>
-  <div class="dot"></div>
-  <h1>PROJECT <span>KINGSLAYER</span></h1>
-  <p>SYSTEM INITIALIZING — STAND BY</p>
+
+<!-- ════════════════ AUTH SCREEN ════════════════ -->
+<div class="screen active" id="screen-auth">
+  <div class="auth-bg-text">EVW</div>
+
+  <div class="auth-panel">
+    <div class="corner-tl"></div>
+    <div class="corner-br"></div>
+
+    <div class="auth-logo">
+      <span class="eyebrow">⚔ EVW CLAN // CLASSIFIED</span>
+      <h1>PROJECT <em>KINGSLAYER</em></h1>
+      <span class="sub">TERRITORY COMMAND SYSTEM // EUPHORIA</span>
+    </div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="login">Login</button>
+      <button class="auth-tab" data-tab="register">Request Access</button>
+    </div>
+
+    <!-- Login form -->
+    <div class="auth-form" id="form-login">
+      <div class="field-group">
+        <label class="field-label">Username</label>
+        <input class="field-input" type="text" id="login-username" placeholder="your username" autocomplete="username">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Password</label>
+        <input class="field-input" type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div class="auth-message" id="login-msg"></div>
+      <button class="btn-primary" id="btn-login">AUTHENTICATE</button>
+    </div>
+
+    <!-- Register form -->
+    <div class="auth-form hidden" id="form-register">
+      <div class="field-group">
+        <label class="field-label">Username</label>
+        <input class="field-input" type="text" id="reg-username" placeholder="choose a username">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Password</label>
+        <input class="field-input" type="password" id="reg-password" placeholder="min. 6 characters">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Second Life Username <span style="color:var(--muted)">(optional)</span></label>
+        <input class="field-input" type="text" id="reg-sl" placeholder="your SL login name">
+      </div>
+      <div class="auth-message" id="reg-msg"></div>
+      <button class="btn-primary" id="btn-register">SUBMIT REQUEST</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ APP SCREEN ════════════════ -->
+<div class="screen" id="screen-app">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">PROJECT <em>KINGSLAYER</em></div>
+      <div class="topbar-divider"></div>
+      <nav class="nav-tabs">
+        <button class="nav-tab active" data-page="lands">⚔ Lands</button>
+        <button class="nav-tab admin-tab" data-page="admin" id="nav-admin" style="display:none">⬡ Admin</button>
+      </nav>
+    </div>
+    <div class="topbar-right">
+      <div class="user-info">
+        <strong id="topbar-username">—</strong>
+        <span id="topbar-role">MEMBER</span>
+      </div>
+      <button class="btn-logout" id="btn-logout">[ LOGOUT ]</button>
+    </div>
+  </div>
+
+  <!-- Status bar -->
+  <div class="statusbar">
+    <div class="stat-pill">
+      <span class="num gold" id="stat-total">—</span>
+      <span>TOTAL REGIONS</span>
+    </div>
+    <span class="stat-sep">|</span>
+    <div class="stat-pill">
+      <span class="num green" id="stat-claimed">—</span>
+      <span>UNDER EVW CONTROL</span>
+    </div>
+    <span class="stat-sep">|</span>
+    <div class="stat-pill">
+      <span class="num red" id="stat-unclaimed">—</span>
+      <span>ENEMY / UNCLAIMED</span>
+    </div>
+    <span class="stat-sep">|</span>
+    <div class="progress-wrap">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+      <span class="progress-label" id="progress-label">0% CONTROL</span>
+    </div>
+  </div>
+
+  <!-- ── LANDS PAGE ── -->
+  <div class="page active" id="page-lands">
+    <div class="controls-bar">
+      <div class="search-wrap">
+        <svg class="search-icon" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input class="search-input" type="search" id="lands-search" placeholder="Search region, land, claimer...">
+      </div>
+      <div class="filter-group">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="claimed">Claimed</button>
+        <button class="filter-btn" data-filter="unclaimed">Unclaimed</button>
+      </div>
+      <select class="sort-select" id="lands-sort">
+        <option value="region-asc">Region A–Z</option>
+        <option value="region-desc">Region Z–A</option>
+        <option value="date-desc">Newest first</option>
+        <option value="date-asc">Oldest first</option>
+        <option value="status">Status</option>
+      </select>
+      <span class="row-count" id="lands-count"></span>
+    </div>
+
+    <div class="table-scroll" id="lands-table-wrap">
+      <div class="loader" id="lands-loader">
+        <div class="loader-dot"></div>
+        <div class="loader-dot"></div>
+        <div class="loader-dot"></div>
+        <span>LOADING INTEL...</span>
+      </div>
+      <table id="lands-table" style="display:none">
+        <thead>
+          <tr>
+            <th>Status</th>
+            <th>Region</th>
+            <th>Land Name</th>
+            <th>Enemy Claimer</th>
+            <th>Claimed By (EVW)</th>
+            <th>First Seen</th>
+            <th>Teleport</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="lands-tbody"></tbody>
+      </table>
+      <div class="empty-state" id="lands-empty" style="display:none">
+        <span class="big">◈</span>
+        <span>No records match your filter.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ADMIN PAGE ── -->
+  <div class="page" id="page-admin">
+    <div class="admin-grid">
+
+      <div>
+        <div class="admin-section-title">⏳ Pending Access Requests</div>
+        <div id="pending-list">
+          <div class="loader">
+            <div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div>
+            <span>LOADING...</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="admin-section-title">👥 All Members</div>
+        <table class="members-table">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>SL Username</th>
+              <th>Role</th>
+              <th>Joined</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="members-tbody"></tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+//  CONFIG
+// ════════════════════════════════════════════════════════════
+const API = '';  // same origin — Vercel functions at /api/*
+
+// ════════════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════════════
+let currentUser  = null;
+let sessionToken = null;
+let allLands     = [];
+let currentFilter = 'all';
+let currentSearch = '';
+let currentSort   = 'region-asc';
+
+// ════════════════════════════════════════════════════════════
+//  UTILS
+// ════════════════════════════════════════════════════════════
+function $(id) { return document.getElementById(id); }
+
+function toast(msg, type = '') {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = 'show ' + type;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.className = '', 2400);
+}
+
+async function api(path, opts = {}) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (sessionToken) headers['Authorization'] = 'Bearer ' + sessionToken;
+  const res = await fetch(API + '/api/' + path, {
+    ...opts,
+    headers: { ...headers, ...(opts.headers || {}) },
+    body: opts.body ? JSON.stringify(opts.body) : undefined,
+  });
+  const data = await res.json().catch(() => ({}));
+  return { ok: res.ok, status: res.status, data };
+}
+
+function saveSession(token, user) {
+  sessionToken = token;
+  currentUser  = user;
+  localStorage.setItem('ks_token', token);
+  localStorage.setItem('ks_user',  JSON.stringify(user));
+}
+
+function clearSession() {
+  sessionToken = null;
+  currentUser  = null;
+  localStorage.removeItem('ks_token');
+  localStorage.removeItem('ks_user');
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $(id).classList.add('active');
+}
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  $(id).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.page === id.replace('page-', ''));
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+//  AUTH
+// ════════════════════════════════════════════════════════════
+// Tab switching
+document.querySelectorAll('.auth-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    $('form-login').classList.toggle('hidden', tab.dataset.tab !== 'login');
+    $('form-register').classList.toggle('hidden', tab.dataset.tab !== 'register');
+    $('login-msg').className = 'auth-message';
+    $('reg-msg').className   = 'auth-message';
+  });
+});
+
+// Login
+$('btn-login').addEventListener('click', async () => {
+  const username = $('login-username').value.trim();
+  const password = $('login-password').value;
+  const msg = $('login-msg');
+  if (!username || !password) {
+    msg.textContent = 'Please enter username and password.';
+    msg.className = 'auth-message error'; return;
+  }
+  $('btn-login').textContent = 'AUTHENTICATING...';
+  $('btn-login').disabled = true;
+  const { ok, data } = await api('login', { method: 'POST', body: { username, password } });
+  $('btn-login').textContent = 'AUTHENTICATE';
+  $('btn-login').disabled = false;
+  if (!ok) {
+    msg.textContent = data.error || 'Login failed.';
+    msg.className = 'auth-message error'; return;
+  }
+  saveSession(data.token, data.user);
+  enterApp();
+});
+
+// Allow Enter key on login
+[$('login-username'), $('login-password')].forEach(el =>
+  el.addEventListener('keydown', e => { if (e.key === 'Enter') $('btn-login').click(); })
+);
+
+// Register
+$('btn-register').addEventListener('click', async () => {
+  const username    = $('reg-username').value.trim();
+  const password    = $('reg-password').value;
+  const sl_username = $('reg-sl').value.trim();
+  const msg = $('reg-msg');
+  if (!username || !password) {
+    msg.textContent = 'Username and password are required.';
+    msg.className = 'auth-message error'; return;
+  }
+  $('btn-register').textContent = 'SUBMITTING...';
+  $('btn-register').disabled = true;
+  const { ok, data } = await api('register', { method: 'POST', body: { username, password, sl_username } });
+  $('btn-register').textContent = 'SUBMIT REQUEST';
+  $('btn-register').disabled = false;
+  msg.textContent = data.message || data.error || '';
+  msg.className = 'auth-message ' + (ok ? 'success' : 'error');
+});
+
+// Logout
+$('btn-logout').addEventListener('click', async () => {
+  await api('logout', { method: 'POST' });
+  clearSession();
+  showScreen('screen-auth');
+  $('form-login').querySelectorAll('input').forEach(i => i.value = '');
+  $('login-msg').className = 'auth-message';
+});
+
+// ════════════════════════════════════════════════════════════
+//  ENTER APP
+// ════════════════════════════════════════════════════════════
+function enterApp() {
+  showScreen('screen-app');
+  $('topbar-username').textContent = currentUser.username.toUpperCase();
+  $('topbar-role').textContent     = currentUser.is_admin ? '★ ADMIN' : 'OPERATIVE';
+  $('nav-admin').style.display     = currentUser.is_admin ? '' : 'none';
+  loadLands();
+  if (currentUser.is_admin) loadAdmin();
+}
+
+// ════════════════════════════════════════════════════════════
+//  LANDS
+// ════════════════════════════════════════════════════════════
+async function loadLands() {
+  $('lands-loader').style.display = 'flex';
+  $('lands-table').style.display  = 'none';
+  $('lands-empty').style.display  = 'none';
+
+  const { ok, data } = await api('lands');
+  $('lands-loader').style.display = 'none';
+
+  if (!ok) { toast('Failed to load lands.', 'error'); return; }
+
+  allLands = data.lands;
+  updateStats();
+  renderLands();
+  $('lands-table').style.display = '';
+}
+
+function updateStats() {
+  const total     = allLands.length;
+  const claimed   = allLands.filter(l => l.status === 'claimed').length;
+  const unclaimed = total - claimed;
+  const pct       = total ? Math.round((claimed / total) * 100) : 0;
+  $('stat-total').textContent     = total;
+  $('stat-claimed').textContent   = claimed;
+  $('stat-unclaimed').textContent = unclaimed;
+  $('progress-fill').style.width  = pct + '%';
+  $('progress-label').textContent = pct + '% CONTROL';
+}
+
+function getVisible() {
+  let list = [...allLands];
+
+  if (currentFilter !== 'all')
+    list = list.filter(l => l.status === currentFilter);
+
+  if (currentSearch) {
+    const q = currentSearch.toLowerCase();
+    list = list.filter(l =>
+      (l.region        || '').toLowerCase().includes(q) ||
+      (l.land_name     || '').toLowerCase().includes(q) ||
+      (l.enemy_claimer || '').toLowerCase().includes(q) ||
+      (l.claimed_by    || '').toLowerCase().includes(q)
+    );
+  }
+
+  list.sort((a, b) => {
+    switch (currentSort) {
+      case 'region-asc':  return (a.region||'').localeCompare(b.region||'');
+      case 'region-desc': return (b.region||'').localeCompare(a.region||'');
+      case 'date-desc':   return (b.first_seen||'').localeCompare(a.first_seen||'');
+      case 'date-asc':    return (a.first_seen||'').localeCompare(b.first_seen||'');
+      case 'status':      return (a.status||'').localeCompare(b.status||'');
+      default: return 0;
+    }
+  });
+
+  return list;
+}
+
+function renderLands() {
+  const visible = getVisible();
+  const tbody   = $('lands-tbody');
+  const empty   = $('lands-empty');
+  const table   = $('lands-table');
+  tbody.innerHTML = '';
+
+  if (!visible.length) {
+    table.style.display = 'none';
+    empty.style.display = 'flex';
+    $('lands-count').textContent = '0 records';
+    return;
+  }
+
+  table.style.display = '';
+  empty.style.display = 'none';
+  $('lands-count').textContent = `${visible.length} / ${allLands.length} regions`;
+
+  visible.forEach(land => {
+    const isClaimed = land.status === 'claimed';
+    const dateStr   = land.first_seen ? land.first_seen.slice(0, 10) : '—';
+
+    const tr = document.createElement('tr');
+    tr.className = 'status-' + land.status;
+    tr.innerHTML = `
+      <td>
+        <span class="status-badge ${land.status}">
+          <span class="status-dot"></span>
+          ${isClaimed ? 'CLAIMED' : 'UNCLAIMED'}
+        </span>
+      </td>
+      <td class="td-region">${land.region}</td>
+      <td class="td-land">${land.land_name || '<span style="color:var(--muted)">—</span>'}</td>
+      <td class="td-claimer">${land.enemy_claimer || '<span style="color:var(--muted)">—</span>'}</td>
+      <td class="td-claimed-by">
+        ${isClaimed
+          ? `<input class="inline-edit" data-id="${land.id}" placeholder="who claimed?" value="${land.claimed_by || ''}">`
+          : '<span style="color:var(--muted)">—</span>'
+        }
+      </td>
+      <td class="td-date">${dateStr}</td>
+      <td class="td-link">
+        ${land.slurl
+          ? `<a href="${land.slurl}" target="_blank">↗ TP</a>`
+          : '<span style="color:var(--muted)">—</span>'
+        }
+      </td>
+      <td>
+        <button class="btn-toggle ${isClaimed ? 'unclaim' : ''}" data-id="${land.id}" data-status="${land.status}">
+          ${isClaimed ? '✗ Unclaim' : '✔ Claim'}
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Toggle claim status
+  tbody.querySelectorAll('.btn-toggle').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id        = btn.dataset.id;
+      const newStatus = btn.dataset.status === 'claimed' ? 'unclaimed' : 'claimed';
+      btn.disabled = true;
+      btn.textContent = '...';
+      const { ok } = await api('lands', {
+        method: 'PATCH',
+        body: { id, status: newStatus }
+      });
+      if (ok) {
+        const land = allLands.find(l => l.id === id);
+        if (land) land.status = newStatus;
+        updateStats();
+        renderLands();
+        toast(newStatus === 'claimed' ? '✔ Land claimed!' : '✗ Land unclaimed.', newStatus === 'claimed' ? 'success' : '');
+      } else {
+        btn.disabled = false;
+        btn.textContent = btn.dataset.status === 'claimed' ? '✗ Unclaim' : '✔ Claim';
+        toast('Update failed.', 'error');
+      }
+    });
+  });
+
+  // Inline claimed-by edit
+  tbody.querySelectorAll('.inline-edit').forEach(inp => {
+    let debounce;
+    inp.addEventListener('input', () => {
+      clearTimeout(debounce);
+      debounce = setTimeout(async () => {
+        const id = inp.dataset.id;
+        await api('lands', { method: 'PATCH', body: { id, claimed_by: inp.value } });
+        const land = allLands.find(l => l.id === id);
+        if (land) land.claimed_by = inp.value;
+      }, 700);
+    });
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { inp.blur(); toast('Saved!'); }
+    });
+  });
+}
+
+// Controls
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    renderLands();
+  });
+});
+
+$('lands-search').addEventListener('input', e => {
+  currentSearch = e.target.value.trim();
+  renderLands();
+});
+
+$('lands-sort').addEventListener('change', e => {
+  currentSort = e.target.value;
+  renderLands();
+});
+
+// Nav tabs
+document.querySelectorAll('.nav-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    showPage('page-' + tab.dataset.page);
+  });
+});
+
+// ════════════════════════════════════════════════════════════
+//  ADMIN
+// ════════════════════════════════════════════════════════════
+async function loadAdmin() {
+  const { ok, data } = await api('admin/users');
+  if (!ok) return;
+
+  const users   = data.users || [];
+  const pending = users.filter(u => !u.is_approved);
+  const members = users.filter(u => u.is_approved);
+
+  // Pending
+  const pendingList = $('pending-list');
+  if (!pending.length) {
+    pendingList.innerHTML = '<div style="font-family:var(--mono);font-size:0.75rem;color:var(--muted);padding:1rem 0">No pending requests.</div>';
+  } else {
+    pendingList.innerHTML = pending.map(u => `
+      <div class="pending-card" id="pending-${u.id}">
+        <div class="pending-info">
+          <div class="pending-name">${u.username}</div>
+          <div class="pending-meta">SL: ${u.sl_username || '—'} &nbsp;|&nbsp; Requested: ${u.created_at ? u.created_at.slice(0,10) : '—'}</div>
+        </div>
+        <div class="pending-actions">
+          <button class="btn-approve" onclick="approveUser('${u.id}', true)">✔ Approve</button>
+          <button class="btn-reject"  onclick="approveUser('${u.id}', false)">✗ Reject</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Members table
+  const tbody = $('members-tbody');
+  tbody.innerHTML = members.map(u => `
+    <tr>
+      <td style="color:#fff">${u.username}</td>
+      <td>${u.sl_username || '—'}</td>
+      <td><span class="${u.is_admin ? 'badge-admin' : 'badge-member'}">${u.is_admin ? 'ADMIN' : 'MEMBER'}</span></td>
+      <td>${u.created_at ? u.created_at.slice(0,10) : '—'}</td>
+      <td>
+        ${!u.is_admin
+          ? `<button class="btn-reject" style="font-size:0.6rem;padding:0.2rem 0.5rem" onclick="removeUser('${u.id}', '${u.username}')">Remove</button>`
+          : '<span style="color:var(--muted);font-family:var(--mono);font-size:0.65rem">—</span>'
+        }
+      </td>
+    </tr>
+  `).join('');
+}
+
+window.approveUser = async function(id, approve) {
+  const { ok } = await api('admin/users', {
+    method: 'PATCH',
+    body: { id, action: approve ? 'approve' : 'reject' }
+  });
+  if (ok) {
+    toast(approve ? '✔ User approved.' : '✗ Request rejected.', approve ? 'success' : '');
+    loadAdmin();
+  } else {
+    toast('Action failed.', 'error');
+  }
+};
+
+window.removeUser = async function(id, username) {
+  if (!confirm(`Remove ${username} from the clan? This cannot be undone.`)) return;
+  const { ok } = await api('admin/users', { method: 'PATCH', body: { id, action: 'remove' } });
+  if (ok) { toast('User removed.', 'error'); loadAdmin(); }
+  else toast('Failed to remove user.', 'error');
+};
+
+// ════════════════════════════════════════════════════════════
+//  INIT — check for existing session
+// ════════════════════════════════════════════════════════════
+(async function init() {
+  const savedToken = localStorage.getItem('ks_token');
+  const savedUser  = localStorage.getItem('ks_user');
+  if (savedToken && savedUser) {
+    sessionToken = savedToken;
+    currentUser  = JSON.parse(savedUser);
+    // Verify token still valid
+    const { ok } = await api('lands');
+    if (ok) { enterApp(); return; }
+    clearSession();
+  }
+  showScreen('screen-auth');
+})();
+</script>
 </body>
 </html>
