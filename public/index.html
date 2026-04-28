@@ -866,6 +866,121 @@
     @keyframes livepulse {
       0%, 100% { opacity: 1; } 50% { opacity: 0.4; }
     }
+
+    /* ── Sync page ── */
+    .sync-dropzone {
+      border: 2px dashed var(--border2);
+      background: var(--bg3);
+      padding: 3rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+      position: relative;
+    }
+
+    .sync-dropzone:hover, .sync-dropzone.dragover {
+      border-color: var(--gold);
+      background: rgba(200,168,75,0.05);
+    }
+
+    .sync-dropzone .drop-icon {
+      font-family: var(--display);
+      font-size: 3rem;
+      color: var(--border2);
+      display: block;
+      margin-bottom: 0.75rem;
+      transition: color 0.2s;
+    }
+
+    .sync-dropzone:hover .drop-icon,
+    .sync-dropzone.dragover .drop-icon { color: var(--gold); }
+
+    .sync-dropzone .drop-label {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--text2);
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .sync-dropzone .drop-sub {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+    }
+
+    #sync-file-input { display: none; }
+
+    .sync-results {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--gold);
+      padding: 1.25rem 1.5rem;
+      display: none;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .sync-results.visible { display: flex; }
+
+    .sync-stat-row {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .sync-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      min-width: 80px;
+    }
+
+    .sync-stat .num {
+      font-family: var(--display);
+      font-size: 1.8rem;
+      line-height: 1;
+    }
+
+    .sync-stat .lbl {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .sync-detail-list {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--text2);
+      max-height: 200px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .sync-detail-list::-webkit-scrollbar { width: 4px; }
+    .sync-detail-list::-webkit-scrollbar-thumb { background: var(--border2); }
+
+    .sync-detail-item { padding: 0.15rem 0; border-bottom: 1px solid var(--border); }
+    .sync-detail-item.new     { color: var(--cyan2); }
+    .sync-detail-item.updated { color: var(--gold); }
+    .sync-detail-item.skipped { color: var(--muted); }
+    .sync-detail-item.error   { color: var(--red2); }
+
+    .sync-progress {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--gold);
+      display: none;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .sync-progress.visible { display: flex; }
   </style>
 </head>
 <body>
@@ -934,6 +1049,7 @@
       <nav class="nav-tabs">
         <button class="nav-tab active" data-page="lands">⚔ Lands</button>
         <button class="nav-tab admin-tab" data-page="admin" id="nav-admin" style="display:none">⬡ Admin</button>
+        <button class="nav-tab admin-tab" data-page="sync" id="nav-sync" style="display:none">⇅ Sync</button>
       </nav>
     </div>
     <div class="topbar-right">
@@ -1060,7 +1176,86 @@
     </div>
   </div>
 
-</div>
+  <!-- ── SYNC PAGE ── -->
+  <div class="page" id="page-sync">
+    <div class="admin-grid">
+
+      <div>
+        <div class="admin-section-title">⇅ Euphoria Channel Sync</div>
+        <p style="font-family:var(--mono);font-size:0.72rem;color:var(--text2);margin-bottom:1.5rem;line-height:1.7">
+          Export the Euphoria Discord channel using DiscordChatExporter (JSON format), then drop the file below.<br>
+          New enemy lands will be added. Existing EVW-claimed lands will only be updated if the log entry is newer than our last recorded update.
+        </p>
+
+        <div class="sync-dropzone" id="sync-dropzone">
+          <span class="drop-icon">⬇</span>
+          <span class="drop-label">Drop Euphoria JSON export here</span>
+          <span class="drop-sub">or click to browse — JSON files only</span>
+        </div>
+        <input type="file" id="sync-file-input" accept=".json">
+
+        <div class="sync-progress" id="sync-progress" style="margin-top:1rem">
+          <div class="loader-dot"></div>
+          <div class="loader-dot"></div>
+          <div class="loader-dot"></div>
+          <span id="sync-progress-text">Parsing file...</span>
+        </div>
+      </div>
+
+      <div class="sync-results" id="sync-results">
+        <div class="admin-section-title" style="margin-bottom:0">Sync Report</div>
+
+        <div class="sync-stat-row">
+          <div class="sync-stat">
+            <span class="num gold"  id="sync-stat-parsed">0</span>
+            <span class="lbl">Records Parsed</span>
+          </div>
+          <div class="sync-stat">
+            <span class="num" style="color:var(--cyan2)" id="sync-stat-inserted">0</span>
+            <span class="lbl">New Lands Added</span>
+          </div>
+          <div class="sync-stat">
+            <span class="num" style="color:var(--gold)" id="sync-stat-updated">0</span>
+            <span class="lbl">Lands Updated</span>
+          </div>
+          <div class="sync-stat">
+            <span class="num" style="color:var(--muted)" id="sync-stat-skipped">0</span>
+            <span class="lbl">Skipped</span>
+          </div>
+          <div class="sync-stat">
+            <span class="num" style="color:var(--green2)" id="sync-stat-evw">0</span>
+            <span class="lbl">EVW Owned</span>
+          </div>
+        </div>
+
+        <div id="sync-detail-new" style="display:none">
+          <div style="font-family:var(--mono);font-size:0.65rem;color:var(--cyan2);letter-spacing:0.15em;margin-bottom:0.4rem">
+            ✦ NEW LANDS ADDED
+          </div>
+          <div class="sync-detail-list" id="sync-list-new"></div>
+        </div>
+
+        <div id="sync-detail-updated" style="display:none">
+          <div style="font-family:var(--mono);font-size:0.65rem;color:var(--gold);letter-spacing:0.15em;margin-bottom:0.4rem">
+            ↻ LANDS UPDATED
+          </div>
+          <div class="sync-detail-list" id="sync-list-updated"></div>
+        </div>
+
+        <div id="sync-detail-errors" style="display:none">
+          <div style="font-family:var(--mono);font-size:0.65rem;color:var(--red2);letter-spacing:0.15em;margin-bottom:0.4rem">
+            ⚠ ERRORS
+          </div>
+          <div class="sync-detail-list" id="sync-list-errors"></div>
+        </div>
+
+        <div style="font-family:var(--mono);font-size:0.65rem;color:var(--muted);margin-top:0.5rem" id="sync-timestamp"></div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- end screen-app -->
 
 <!-- Toast -->
 <div id="toast"></div>
@@ -1212,6 +1407,8 @@ function enterApp() {
   $('topbar-username').textContent = currentUser.username.toUpperCase();
   $('topbar-role').textContent     = currentUser.is_admin ? '★ ADMIN' : 'OPERATIVE';
   $('nav-admin').style.display     = currentUser.is_admin ? '' : 'none';
+  $('nav-sync').style.display      = currentUser.is_admin ? '' : 'none';
+  initSyncPage();
   loadLands();
   if (currentUser.is_admin) loadAdmin();
 }
@@ -1514,6 +1711,129 @@ window.removeUser = async function(id, username) {
   if (ok) { toast('User removed.', 'error'); loadAdmin(); }
   else toast('Failed to remove user.', 'error');
 };
+
+
+// ════════════════════════════════════════════════════════════
+//  SYNC PAGE
+// ════════════════════════════════════════════════════════════
+function initSyncPage() {
+  const dropzone  = $('sync-dropzone');
+  const fileInput = $('sync-file-input');
+
+  // Click to browse
+  dropzone.addEventListener('click', () => fileInput.click());
+
+  // Drag and drop
+  dropzone.addEventListener('dragover', e => {
+    e.preventDefault();
+    dropzone.classList.add('dragover');
+  });
+
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+
+  dropzone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropzone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) handleSyncFile(file);
+  });
+
+  fileInput.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (file) handleSyncFile(file);
+    fileInput.value = ''; // reset so same file can be re-uploaded
+  });
+}
+
+async function handleSyncFile(file) {
+  if (!file.name.endsWith('.json')) {
+    toast('Please upload a .json file.', 'error'); return;
+  }
+
+  const progress     = $('sync-progress');
+  const progressText = $('sync-progress-text');
+  const results      = $('sync-results');
+
+  results.classList.remove('visible');
+  progress.classList.add('visible');
+  progressText.textContent = 'Reading file...';
+
+  let jsonText;
+  try {
+    jsonText = await file.text();
+    JSON.parse(jsonText); // validate before sending
+  } catch (e) {
+    progress.classList.remove('visible');
+    toast('Invalid JSON file: ' + e.message, 'error');
+    return;
+  }
+
+  progressText.textContent = 'Syncing with database...';
+
+  const { ok, data } = await api('euphoria-sync', {
+    method: 'POST',
+    body: { json: jsonText },
+  });
+
+  progress.classList.remove('visible');
+
+  if (!ok) {
+    toast((data && data.error) || 'Sync failed.', 'error');
+    return;
+  }
+
+  // ── Populate results ──────────────────────────────────────
+  $('sync-stat-parsed').textContent   = data.parsed   || 0;
+  $('sync-stat-inserted').textContent = data.inserted || 0;
+  $('sync-stat-updated').textContent  = data.updated  || 0;
+  $('sync-stat-skipped').textContent  = data.skipped  || 0;
+  $('sync-stat-evw').textContent      = data.evwOwned || 0;
+
+  const details = data.details || {};
+
+  function populateList(containerId, listId, items, cssClass) {
+    const container = $(containerId);
+    const list      = $(listId);
+    if (items && items.length) {
+      list.innerHTML = items.map(r =>
+        `<div class="sync-detail-item ${cssClass}">${r}</div>`
+      ).join('');
+      container.style.display = '';
+    } else {
+      container.style.display = 'none';
+    }
+  }
+
+  populateList('sync-detail-new',     'sync-list-new',     details.new_regions,     'new');
+  populateList('sync-detail-updated', 'sync-list-updated', details.updated_regions, 'updated');
+
+  if (data.errors && data.errors.length) {
+    populateList('sync-detail-errors', 'sync-list-errors', data.errors, 'error');
+    $('sync-detail-errors').style.display = '';
+  } else {
+    $('sync-detail-errors').style.display = 'none';
+  }
+
+  $('sync-timestamp').textContent = 'Synced at ' + new Date().toLocaleTimeString();
+  results.classList.add('visible');
+
+  // Refresh the lands table silently so new data shows immediately
+  const landsRes = await api('lands');
+  if (landsRes.ok) {
+    allLands = landsRes.data.lands;
+    updateStats();
+    renderLands();
+  }
+
+  const added = data.inserted || 0;
+  const upd   = data.updated  || 0;
+  toast(
+    added || upd
+      ? `✔ Sync complete: ${added} new, ${upd} updated.`
+      : '✔ Sync complete: database already up to date.',
+    'success'
+  );
+}
 
 // ════════════════════════════════════════════════════════════
 //  INIT — check for existing session
