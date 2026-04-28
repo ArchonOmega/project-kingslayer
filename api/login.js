@@ -1,9 +1,8 @@
-// api/login.js
-import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
-import { supabase } from './_supabase.js';
+const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
+const { supabase } = require('./_supabase');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST')
     return res.status(405).json({ error: 'Method not allowed' });
 
@@ -27,7 +26,6 @@ export default async function handler(req, res) {
   if (!user.is_approved)
     return res.status(403).json({ error: 'Your account is pending admin approval.' });
 
-  // Create session token (expires in 7 days)
   const token     = crypto.randomBytes(48).toString('hex');
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
 
@@ -46,4 +44,4 @@ export default async function handler(req, res) {
       is_admin:    user.is_admin,
     }
   });
-}
+};

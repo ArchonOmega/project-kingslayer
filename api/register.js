@@ -1,8 +1,7 @@
-// api/register.js
-import bcrypt from 'bcryptjs';
-import { supabase } from './_supabase.js';
+const bcrypt = require('bcryptjs');
+const { supabase } = require('./_supabase');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST')
     return res.status(405).json({ error: 'Method not allowed' });
 
@@ -17,7 +16,6 @@ export default async function handler(req, res) {
   if (password.length < 6)
     return res.status(400).json({ error: 'Password must be at least 6 characters' });
 
-  // Check if username taken
   const { data: existing } = await supabase
     .from('users')
     .select('id')
@@ -29,7 +27,6 @@ export default async function handler(req, res) {
 
   const password_hash = await bcrypt.hash(password, 12);
 
-  // Check if this is the very first user — make them admin + auto-approved
   const { count } = await supabase
     .from('users')
     .select('*', { count: 'exact', head: true });
@@ -45,11 +42,11 @@ export default async function handler(req, res) {
   });
 
   if (error)
-    return res.status(500).json({ error: 'Failed to create account' });
+    return res.status(500).json({ error: 'Failed to create account: ' + error.message });
 
   return res.status(201).json({
     message: isFirst
       ? 'Admin account created. You can log in immediately.'
       : 'Account created. Please wait for an admin to approve it.'
   });
-}
+};

@@ -1,11 +1,6 @@
-// api/_auth.js — session validation helper
-import { supabase } from './_supabase.js';
+const { supabase } = require('./_supabase');
 
-/**
- * Validates the Bearer token from the Authorization header.
- * Returns { user } on success or { error, status } on failure.
- */
-export async function requireAuth(req) {
+async function requireAuth(req) {
   const header = req.headers['authorization'] || '';
   const token  = header.replace('Bearer ', '').trim();
   if (!token) return { error: 'No token', status: 401 };
@@ -26,18 +21,17 @@ export async function requireAuth(req) {
     .eq('id', session.user_id)
     .single();
 
-  if (!user)           return { error: 'User not found', status: 401 };
+  if (!user)             return { error: 'User not found', status: 401 };
   if (!user.is_approved) return { error: 'Account pending approval', status: 403 };
 
   return { user };
 }
 
-/**
- * Same as requireAuth but also checks is_admin.
- */
-export async function requireAdmin(req) {
+async function requireAdmin(req) {
   const result = await requireAuth(req);
   if (result.error) return result;
   if (!result.user.is_admin) return { error: 'Admin only', status: 403 };
   return result;
 }
+
+module.exports = { requireAuth, requireAdmin };

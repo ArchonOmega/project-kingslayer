@@ -1,23 +1,17 @@
-// api/hud-claim.js
-// Called directly by the LSL HUD scripts via llHTTPRequest.
-// Uses a shared HUD secret instead of a user session.
-import { supabase } from './_supabase.js';
+const { supabase } = require('./_supabase');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST')
     return res.status(405).json({ error: 'Method not allowed' });
 
-  // Simple shared secret so random people can't post to this endpoint
   const secret = req.headers['x-hud-secret'] || '';
   if (secret !== process.env.HUD_SECRET)
     return res.status(401).json({ error: 'Unauthorized' });
 
   const { event, land, region, link, reported_by } = req.body || {};
-
   if (!region) return res.status(400).json({ error: 'region required' });
 
   if (event === 'claimed') {
-    // Upsert: insert if new, update status if existing
     const { data: existing } = await supabase
       .from('lands')
       .select('id')
@@ -56,9 +50,8 @@ export default async function handler(req, res) {
   }
 
   if (event === 'contested') {
-    // Just log it — don't change status
     return res.status(200).json({ message: 'Contested alert received.' });
   }
 
   return res.status(400).json({ error: 'Unknown event type' });
-}
+};
