@@ -836,6 +836,36 @@
       .td-date, .td-land, .td-claimer { display: none; }
       .auth-panel { width: 95vw; padding: 1.5rem; }
     }
+
+    /* ── Live indicator ── */
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .live-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: background 0.3s;
+      flex-shrink: 0;
+    }
+
+    .live-dot.syncing { background: var(--gold);   box-shadow: 0 0 6px var(--gold); }
+    .live-dot.updated { background: var(--green2); box-shadow: 0 0 6px var(--green2); }
+    .live-dot.live    { background: var(--green2); box-shadow: 0 0 6px var(--green2);
+                        animation: livepulse 2s infinite; }
+
+    @keyframes livepulse {
+      0%, 100% { opacity: 1; } 50% { opacity: 0.4; }
+    }
   </style>
 </head>
 <body>
@@ -910,6 +940,10 @@
       <div class="user-info">
         <strong id="topbar-username">—</strong>
         <span id="topbar-role">MEMBER</span>
+      </div>
+      <div class="live-indicator" id="live-indicator">
+        <div class="live-dot" id="live-dot"></div>
+        <span id="live-text">STANDBY</span>
       </div>
       <button class="btn-logout" id="btn-logout">[ LOGOUT ]</button>
     </div>
@@ -1163,6 +1197,7 @@ $('btn-register').addEventListener('click', async () => {
 // Logout
 $('btn-logout').addEventListener('click', async () => {
   await api('logout', { method: 'POST' });
+  stopPolling();
   clearSession();
   showScreen('screen-auth');
   $('form-login').querySelectorAll('input').forEach(i => i.value = '');
@@ -1184,6 +1219,49 @@ function enterApp() {
 // ════════════════════════════════════════════════════════════
 //  LANDS
 // ════════════════════════════════════════════════════════════
+let pollInterval    = null;
+const POLL_MS       = 10000; // poll every 10 seconds
+let lastUpdatedAt   = null;  // track last change to avoid unnecessary re-renders
+
+function setLiveStatus(state, text) {
+  const dot  = $('live-dot');
+  const label = $('live-text');
+  dot.className  = 'live-dot ' + state;
+  label.textContent = text;
+}
+
+function startPolling() {
+  if (pollInterval) return; // already running
+  setLiveStatus('live', 'LIVE');
+  pollInterval = setInterval(pollLands, POLL_MS);
+}
+
+function stopPolling() {
+  if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+  setLiveStatus('', 'OFFLINE');
+}
+
+async function pollLands() {
+  // Silent background refresh — don't show loader, don't disrupt user
+  setLiveStatus('syncing', 'SYNCING');
+  const { ok, data } = await api('lands');
+  if (!ok) { setLiveStatus('live', 'LIVE'); return; }
+
+  // Check if anything actually changed by comparing a quick hash of statuses
+  const newSig = data.lands.map(l => l.id + l.status + (l.claimed_by||'')).join('|');
+  const oldSig = allLands.map(l => l.id + l.status + (l.claimed_by||'')).join('|');
+
+  if (newSig !== oldSig) {
+    allLands = data.lands;
+    updateStats();
+    renderLands();
+    setLiveStatus('updated', 'UPDATED');
+    setTimeout(() => setLiveStatus('live', 'LIVE'), 1500);
+  } else {
+    setLiveStatus('live', 'LIVE');
+  }
+}
+
 async function loadLands() {
   $('lands-loader').style.display = 'flex';
   $('lands-table').style.display  = 'none';
@@ -1198,6 +1276,7 @@ async function loadLands() {
   updateStats();
   renderLands();
   $('lands-table').style.display = '';
+  startPolling();
 }
 
 function updateStats() {
@@ -1448,6 +1527,7 @@ window.removeUser = async function(id, username) {
     // Verify token still valid
     const { ok } = await api('lands');
     if (ok) { enterApp(); return; }
+    stopPolling();
     clearSession();
   }
   showScreen('screen-auth');
