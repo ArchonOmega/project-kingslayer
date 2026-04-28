@@ -1,7 +1,12 @@
 {
-  "name": "project-kingslayer",
+  "name": "kingslayer",
   "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev"
+  },
   "dependencies": {
-    "@vercel/kv": "^1.0.1"
+    "@supabase/supabase-js": "^2.39.0",
+    "bcryptjs": "^2.4.3"
   }
 }
