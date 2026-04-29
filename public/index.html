@@ -1203,6 +1203,49 @@
       font-size: 0.75rem;
       color: var(--muted);
     }
+
+    /* ── Shield verification ── */
+    .shield-warn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      cursor: default;
+      opacity: 0.75;
+    }
+
+    .shield-warn .shield-icon { font-size: 0.7rem; }
+
+    .btn-shield {
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.08em;
+      padding: 0.18rem 0.45rem;
+      border: 1px solid var(--border);
+      background: none;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .btn-shield:hover {
+      border-color: var(--cyan2);
+      color: var(--cyan2);
+    }
+
+    .btn-shield.verified {
+      border-color: var(--green2);
+      color: var(--green2);
+      opacity: 0.7;
+    }
+
+    .td-shield { white-space: nowrap; }
   </style>
 </head>
 <body>
@@ -1354,6 +1397,7 @@
             <th>Claimed By (EVW)</th>
             <th>First Seen</th>
             <th>Teleport</th>
+            <th>Shield</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -1782,6 +1826,65 @@ function getVisible() {
   return list;
 }
 
+// ── Shield helpers ──────────────────────────────────────────
+const SHIELD_WARN_MS = 6 * 60 * 60 * 1000; // 6 hours
+
+function buildShieldCell(land) {
+  const verifiedAt = land.shield_verified_at
+    ? new Date(land.shield_verified_at) : null;
+  const claimedAt  = land.claimed_at
+    ? new Date(land.claimed_at) : null;
+
+  // Reference time: last verified, or claimed_at, or nothing
+  const refTime = verifiedAt || claimedAt || null;
+  const now     = Date.now();
+  const age     = refTime ? now - refTime.getTime() : null;
+  const stale   = age === null || age > SHIELD_WARN_MS;
+
+  const verifiedBy = land.shield_verified_by || '';
+  const timeLabel  = refTime ? formatTimeAgo(refTime.toISOString()) : 'never';
+
+  let warnHtml = '';
+  if (stale) {
+    warnHtml = `<span class="shield-warn" title="Last verified: \${timeLabel}\${verifiedBy ? ' by ' + verifiedBy : ''}">
+      <span class="shield-icon">🕐</span>\${timeLabel}
+    </span> `;
+  }
+
+  const btnLabel   = stale ? '🛡 Verify' : '🛡 ✓';
+  const btnClass   = stale ? 'btn-shield' : 'btn-shield verified';
+  const btnTitle   = stale
+    ? 'Mark shield as 100%'
+    : `Verified \${timeLabel}\${verifiedBy ? ' by ' + verifiedBy : ''}`;
+
+  return `\${warnHtml}<button class="\${btnClass}" data-id="\${land.id}" title="\${btnTitle}" onclick="verifyShield(this, '\${land.id}')">\${btnLabel}</button>`;
+}
+
+window.verifyShield = async function(btn, id) {
+  btn.disabled    = true;
+  btn.textContent = '...';
+  const { ok, data } = await api('shield-verify', { method: 'POST', body: { id } });
+  if (!ok) {
+    btn.disabled    = false;
+    btn.textContent = '🛡 Verify';
+    toast('Failed to verify shield.', 'error');
+    return;
+  }
+  // Update local land record so re-render shows correct state
+  const land = allLands.find(l => l.id === id);
+  if (land) {
+    land.shield_verified_at = data.shield_verified_at;
+    land.shield_verified_by = data.shield_verified_by;
+  }
+  // Re-render just the shield cell without full table redraw
+  const row       = btn.closest('tr');
+  const shieldTd  = row ? row.querySelector('.td-shield') : null;
+  if (shieldTd && land) {
+    shieldTd.innerHTML = buildShieldCell(land);
+  }
+  toast('🛡 Shield verified for ' + (land ? land.region : id), 'success');
+};
+
 function renderLands() {
   const visible = getVisible();
   const tbody   = $('lands-tbody');
@@ -2049,7 +2152,7 @@ function renderFeed(events) {
     return;
   }
 
-  const icons = { claimed: '🟢', lost: '🔴', contested: '⚔️' };
+  const icons = { claimed: '🟢', lost: '🔴', contested: '⚔️', shield: '🛡' };
 
   body.innerHTML = events.map(ev => {
     const icon    = icons[ev.event] || '◈';
