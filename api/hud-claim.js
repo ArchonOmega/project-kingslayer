@@ -1,7 +1,18 @@
+// api/hud-claim.js
 const { supabase } = require('./_supabase');
 
+async function logActivity(event, region, land, slurl, reported_by, enemy_clan) {
+  await supabase.from('activity_log').insert({
+    event,
+    region,
+    land_name:   land       || '',
+    slurl:       slurl      || '',
+    reported_by: reported_by || 'Unknown',
+    enemy_clan:  enemy_clan  || '',
+  });
+}
+
 module.exports = async function handler(req, res) {
-  // Auth check
   const secret = req.headers['x-hud-secret'] || '';
   if (secret !== process.env.HUD_SECRET)
     return res.status(401).json({ error: 'Unauthorized' });
@@ -43,16 +54,16 @@ module.exports = async function handler(req, res) {
         await supabase.from('lands').update({
           status:     'claimed',
           claimed_by: reported_by || '',
-          land_name:  land || '',
-          slurl:      link || '',
+          land_name:  land  || '',
+          slurl:      link  || '',
           claimed_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         }).eq('id', existing.id);
       } else {
         await supabase.from('lands').insert({
           region,
-          land_name:     land || '',
-          slurl:         link || '',
+          land_name:     land  || '',
+          slurl:         link  || '',
           status:        'claimed',
           claimed_by:    reported_by || '',
           enemy_claimer: '',
@@ -60,6 +71,9 @@ module.exports = async function handler(req, res) {
           claimed_at:    new Date().toISOString(),
         });
       }
+
+      // Log activity
+      await logActivity('claimed', region, land, link, reported_by, '');
       return res.status(200).json({ message: 'Land claimed and recorded.' });
     }
 
@@ -79,11 +93,10 @@ module.exports = async function handler(req, res) {
           updated_at:    new Date().toISOString(),
         }).eq('id', existing.id);
       } else {
-        // Not in DB at all — add it as unclaimed
         await supabase.from('lands').insert({
           region,
-          land_name:     land || '',
-          slurl:         link || '',
+          land_name:     land  || '',
+          slurl:         link  || '',
           status:        'unclaimed',
           claimed_by:    '',
           enemy_claimer: enemy_clan || '',
@@ -91,10 +104,15 @@ module.exports = async function handler(req, res) {
           claimed_at:    null,
         });
       }
+
+      // Log activity
+      await logActivity('lost', region, land, link, reported_by, enemy_clan);
       return res.status(200).json({ message: 'Land marked as lost.' });
     }
 
     if (event === 'contested') {
+      // Log activity even for contested
+      await logActivity('contested', region, land, link, reported_by, '');
       return res.status(200).json({ message: 'Contested alert received.' });
     }
 

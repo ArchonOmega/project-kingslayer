@@ -981,6 +981,228 @@
     }
 
     .sync-progress.visible { display: flex; }
+
+    /* ── Intel / Activity page ── */
+    .intel-grid {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .intel-grid { grid-template-columns: 1fr; }
+    }
+
+    .intel-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .intel-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .intel-card-title {
+      font-family: var(--display);
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+    }
+
+    .intel-card-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.5rem 0;
+    }
+
+    .intel-card-body::-webkit-scrollbar { width: 4px; }
+    .intel-card-body::-webkit-scrollbar-thumb { background: var(--border2); }
+
+    /* Period toggle */
+    .period-toggle {
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    .period-btn {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      padding: 0.2rem 0.55rem;
+      border: 1px solid var(--border);
+      background: none;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-transform: uppercase;
+    }
+
+    .period-btn.active {
+      background: var(--gold);
+      color: #000;
+      border-color: var(--gold);
+    }
+
+    /* Leaderboard */
+    .lb-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.65rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+
+    .lb-row:hover { background: var(--bg3); }
+
+    .lb-rank {
+      font-family: var(--display);
+      font-size: 1.4rem;
+      color: var(--muted);
+      width: 28px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .lb-rank.gold   { color: #ffd700; }
+    .lb-rank.silver { color: #c0c0c0; }
+    .lb-rank.bronze { color: #cd7f32; }
+
+    .lb-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      min-width: 0;
+    }
+
+    .lb-name {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .lb-bar-wrap {
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .lb-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--green2));
+      border-radius: 2px;
+      transition: width 0.5s ease;
+    }
+
+    .lb-stats {
+      display: flex;
+      gap: 0.75rem;
+      flex-shrink: 0;
+      text-align: right;
+    }
+
+    .lb-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.1rem;
+      min-width: 36px;
+    }
+
+    .lb-stat .n {
+      font-family: var(--display);
+      font-size: 1rem;
+      line-height: 1;
+    }
+
+    .lb-stat .l {
+      font-family: var(--mono);
+      font-size: 0.55rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* Activity feed */
+    .feed-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.7rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+
+    .feed-item:hover { background: var(--bg3); }
+
+    .feed-icon {
+      font-size: 1rem;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    .feed-body { flex: 1; min-width: 0; }
+
+    .feed-headline {
+      font-family: var(--ui);
+      font-size: 0.82rem;
+      color: var(--text);
+      line-height: 1.4;
+    }
+
+    .feed-headline strong { color: #fff; }
+    .feed-headline .region { color: var(--gold); }
+    .feed-headline .enemy  { color: var(--red2); }
+
+    .feed-meta {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+    }
+
+    .feed-link {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--gold);
+      text-decoration: none;
+      margin-left: 0.5rem;
+    }
+
+    .feed-link:hover { text-decoration: underline; }
+
+    /* Full-width leaderboard card */
+    .intel-card.full-width {
+      grid-column: 1 / -1;
+    }
+
+    /* Empty state */
+    .intel-empty {
+      padding: 2rem;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
   </style>
 </head>
 <body>
@@ -1048,6 +1270,7 @@
       <div class="topbar-divider"></div>
       <nav class="nav-tabs">
         <button class="nav-tab active" data-page="lands">⚔ Lands</button>
+        <button class="nav-tab" data-page="intel" id="nav-intel">◈ Intel</button>
         <button class="nav-tab admin-tab" data-page="admin" id="nav-admin" style="display:none">⬡ Admin</button>
         <button class="nav-tab admin-tab" data-page="sync" id="nav-sync" style="display:none">⇅ Sync</button>
       </nav>
@@ -1175,6 +1398,45 @@
 
     </div>
   </div>
+
+  <!-- ── INTEL PAGE ── -->
+  <div class="page" id="page-intel">
+    <div class="intel-grid">
+
+      <!-- Leaderboard -->
+      <div class="intel-card">
+        <div class="intel-card-header">
+          <span class="intel-card-title">★ OPERATIVE LEADERBOARD</span>
+          <div class="period-toggle">
+            <button class="period-btn active" data-period="alltime">All Time</button>
+            <button class="period-btn" data-period="30days">30 Days</button>
+          </div>
+        </div>
+        <div class="intel-card-body" id="lb-body">
+          <div class="loader" style="padding:2rem">
+            <div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div>
+            <span>LOADING...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity Feed -->
+      <div class="intel-card">
+        <div class="intel-card-header">
+          <span class="intel-card-title">⚡ RECENT ACTIVITY</span>
+          <span style="font-family:var(--mono);font-size:0.62rem;color:var(--muted)" id="feed-count"></span>
+        </div>
+        <div class="intel-card-body" id="feed-body">
+          <div class="loader" style="padding:2rem">
+            <div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div>
+            <span>LOADING...</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 
   <!-- ── SYNC PAGE ── -->
   <div class="page" id="page-sync">
@@ -1393,6 +1655,7 @@ $('btn-register').addEventListener('click', async () => {
 $('btn-logout').addEventListener('click', async () => {
   await api('logout', { method: 'POST' });
   stopPolling();
+  if (intelInterval) { clearInterval(intelInterval); intelInterval = null; }
   clearSession();
   showScreen('screen-auth');
   $('form-login').querySelectorAll('input').forEach(i => i.value = '');
@@ -1409,6 +1672,7 @@ function enterApp() {
   $('nav-admin').style.display     = currentUser.is_admin ? '' : 'none';
   $('nav-sync').style.display      = currentUser.is_admin ? '' : 'none';
   initSyncPage();
+  initIntelPage();
   loadLands();
   if (currentUser.is_admin) loadAdmin();
 }
@@ -1641,6 +1905,14 @@ $('lands-sort').addEventListener('change', e => {
 document.querySelectorAll('.nav-tab').forEach(tab => {
   tab.addEventListener('click', () => {
     showPage('page-' + tab.dataset.page);
+    if (tab.dataset.page === 'intel') {
+      loadIntel();
+      // Auto-refresh intel every 30s while on the tab
+      if (intelInterval) clearInterval(intelInterval);
+      intelInterval = setInterval(loadIntel, 30000);
+    } else {
+      if (intelInterval) { clearInterval(intelInterval); intelInterval = null; }
+    }
   });
 });
 
@@ -1712,6 +1984,125 @@ window.removeUser = async function(id, username) {
   else toast('Failed to remove user.', 'error');
 };
 
+
+
+// ════════════════════════════════════════════════════════════
+//  INTEL PAGE
+// ════════════════════════════════════════════════════════════
+let intelPeriod   = 'alltime';
+let intelLoaded   = false;
+let intelInterval = null;
+
+async function loadIntel() {
+  const { ok, data } = await api('activity?period=' + intelPeriod);
+  if (!ok) { return; }
+  renderLeaderboard(data.leaderboard || []);
+  renderFeed(data.feed || []);
+  intelLoaded = true;
+}
+
+function renderLeaderboard(rows) {
+  const body = $('lb-body');
+  if (!rows.length) {
+    body.innerHTML = '<div class="intel-empty">No activity recorded yet.<br>Start claiming lands with the HUD!</div>';
+    return;
+  }
+
+  const maxClaims = Math.max(...rows.map(r => r.claimed), 1);
+  const rankClass = ['gold', 'silver', 'bronze'];
+
+  body.innerHTML = rows.map((r, i) => {
+    const pct = Math.round((r.claimed / maxClaims) * 100);
+    return `
+      <div class="lb-row">
+        <div class="lb-rank ${rankClass[i] || ''}">${i + 1}</div>
+        <div class="lb-info">
+          <div class="lb-name">${r.member}</div>
+          <div class="lb-bar-wrap">
+            <div class="lb-bar" style="width:${pct}%"></div>
+          </div>
+        </div>
+        <div class="lb-stats">
+          <div class="lb-stat">
+            <span class="n" style="color:var(--green2)">${r.claimed}</span>
+            <span class="l">Claimed</span>
+          </div>
+          <div class="lb-stat">
+            <span class="n" style="color:var(--red2)">${r.lost}</span>
+            <span class="l">Lost</span>
+          </div>
+          <div class="lb-stat">
+            <span class="n" style="color:var(--gold)">${r.contested}</span>
+            <span class="l">Contd</span>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderFeed(events) {
+  const body = $('feed-body');
+  $('feed-count').textContent = events.length + ' events';
+
+  if (!events.length) {
+    body.innerHTML = '<div class="intel-empty">No events yet. Activity from the HUD will appear here.</div>';
+    return;
+  }
+
+  const icons = { claimed: '🟢', lost: '🔴', contested: '⚔️' };
+
+  body.innerHTML = events.map(ev => {
+    const icon    = icons[ev.event] || '◈';
+    const timeAgo = formatTimeAgo(ev.created_at);
+    const linkTag = ev.slurl
+      ? `<a class="feed-link" href="${ev.slurl}" target="_blank">↗ TP</a>`
+      : '';
+
+    let headline = '';
+    if (ev.event === 'claimed') {
+      headline = `<strong>${ev.reported_by}</strong> claimed <span class="region">${ev.region}</span>${ev.land_name ? ' (' + ev.land_name + ')' : ''}`;
+    } else if (ev.event === 'lost') {
+      const clan = ev.enemy_clan ? ` to <span class="enemy">${ev.enemy_clan}</span>` : '';
+      headline = `<strong>${ev.reported_by}</strong> reported <span class="region">${ev.region}</span> lost${clan}`;
+    } else if (ev.event === 'contested') {
+      headline = `<strong>${ev.reported_by}</strong> called for assistance at <span class="region">${ev.region}</span>`;
+    }
+
+    return `
+      <div class="feed-item">
+        <div class="feed-icon">${icon}</div>
+        <div class="feed-body">
+          <div class="feed-headline">${headline}${linkTag}</div>
+          <div class="feed-meta">${timeAgo}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function formatTimeAgo(ts) {
+  if (!ts) return '—';
+  const diff = Date.now() - new Date(ts).getTime();
+  const mins  = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days  = Math.floor(diff / 86400000);
+  if (mins < 1)   return 'just now';
+  if (mins < 60)  return mins + 'm ago';
+  if (hours < 24) return hours + 'h ago';
+  if (days < 7)   return days + 'd ago';
+  return new Date(ts).toLocaleDateString();
+}
+
+function initIntelPage() {
+  // Period toggle buttons
+  document.querySelectorAll('.period-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      intelPeriod = btn.dataset.period;
+      loadIntel();
+    });
+  });
+}
 
 // ════════════════════════════════════════════════════════════
 //  SYNC PAGE
