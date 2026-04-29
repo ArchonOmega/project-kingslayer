@@ -1753,8 +1753,8 @@ async function pollLands() {
   if (!ok) { setLiveStatus('live', 'LIVE'); return; }
 
   // Check if anything actually changed by comparing a quick hash of statuses
-  const newSig = data.lands.map(l => l.id + l.status + (l.claimed_by||'')).join('|');
-  const oldSig = allLands.map(l => l.id + l.status + (l.claimed_by||'')).join('|');
+  const newSig = data.lands.map(l => l.id + l.status + (l.claimed_by||'') + (l.shield_verified_at||'')).join('|');
+  const oldSig = allLands.map(l => l.id + l.status + (l.claimed_by||'') + (l.shield_verified_at||'')).join('|');
 
   if (newSig !== oldSig) {
     allLands = data.lands;
