@@ -1932,6 +1932,9 @@ function renderLands() {
           : '<span style="color:var(--muted)">—</span>'
         }
       </td>
+      <td class="td-shield">
+        ${isClaimed ? buildShieldCell(land) : '<span style="color:var(--muted);font-family:var(--mono);font-size:0.65rem">—</span>'}
+      </td>
       <td>
         <button class="btn-toggle ${isClaimed ? 'unclaim' : ''}" data-id="${land.id}" data-status="${land.status}">
           ${isClaimed ? '✗ Unclaim' : '✔ Claim'}
