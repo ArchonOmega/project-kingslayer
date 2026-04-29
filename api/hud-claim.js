@@ -4,8 +4,16 @@ const { supabase } = require('./_supabase');
 // Strip control characters and trim whitespace from region names
 function sanitizeStr(s) {
   if (!s) return '';
-  // Remove carriage returns, newlines, tabs and other control chars
-  return s.replace(/[\r\n\t\x00-\x1F\x7F]/g, '').trim();
+  // SL sometimes sends the actual carriage return char (0x0D) in region names
+  s = s.replace(/\r/g, 'r');
+  // jsonSafe() in LSL encodes \r as the literal two-char sequence backslash+r
+  // so we also need to replace that
+  s = s.replace(/\\r/g, 'r');
+  // Strip remaining control characters
+  s = s.replace(/[\n\t\x00-\x1F\x7F]/g, '').trim();
+  // Also clean up any remaining backslash-letter escape sequences from jsonSafe
+  s = s.replace(/\\n/g, ' ').replace(/\\t/g, ' ');
+  return s;
 }
 
 
@@ -86,9 +94,47 @@ module.exports = async function handler(req, res) {
         });
       }
 
+      // Deduct a crystal from the reporting member
+      if (reported_by) {
+        // reported_by format is "Display Name (username)" — extract username
+        const usernameMatch = reported_by.match(/\(([^)]+)\)\s*$/);
+        const username = usernameMatch ? usernameMatch[1].trim() : reported_by;
+
+        const { data: member } = await supabase
+          .from('users')
+          .select('id, crystals, is_elite')
+          .eq('username', username.toLowerCase())
+          .single();
+
+        if (member) {
+          const newCount = Math.max(0, (member.crystals || 0) - 1);
+          await supabase
+            .from('users')
+            .update({ crystals: newCount })
+            .eq('id', member.id);
+        }
+      }
+
       // Log activity
       await logActivity('claimed', region, land, link, reported_by, '');
-      return res.status(200).json({ message: 'Land claimed and recorded.' });
+      // Fetch updated crystal count to return to HUD
+      let crystalCount = null;
+      if (reported_by) {
+        const usernameMatch = reported_by.match(/\(([^)]+)\)\s*$/);
+        const username = usernameMatch ? usernameMatch[1].trim() : reported_by;
+        const { data: updatedMember } = await supabase
+          .from('users')
+          .select('crystals, is_elite')
+          .eq('username', username.toLowerCase())
+          .single();
+        if (updatedMember) {
+          crystalCount = updatedMember.crystals;
+        }
+      }
+      return res.status(200).json({
+        message: 'Land claimed and recorded.',
+        crystals_remaining: crystalCount,
+      });
     }
 
     if (event === 'lost') {

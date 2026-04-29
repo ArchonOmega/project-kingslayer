@@ -1,15 +1,22 @@
 // api/shield-verify-hud.js
 // Called by the LSL HUD shield button.
 // Looks up the land by region name and marks shield as verified.
+// If the region isn't in the DB yet, auto-adds it as claimed.
 const { supabase } = require('./_supabase');
 
-// Strip control characters and trim whitespace from region names
 function sanitizeStr(s) {
   if (!s) return '';
-  // Remove carriage returns, newlines, tabs and other control chars
-  return s.replace(/[\r\n\t\x00-\x1F\x7F]/g, '').trim();
+  // SL sometimes sends the actual carriage return char (0x0D) in region names
+  s = s.replace(/\r/g, 'r');
+  // jsonSafe() in LSL encodes \r as the literal two-char sequence backslash+r
+  // so we also need to replace that
+  s = s.replace(/\\r/g, 'r');
+  // Strip remaining control characters
+  s = s.replace(/[\n\t\x00-\x1F\x7F]/g, '').trim();
+  // Also clean up any remaining backslash-letter escape sequences from jsonSafe
+  s = s.replace(/\\n/g, ' ').replace(/\\t/g, ' ');
+  return s;
 }
-
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST')
@@ -19,7 +26,7 @@ module.exports = async function handler(req, res) {
   if (secret !== process.env.HUD_SECRET)
     return res.status(401).json({ error: 'Unauthorized' });
 
-  const _b = req.body || {};
+  const _b          = req.body || {};
   const region      = sanitizeStr(_b.region);
   const land        = sanitizeStr(_b.land);
   const link        = sanitizeStr(_b.link);
@@ -35,33 +42,67 @@ module.exports = async function handler(req, res) {
     .eq('region', region)
     .single();
 
+  let landId   = existing ? existing.id : null;
+  let landName = existing ? (existing.land_name || land || '') : (land || '');
+  let slurl    = existing ? (existing.slurl || link || '')     : (link || '');
+
   if (!existing) {
-    // Land not in DB at all — can't verify what we don't track
-    return res.status(404).json({ error: 'Region not found in database: ' + region });
+    // Land not in DB — auto-add as claimed since member is verifying shield on it
+    const { data: inserted, error: insertErr } = await supabase
+      .from('lands')
+      .insert({
+        region,
+        land_name:          landName,
+        slurl,
+        status:             'claimed',
+        claimed_by:         reported_by || '',
+        enemy_claimer:      '',
+        first_seen:         now,
+        claimed_at:         now,
+        shield_verified_at: now,
+        shield_verified_by: reported_by || 'Unknown',
+        updated_at:         now,
+      })
+      .select('id')
+      .single();
+
+    if (insertErr)
+      return res.status(500).json({ error: 'Failed to add region: ' + insertErr.message });
+
+    landId = inserted.id;
+  } else if (existing.status !== 'claimed') {
+    // In DB but marked unclaimed — update to claimed since member is verifying shield
+    await supabase
+      .from('lands')
+      .update({
+        status:             'claimed',
+        claimed_by:         reported_by || '',
+        claimed_at:         now,
+        shield_verified_at: now,
+        shield_verified_by: reported_by || 'Unknown',
+        updated_at:         now,
+      })
+      .eq('id', existing.id);
+  } else {
+    // Exists and is claimed — just update shield verification
+    const { error } = await supabase
+      .from('lands')
+      .update({
+        shield_verified_at: now,
+        shield_verified_by: reported_by || 'Unknown',
+        updated_at:         now,
+      })
+      .eq('id', existing.id);
+
+    if (error) return res.status(500).json({ error: error.message });
   }
-
-  if (existing.status !== 'claimed') {
-    return res.status(400).json({ error: 'Land is not currently claimed by EVW.' });
-  }
-
-  // Update shield verification
-  const { error } = await supabase
-    .from('lands')
-    .update({
-      shield_verified_at: now,
-      shield_verified_by: reported_by || 'Unknown',
-      updated_at:         now,
-    })
-    .eq('id', existing.id);
-
-  if (error) return res.status(500).json({ error: error.message });
 
   // Log to activity
   await supabase.from('activity_log').insert({
     event:       'shield',
-    region:      existing.region,
-    land_name:   existing.land_name || land || '',
-    slurl:       existing.slurl     || link || '',
+    region,
+    land_name:   landName,
+    slurl,
     reported_by: reported_by || 'Unknown',
     enemy_clan:  '',
   });
