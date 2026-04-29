@@ -2158,31 +2158,36 @@ function renderFeed(events) {
 
   const icons = { claimed: '🟢', lost: '🔴', contested: '⚔️', shield: '🛡' };
 
-  body.innerHTML = events.map(ev => {
-    const icon    = icons[ev.event] || '◈';
-    const timeAgo = formatTimeAgo(ev.created_at);
-    const linkTag = ev.slurl
-      ? `<a class="feed-link" href="${ev.slurl}" target="_blank">↗ TP</a>`
+  body.innerHTML = events.map(function(ev) {
+    var icon      = icons[ev.event] || '◈';
+    var timeAgo   = formatTimeAgo(ev.created_at);
+    var reporter  = ev.reported_by || 'Unknown operative';
+    var region    = ev.region      || 'Unknown region';
+    var landExtra = ev.land_name   ? ' (' + ev.land_name + ')' : '';
+    var linkTag   = ev.slurl
+      ? '<a class="feed-link" href="' + ev.slurl + '" target="_blank">↗ TP</a>'
       : '';
 
-    let headline = '';
+    var headline = '';
     if (ev.event === 'claimed') {
-      headline = `<strong>${ev.reported_by}</strong> claimed <span class="region">${ev.region}</span>${ev.land_name ? ' (' + ev.land_name + ')' : ''}`;
+      headline = '<strong>' + reporter + '</strong> claimed <span class="region">' + region + '</span>' + landExtra;
     } else if (ev.event === 'lost') {
-      const clan = ev.enemy_clan ? ` to <span class="enemy">${ev.enemy_clan}</span>` : '';
-      headline = `<strong>${ev.reported_by}</strong> reported <span class="region">${ev.region}</span> lost${clan}`;
+      var clan = ev.enemy_clan ? ' to <span class="enemy">' + ev.enemy_clan + '</span>' : '';
+      headline = '<strong>' + reporter + '</strong> reported <span class="region">' + region + '</span> lost' + clan;
     } else if (ev.event === 'contested') {
-      headline = `<strong>${ev.reported_by}</strong> called for assistance at <span class="region">${ev.region}</span>`;
+      headline = '<strong>' + reporter + '</strong> called for assistance at <span class="region">' + region + '</span>';
+    } else if (ev.event === 'shield') {
+      headline = '<strong>' + reporter + '</strong> verified shield on <span class="region">' + region + '</span>';
+    } else {
+      headline = '<strong>' + reporter + '</strong> logged event at <span class="region">' + region + '</span>';
     }
 
-    return `
-      <div class="feed-item">
-        <div class="feed-icon">${icon}</div>
-        <div class="feed-body">
-          <div class="feed-headline">${headline}${linkTag}</div>
-          <div class="feed-meta">${timeAgo}</div>
-        </div>
-      </div>`;
+    return '<div class="feed-item">'
+      + '<div class="feed-icon">' + icon + '</div>'
+      + '<div class="feed-body">'
+      + '<div class="feed-headline">' + headline + linkTag + '</div>'
+      + '<div class="feed-meta">' + timeAgo + '</div>'
+      + '</div></div>';
   }).join('');
 }
 
