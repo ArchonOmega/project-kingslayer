@@ -3,6 +3,14 @@
 // Looks up the land by region name and marks shield as verified.
 const { supabase } = require('./_supabase');
 
+// Strip control characters and trim whitespace from region names
+function sanitizeStr(s) {
+  if (!s) return '';
+  // Remove carriage returns, newlines, tabs and other control chars
+  return s.replace(/[\r\n\t\x00-\x1F\x7F]/g, '').trim();
+}
+
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST')
     return res.status(405).json({ error: 'Method not allowed' });
@@ -11,7 +19,11 @@ module.exports = async function handler(req, res) {
   if (secret !== process.env.HUD_SECRET)
     return res.status(401).json({ error: 'Unauthorized' });
 
-  const { region, land, link, reported_by } = req.body || {};
+  const _b = req.body || {};
+  const region      = sanitizeStr(_b.region);
+  const land        = sanitizeStr(_b.land);
+  const link        = sanitizeStr(_b.link);
+  const reported_by = sanitizeStr(_b.reported_by);
   if (!region) return res.status(400).json({ error: 'region required' });
 
   const now = new Date().toISOString();

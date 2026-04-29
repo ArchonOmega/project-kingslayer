@@ -1,6 +1,14 @@
 // api/hud-claim.js
 const { supabase } = require('./_supabase');
 
+// Strip control characters and trim whitespace from region names
+function sanitizeStr(s) {
+  if (!s) return '';
+  // Remove carriage returns, newlines, tabs and other control chars
+  return s.replace(/[\r\n\t\x00-\x1F\x7F]/g, '').trim();
+}
+
+
 async function logActivity(event, region, land, slurl, reported_by, enemy_clan) {
   await supabase.from('activity_log').insert({
     event,
@@ -40,7 +48,13 @@ module.exports = async function handler(req, res) {
 
   // ── POST — record a claim/lost/contested event ───────────
   if (req.method === 'POST') {
-    const { event, land, region, link, reported_by, enemy_clan } = req.body || {};
+    const _b = req.body || {};
+    const event       = sanitizeStr(_b.event);
+    const land        = sanitizeStr(_b.land);
+    const region      = sanitizeStr(_b.region);
+    const link        = sanitizeStr(_b.link);
+    const reported_by = sanitizeStr(_b.reported_by);
+    const enemy_clan  = sanitizeStr(_b.enemy_clan);
     if (!region) return res.status(400).json({ error: 'region required' });
 
     if (event === 'claimed') {
