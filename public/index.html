@@ -2642,8 +2642,8 @@ window.saveMaintenanceMessage = async function() {
     var mData = await mRes.json();
     if (mData.maintenance) {
       // Check if current user is admin before redirecting
-      var savedUser = localStorage.getItem('ks_user');
-      var isAdmin = savedUser ? JSON.parse(savedUser).is_admin : false;
+      var maintSavedUser = localStorage.getItem('ks_user');
+      var isAdmin = maintSavedUser ? JSON.parse(maintSavedUser).is_admin : false;
       if (!isAdmin) {
         window.location.href = '/maintenance.html';
         return;
