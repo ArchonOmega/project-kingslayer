@@ -414,7 +414,7 @@
 
     /* ── Page panels ── */
     .page { display: none; flex: 1; overflow: hidden; flex-direction: column; }
-    #page-intel { overflow-y: auto; }
+    #page-intel { overflow-y: auto; flex: 1; min-height: 0; }
     .page.active { display: flex; }
 
     /* ── Controls bar ── */
@@ -985,8 +985,6 @@
 
     /* ── Intel / Activity page ── */
     .intel-grid {
-      flex: 1;
-      overflow-y: auto;
       padding: 1.5rem;
       display: grid;
       grid-template-columns: 1fr 1fr;
