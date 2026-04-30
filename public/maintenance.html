@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PROJECT KINGSLAYER // SYSTEM OFFLINE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #060709;
+      --gold:   #c8a84b;
+      --gold2:  #e8c86a;
+      --dim:    #7a6530;
+      --red:    #8b1a1a;
+      --red2:   #c0392b;
+      --text:   #9aa0b0;
+      --muted:  #3a4050;
+      --mono:   'Share Tech Mono', monospace;
+      --display:'Bebas Neue', sans-serif;
+      --ui:     'Rajdhani', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--bg);
+      overflow: hidden;
+      font-family: var(--mono);
+      color: var(--text);
+    }
+
+    /* ── Canvas layer ── */
+    #canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+    }
+
+    /* ── Scanlines ── */
+    .scanlines {
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 2px,
+        rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px
+      );
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* ── Vignette ── */
+    .vignette {
+      position: fixed; inset: 0;
+      background: radial-gradient(ellipse at center,
+        transparent 40%, rgba(0,0,0,0.85) 100%);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* ── Main content ── */
+    .stage {
+      position: fixed; inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      gap: 0;
+    }
+
+    /* ── Corner brackets ── */
+    .bracket {
+      position: fixed;
+      width: 60px; height: 60px;
+      z-index: 10;
+      opacity: 0;
+      animation: bracketIn 1s ease forwards;
+    }
+
+    .bracket.tl { top: 24px; left: 24px;
+      border-top: 1px solid var(--gold); border-left: 1px solid var(--gold); }
+    .bracket.tr { top: 24px; right: 24px;
+      border-top: 1px solid var(--gold); border-right: 1px solid var(--gold); }
+    .bracket.bl { bottom: 24px; left: 24px;
+      border-bottom: 1px solid var(--gold); border-left: 1px solid var(--gold); }
+    .bracket.br { bottom: 24px; right: 24px;
+      border-bottom: 1px solid var(--gold); border-right: 1px solid var(--gold); }
+
+    .bracket.tl { animation-delay: 0.8s; }
+    .bracket.tr { animation-delay: 1.0s; }
+    .bracket.bl { animation-delay: 1.2s; }
+    .bracket.br { animation-delay: 1.4s; }
+
+    @keyframes bracketIn {
+      from { opacity: 0; transform: scale(0.7); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    /* ── Top status line ── */
+    .top-status {
+      position: fixed;
+      top: 28px; left: 50%; transform: translateX(-50%);
+      font-size: 0.6rem;
+      letter-spacing: 0.4em;
+      color: var(--muted);
+      text-transform: uppercase;
+      z-index: 10;
+      opacity: 0;
+      animation: fadeIn 0.5s ease 1.6s forwards;
+      white-space: nowrap;
+    }
+
+    /* ── Bottom ticker ── */
+    .ticker-wrap {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 32px;
+      border-top: 1px solid rgba(200,168,75,0.15);
+      overflow: hidden;
+      z-index: 10;
+      opacity: 0;
+      animation: fadeIn 0.5s ease 2s forwards;
+    }
+
+    .ticker-inner {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      white-space: nowrap;
+      animation: ticker 40s linear infinite;
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+    }
+
+    .ticker-item {
+      padding: 0 3rem;
+    }
+
+    .ticker-item span {
+      color: var(--dim);
+      margin-right: 0.5rem;
+    }
+
+    @keyframes ticker {
+      from { transform: translateX(100vw); }
+      to   { transform: translateX(-100%); }
+    }
+
+    /* ── EVW logo mark ── */
+    .logo-mark {
+      font-family: var(--display);
+      font-size: clamp(1rem, 3vw, 1.2rem);
+      letter-spacing: 0.6em;
+      color: var(--dim);
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeIn 0.6s ease 0.3s forwards;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── Main sigil / logo ── */
+    .sigil-wrap {
+      position: relative;
+      width: clamp(180px, 25vw, 280px);
+      height: clamp(180px, 25vw, 280px);
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeIn 0.8s ease 0.5s forwards;
+    }
+
+    .sigil-wrap svg {
+      width: 100%; height: 100%;
+    }
+
+    /* ── Title block ── */
+    .title-block {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .title-eyebrow {
+      font-size: 0.62rem;
+      letter-spacing: 0.5em;
+      color: var(--dim);
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeIn 0.5s ease 0.9s forwards;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .title-main {
+      font-family: var(--display);
+      font-size: clamp(3.5rem, 8vw, 7rem);
+      letter-spacing: 0.06em;
+      line-height: 0.9;
+      color: #fff;
+      opacity: 0;
+      animation: titleReveal 1s ease 1s forwards;
+      display: block;
+    }
+
+    .title-main em {
+      color: var(--gold);
+      font-style: normal;
+    }
+
+    @keyframes titleReveal {
+      from { opacity: 0; clip-path: inset(0 100% 0 0); }
+      to   { opacity: 1; clip-path: inset(0 0% 0 0); }
+    }
+
+    /* ── Status box ── */
+    .status-box {
+      border: 1px solid var(--red);
+      padding: 0.8rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      margin-bottom: 2rem;
+      position: relative;
+      opacity: 0;
+      animation: fadeIn 0.5s ease 1.5s forwards;
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    }
+
+    .status-box::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(139,26,26,0.08);
+    }
+
+    .status-label {
+      font-size: 0.55rem;
+      letter-spacing: 0.4em;
+      color: var(--red2);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .status-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--red2);
+      box-shadow: 0 0 8px var(--red2);
+      animation: statusPulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes statusPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.3; transform: scale(0.7); }
+    }
+
+    .status-text {
+      font-family: var(--display);
+      font-size: clamp(1.2rem, 3vw, 1.8rem);
+      letter-spacing: 0.2em;
+      color: var(--red2);
+      line-height: 1;
+    }
+
+    /* ── Message ── */
+    .maintenance-message {
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      color: var(--text);
+      text-align: center;
+      max-width: 480px;
+      line-height: 1.8;
+      opacity: 0;
+      animation: fadeIn 0.5s ease 1.7s forwards;
+      margin-bottom: 2.5rem;
+      padding: 0 1rem;
+    }
+
+    /* ── Clock & coordinates ── */
+    .data-row {
+      display: flex;
+      gap: 3rem;
+      align-items: center;
+      opacity: 0;
+      animation: fadeIn 0.5s ease 1.9s forwards;
+    }
+
+    .data-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .data-value {
+      font-size: 0.9rem;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+    }
+
+    .data-label {
+      font-size: 0.52rem;
+      letter-spacing: 0.25em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .data-sep {
+      color: var(--muted);
+      font-size: 1.2rem;
+      margin-bottom: 0.75rem;
+    }
+
+    /* ── Loading bar ── */
+    .loading-wrap {
+      width: clamp(200px, 30vw, 380px);
+      margin-top: 2rem;
+      opacity: 0;
+      animation: fadeIn 0.5s ease 2.1s forwards;
+    }
+
+    .loading-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .loading-bar {
+      height: 2px;
+      background: var(--muted);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loading-fill {
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      animation: loadingPulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes loadingPulse {
+      0%   { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Side coords ── */
+    .side-coords {
+      position: fixed;
+      right: 32px; top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      z-index: 10;
+      opacity: 0;
+      animation: fadeIn 0.5s ease 2.2s forwards;
+    }
+
+    .coord-line {
+      font-size: 0.55rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      text-align: right;
+      writing-mode: horizontal-tb;
+    }
+
+    .coord-line.active { color: var(--dim); }
+  </style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+<div class="scanlines"></div>
+<div class="vignette"></div>
+
+<!-- Corner brackets -->
+<div class="bracket tl"></div>
+<div class="bracket tr"></div>
+<div class="bracket bl"></div>
+<div class="bracket br"></div>
+
+<!-- Top status -->
+<div class="top-status" id="top-status">EVW CLAN // EUPHORIA WORLD WAR // COMMAND SYSTEM</div>
+
+<!-- Ticker -->
+<div class="ticker-wrap">
+  <div class="ticker-inner">
+    <div class="ticker-item"><span>◈</span> SYSTEM MAINTENANCE IN PROGRESS</div>
+    <div class="ticker-item"><span>◈</span> ALL ACTIVE SESSIONS SUSPENDED</div>
+    <div class="ticker-item"><span>◈</span> DATABASE INTEGRITY CHECK RUNNING</div>
+    <div class="ticker-item"><span>◈</span> TERRITORY DATA LOCKED</div>
+    <div class="ticker-item"><span>◈</span> EVW COMMAND NETWORK OFFLINE</div>
+    <div class="ticker-item"><span>◈</span> ESTIMATED RESTORATION: TBD</div>
+    <div class="ticker-item"><span>◈</span> STAND BY FOR SYSTEM RESUMPTION</div>
+    <div class="ticker-item"><span>◈</span> EUPHORIA REALM OPERATIONS PAUSED</div>
+  </div>
+</div>
+
+<!-- Side coords -->
+<div class="side-coords">
+  <div class="coord-line active" id="coord-lat"></div>
+  <div class="coord-line" id="coord-lon"></div>
+  <div class="coord-line active" id="coord-alt"></div>
+</div>
+
+<!-- Main stage -->
+<div class="stage">
+
+  <div class="logo-mark">⚔ EUPHORIA WORLD WAR ⚔</div>
+
+  <!-- Sigil -->
+  <div class="sigil-wrap">
+    <svg viewBox="0 0 280 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Outer rotating ring -->
+      <circle cx="140" cy="140" r="130" stroke="rgba(200,168,75,0.15)" stroke-width="1"/>
+      <circle cx="140" cy="140" r="130" stroke="rgba(200,168,75,0.4)" stroke-width="0.5"
+        stroke-dasharray="8 4" stroke-dashoffset="0">
+        <animateTransform attributeName="transform" type="rotate"
+          from="0 140 140" to="360 140 140" dur="30s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Middle ring counter-rotate -->
+      <circle cx="140" cy="140" r="100" stroke="rgba(200,168,75,0.1)" stroke-width="1"/>
+      <circle cx="140" cy="140" r="100" stroke="rgba(200,168,75,0.25)" stroke-width="0.5"
+        stroke-dasharray="4 8">
+        <animateTransform attributeName="transform" type="rotate"
+          from="360 140 140" to="0 140 140" dur="20s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Inner ring -->
+      <circle cx="140" cy="140" r="68" stroke="rgba(200,168,75,0.2)" stroke-width="1"/>
+
+      <!-- Cardinal tick marks -->
+      <line x1="140" y1="10" x2="140" y2="28" stroke="rgba(200,168,75,0.5)" stroke-width="1"/>
+      <line x1="140" y1="252" x2="140" y2="270" stroke="rgba(200,168,75,0.5)" stroke-width="1"/>
+      <line x1="10" y1="140" x2="28" y2="140" stroke="rgba(200,168,75,0.5)" stroke-width="1"/>
+      <line x1="252" y1="140" x2="270" y2="140" stroke="rgba(200,168,75,0.5)" stroke-width="1"/>
+
+      <!-- Diagonal ticks -->
+      <line x1="48" y1="48" x2="60" y2="60" stroke="rgba(200,168,75,0.25)" stroke-width="0.5"/>
+      <line x1="220" y1="48" x2="208" y2="60" stroke="rgba(200,168,75,0.25)" stroke-width="0.5"/>
+      <line x1="48" y1="232" x2="60" y2="220" stroke="rgba(200,168,75,0.25)" stroke-width="0.5"/>
+      <line x1="232" y1="232" x2="220" y2="220" stroke="rgba(200,168,75,0.25)" stroke-width="0.5"/>
+
+      <!-- Crosshair lines -->
+      <line x1="140" y1="72" x2="140" y2="208" stroke="rgba(200,168,75,0.08)" stroke-width="0.5"/>
+      <line x1="72" y1="140" x2="208" y2="140" stroke="rgba(200,168,75,0.08)" stroke-width="0.5"/>
+
+      <!-- Diagonal crosshair -->
+      <line x1="90" y1="90" x2="190" y2="190" stroke="rgba(200,168,75,0.06)" stroke-width="0.5"/>
+      <line x1="190" y1="90" x2="90" y2="190" stroke="rgba(200,168,75,0.06)" stroke-width="0.5"/>
+
+      <!-- Central diamond -->
+      <polygon points="140,100 170,140 140,180 110,140"
+        fill="rgba(200,168,75,0.05)" stroke="rgba(200,168,75,0.6)" stroke-width="0.75"/>
+
+      <!-- Inner diamond -->
+      <polygon points="140,120 155,140 140,160 125,140"
+        fill="rgba(200,168,75,0.08)" stroke="rgba(200,168,75,0.4)" stroke-width="0.5"/>
+
+      <!-- Center dot with pulse -->
+      <circle cx="140" cy="140" r="4" fill="var(--gold)">
+        <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="140" cy="140" r="8" fill="none" stroke="rgba(200,168,75,0.4)" stroke-width="0.5">
+        <animate attributeName="r" values="8;16;8" dur="3s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.4;0;0.4" dur="3s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- EVW text arc placeholder — 4 corner marks -->
+      <circle cx="140" cy="40" r="2" fill="rgba(200,168,75,0.4)"/>
+      <circle cx="140" cy="240" r="2" fill="rgba(200,168,75,0.4)"/>
+      <circle cx="40" cy="140" r="2" fill="rgba(200,168,75,0.4)"/>
+      <circle cx="240" cy="140" r="2" fill="rgba(200,168,75,0.4)"/>
+    </svg>
+  </div>
+
+  <div class="title-block">
+    <span class="title-eyebrow">PROJECT</span>
+    <span class="title-main">KING<em>SLAYER</em></span>
+  </div>
+
+  <div class="status-box">
+    <div class="status-label">
+      <div class="status-dot"></div>
+      SYSTEM STATUS
+    </div>
+    <div class="status-text">OFFLINE — MAINTENANCE</div>
+  </div>
+
+  <div class="maintenance-message" id="maintenance-message">
+    Command systems are temporarily offline for scheduled maintenance.<br>
+    All territory data is secure. Operations will resume shortly.
+  </div>
+
+  <div class="data-row">
+    <div class="data-item">
+      <div class="data-value" id="clock">00:00:00</div>
+      <div class="data-label">System Time (UTC)</div>
+    </div>
+    <div class="data-sep">|</div>
+    <div class="data-item">
+      <div class="data-value" id="datestamp">—</div>
+      <div class="data-label">Date</div>
+    </div>
+  </div>
+
+  <div class="loading-wrap">
+    <div class="loading-label">
+      <span>AWAITING SYSTEM RESTORATION</span>
+      <span id="load-pct">—</span>
+    </div>
+    <div class="loading-bar">
+      <div class="loading-fill"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ── Live clock ───────────────────────────────────────────
+  function updateClock() {
+    var now = new Date();
+    var hh  = String(now.getUTCHours()).padStart(2, '0');
+    var mm  = String(now.getUTCMinutes()).padStart(2, '0');
+    var ss  = String(now.getUTCSeconds()).padStart(2, '0');
+    document.getElementById('clock').textContent = hh + ':' + mm + ':' + ss;
+
+    var months = ['JAN','FEB','MAR','APR','MAY','JUN',
+                  'JUL','AUG','SEP','OCT','NOV','DEC'];
+    document.getElementById('datestamp').textContent =
+      now.getUTCDate() + ' ' + months[now.getUTCMonth()] + ' ' + now.getUTCFullYear();
+
+    // Fake coords that drift slightly
+    var lat = (29.9792 + Math.sin(now.getTime() / 80000) * 0.0003).toFixed(4);
+    var lon = (31.1342 + Math.cos(now.getTime() / 60000) * 0.0002).toFixed(4);
+    document.getElementById('coord-lat').textContent = lat + '° N';
+    document.getElementById('coord-lon').textContent = lon + '° E';
+    document.getElementById('coord-alt').textContent = (38 + Math.round(Math.sin(now.getTime()/20000)*2)) + 'M ALT';
+
+    // Fake load pct that cycles
+    var pct = Math.round(((now.getSeconds() * 1000 + now.getMilliseconds()) / 60000) * 100);
+    document.getElementById('load-pct').textContent = pct + '%';
+  }
+
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // ── Canvas particle field ────────────────────────────────
+  var canvas  = document.getElementById('canvas');
+  var ctx     = canvas.getContext('2d');
+  var particles = [];
+  var W, H;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+
+  // Spawn particles
+  for (var i = 0; i < 120; i++) {
+    particles.push({
+      x:   Math.random() * W,
+      y:   Math.random() * H,
+      vx:  (Math.random() - 0.5) * 0.3,
+      vy:  (Math.random() - 0.5) * 0.3,
+      r:   Math.random() * 1.2 + 0.3,
+      a:   Math.random(),
+      da:  (Math.random() - 0.5) * 0.005,
+    });
+  }
+
+  // Grid lines
+  var gridLines = [];
+  for (var g = 0; g < 12; g++) {
+    gridLines.push({
+      x1: Math.random() * W, y1: 0,
+      x2: Math.random() * W, y2: H,
+      a: Math.random() * 0.08,
+    });
+    gridLines.push({
+      x1: 0, y1: Math.random() * H,
+      x2: W, y2: Math.random() * H,
+      a: Math.random() * 0.08,
+    });
+  }
+
+  function drawFrame() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Grid
+    gridLines.forEach(function(l) {
+      ctx.strokeStyle = 'rgba(200,168,75,' + l.a + ')';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(l.x1, l.y1);
+      ctx.lineTo(l.x2, l.y2);
+      ctx.stroke();
+    });
+
+    // Particles
+    particles.forEach(function(p) {
+      p.x  += p.vx;
+      p.y  += p.vy;
+      p.a  += p.da;
+      if (p.a > 1)  { p.a = 1;  p.da = -p.da; }
+      if (p.a < 0)  { p.a = 0;  p.da = -p.da; }
+      if (p.x < 0)  p.x = W;
+      if (p.x > W)  p.x = 0;
+      if (p.y < 0)  p.y = H;
+      if (p.y > H)  p.y = 0;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(200,168,75,' + (p.a * 0.5) + ')';
+      ctx.fill();
+    });
+
+    // Connection lines between nearby particles
+    for (var i = 0; i < particles.length; i++) {
+      for (var j = i + 1; j < particles.length; j++) {
+        var dx   = particles[i].x - particles[j].x;
+        var dy   = particles[i].y - particles[j].y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 100) {
+          ctx.strokeStyle = 'rgba(200,168,75,' + (0.06 * (1 - dist / 100)) + ')';
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    requestAnimationFrame(drawFrame);
+  }
+
+  drawFrame();
+
+  // ── Load custom message if set ───────────────────────────
+  fetch('/api/maintenance')
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.message && d.message.trim()) {
+        document.getElementById('maintenance-message').textContent = d.message;
+      }
+    })
+    .catch(function() {});
+</script>
+</body>
+</html>

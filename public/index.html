@@ -1246,6 +1246,123 @@
     }
 
     .td-shield { white-space: nowrap; }
+
+    /* ── Crystal tracker ── */
+    .crystal-card {
+      grid-column: 1 / -1;
+    }
+
+    .crystal-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.6rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+
+    .crystal-row:hover { background: var(--bg3); }
+    .crystal-row.is-self { border-left: 2px solid var(--gold); }
+
+    .crystal-name {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      color: #fff;
+      flex: 1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .crystal-name .elite-badge {
+      font-size: 0.55rem;
+      letter-spacing: 0.1em;
+      padding: 0.1rem 0.35rem;
+      background: rgba(200,168,75,0.15);
+      color: var(--gold);
+      border: 1px solid rgba(200,168,75,0.3);
+      margin-left: 0.4rem;
+      vertical-align: middle;
+    }
+
+    .crystal-counter {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .crystal-gems {
+      display: flex;
+      gap: 0.2rem;
+      align-items: center;
+    }
+
+    .gem {
+      width: 10px; height: 10px;
+      border-radius: 2px;
+      background: var(--border2);
+      transition: background 0.2s;
+    }
+
+    .gem.full { background: var(--cyan2); box-shadow: 0 0 4px var(--cyan2); }
+
+    .crystal-num {
+      font-family: var(--display);
+      font-size: 1.1rem;
+      color: var(--cyan2);
+      min-width: 18px;
+      text-align: center;
+      line-height: 1;
+    }
+
+    .crystal-num.empty { color: var(--muted); }
+
+    .crystal-max {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      color: var(--muted);
+    }
+
+    .btn-crystal {
+      width: 22px; height: 22px;
+      border: 1px solid var(--border);
+      background: var(--bg3);
+      color: var(--text2);
+      font-size: 0.9rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .btn-crystal:hover { border-color: var(--cyan2); color: var(--cyan2); }
+    .btn-crystal:disabled { opacity: 0.3; cursor: default; }
+
+    .elite-toggle {
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.08em;
+      padding: 0.15rem 0.4rem;
+      border: 1px solid var(--border);
+      background: none;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .elite-toggle.active {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(200,168,75,0.1);
+    }
+
+    .elite-toggle:hover { border-color: var(--gold-dim); color: var(--gold-dim); }
   </style>
 </head>
 <body>
@@ -1413,6 +1530,33 @@
   <!-- ── ADMIN PAGE ── -->
   <div class="page" id="page-admin">
     <div class="admin-grid">
+
+      <!-- Maintenance toggle -->
+      <div>
+        <div class="admin-section-title">⚙ System Control</div>
+        <div style="background:var(--bg3);border:1px solid var(--border);padding:1rem 1.2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+          <div>
+            <div style="font-family:var(--mono);font-size:0.8rem;color:#fff;margin-bottom:0.25rem">Maintenance Mode</div>
+            <div style="font-family:var(--mono);font-size:0.65rem;color:var(--muted)">Redirects all visitors to the maintenance screen. Admins can still log in.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:0.75rem">
+            <span id="maintenance-status-label" style="font-family:var(--mono);font-size:0.65rem;color:var(--muted)">CHECKING...</span>
+            <button id="btn-maintenance" onclick="toggleMaintenance()"
+              style="font-family:var(--mono);font-size:0.7rem;letter-spacing:0.1em;padding:0.4rem 1rem;border:1px solid var(--border);background:var(--bg3);color:var(--muted);cursor:pointer;text-transform:uppercase;transition:all 0.15s">
+              —
+            </button>
+          </div>
+        </div>
+        <div style="margin-top:0.75rem;display:flex;gap:0.5rem;align-items:center">
+          <input id="maintenance-msg-input" type="text"
+            placeholder="Custom message for visitors (optional)"
+            style="flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:0.72rem;padding:0.4rem 0.7rem;outline:none">
+          <button onclick="saveMaintenanceMessage()"
+            style="font-family:var(--mono);font-size:0.65rem;padding:0.4rem 0.75rem;border:1px solid var(--border);background:var(--bg3);color:var(--muted);cursor:pointer;white-space:nowrap">
+            Save Message
+          </button>
+        </div>
+      </div>
 
       <div>
         <div class="admin-section-title">⏳ Pending Access Requests</div>
@@ -1660,7 +1804,7 @@ $('btn-login').addEventListener('click', async () => {
   }
   $('btn-login').textContent = 'AUTHENTICATING...';
   $('btn-login').disabled = true;
-  const { ok, data } = await api('login', { method: 'POST', body: { username, password } });
+  const { ok, data } = await api('auth?action=login', { method: 'POST', body: { username, password } });
   $('btn-login').textContent = 'AUTHENTICATE';
   $('btn-login').disabled = false;
   if (!ok) {
@@ -1688,7 +1832,7 @@ $('btn-register').addEventListener('click', async () => {
   }
   $('btn-register').textContent = 'SUBMITTING...';
   $('btn-register').disabled = true;
-  const { ok, data } = await api('register', { method: 'POST', body: { username, password, sl_username } });
+  const { ok, data } = await api('auth?action=register', { method: 'POST', body: { username, password, sl_username } });
   $('btn-register').textContent = 'SUBMIT REQUEST';
   $('btn-register').disabled = false;
   msg.textContent = data.message || data.error || '';
@@ -1697,7 +1841,7 @@ $('btn-register').addEventListener('click', async () => {
 
 // Logout
 $('btn-logout').addEventListener('click', async () => {
-  await api('logout', { method: 'POST' });
+  await api('auth?action=logout', { method: 'POST' });
   stopPolling();
   if (intelInterval) { clearInterval(intelInterval); intelInterval = null; }
   clearSession();
@@ -1865,7 +2009,7 @@ function buildShieldCell(land) {
 window.verifyShield = async function(btn, id) {
   btn.disabled    = true;
   btn.textContent = '...';
-  var res = await api('shield-verify', { method: 'POST', body: { id: id } });
+  var res = await api('shield?source=web', { method: 'POST', body: { id: id } });
   if (!res.ok) {
     btn.disabled    = false;
     btn.textContent = '\u{1F6E1} Verify';
@@ -2012,11 +2156,13 @@ $('lands-sort').addEventListener('change', e => {
 document.querySelectorAll('.nav-tab').forEach(tab => {
   tab.addEventListener('click', () => {
     showPage('page-' + tab.dataset.page);
+    if (tab.dataset.page === 'admin' && currentUser && currentUser.is_admin) { checkMaintenance(); }
     if (tab.dataset.page === 'intel') {
       loadIntel();
+      loadCrystals();
       // Auto-refresh intel every 30s while on the tab
       if (intelInterval) clearInterval(intelInterval);
-      intelInterval = setInterval(loadIntel, 30000);
+      intelInterval = setInterval(function() { loadIntel(); loadCrystals(); }, 30000);
     } else {
       if (intelInterval) { clearInterval(intelInterval); intelInterval = null; }
     }
@@ -2338,10 +2484,173 @@ async function handleSyncFile(file) {
   );
 }
 
+
+// ════════════════════════════════════════════════════════════
+//  CRYSTAL TRACKER
+// ════════════════════════════════════════════════════════════
+let crystalMembers = [];
+
+async function loadCrystals() {
+  var res = await api('crystals');
+  if (!res.ok) return;
+  crystalMembers = res.data.members || [];
+  renderCrystals();
+}
+
+function renderCrystals() {
+  var body = $('crystal-body');
+  if (!crystalMembers.length) {
+    body.innerHTML = '<div class="intel-empty">No members found.</div>';
+    return;
+  }
+
+  body.innerHTML = crystalMembers.map(function(m) {
+    var isSelf   = currentUser && m.id === currentUser.id;
+    var isAdmin  = currentUser && currentUser.is_admin;
+    var canEdit  = isSelf || isAdmin;
+    var maxCryst = m.is_elite ? 5 : 3;
+    var count    = Math.min(m.crystals || 0, maxCryst);
+    var isEmpty  = count === 0;
+
+    // Build gem indicators
+    var gems = '';
+    for (var i = 0; i < maxCryst; i++) {
+      gems += '<div class="gem' + (i < count ? ' full' : '') + '"></div>';
+    }
+
+    var eliteToggle = isAdmin
+      ? '<button class="elite-toggle' + (m.is_elite ? ' active' : '') + '"'
+        + ' onclick="toggleElite(\'' + m.id + '\',' + !m.is_elite + ')">'
+        + (m.is_elite ? '★ ELITE' : '☆ ELITE') + '</button>'
+      : (m.is_elite ? '<span class="elite-badge">ELITE</span>' : '');
+
+    var minusBtn = canEdit
+      ? '<button class="btn-crystal" onclick="adjustCrystal(\'' + m.id + '\',' + (count - 1) + ')" '
+        + (count <= 0 ? 'disabled' : '') + '>−</button>'
+      : '';
+
+    var plusBtn = canEdit
+      ? '<button class="btn-crystal" onclick="adjustCrystal(\'' + m.id + '\',' + (count + 1) + ')" '
+        + (count >= maxCryst ? 'disabled' : '') + '>+</button>'
+      : '';
+
+    return '<div class="crystal-row' + (isSelf ? ' is-self' : '') + '" id="crystal-row-' + m.id + '">'
+      + '<div class="crystal-name">' + m.username
+        + (m.is_elite ? '<span class="elite-badge">ELITE</span>' : '') + '</div>'
+      + '<div class="crystal-counter">'
+        + '<div class="crystal-gems">' + gems + '</div>'
+        + minusBtn
+        + '<div class="crystal-num' + (isEmpty ? ' empty' : '') + '">' + count + '</div>'
+        + '<span class="crystal-max">/ ' + maxCryst + '</span>'
+        + plusBtn
+      + '</div>'
+      + (isAdmin ? '<div>' + eliteToggle + '</div>' : '')
+      + '</div>';
+  }).join('');
+}
+
+window.adjustCrystal = async function(id, newCount) {
+  var res = await api('crystals', { method: 'PATCH', body: { id: id, crystals: newCount } });
+  if (!res.ok) { toast('Failed to update crystals.', 'error'); return; }
+  var m = crystalMembers.find(function(x) { return x.id === id; });
+  if (m) {
+    m.crystals = res.data.updates.crystals !== undefined ? res.data.updates.crystals : newCount;
+  }
+  renderCrystals();
+};
+
+window.toggleElite = async function(id, makeElite) {
+  var res = await api('crystals', { method: 'PATCH', body: { id: id, is_elite: makeElite } });
+  if (!res.ok) { toast('Failed to update Elite status.', 'error'); return; }
+  var m = crystalMembers.find(function(x) { return x.id === id; });
+  if (m) {
+    m.is_elite = makeElite;
+    if (res.data.updates.crystals !== undefined) m.crystals = res.data.updates.crystals;
+  }
+  renderCrystals();
+  toast(makeElite ? '★ Member set to Elite (5 crystals)' : '☆ Member set to Standard (3 crystals)', 'success');
+};
+
+
+// ════════════════════════════════════════════════════════════
+//  MAINTENANCE MODE
+// ════════════════════════════════════════════════════════════
+let maintenanceOn = false;
+
+async function checkMaintenance() {
+  var res = await fetch('/api/maintenance');
+  var d   = await res.json();
+  maintenanceOn = d.maintenance || false;
+  updateMaintenanceUI();
+  if (d.message) {
+    var inp = document.getElementById('maintenance-msg-input');
+    if (inp) inp.value = d.message;
+  }
+}
+
+function updateMaintenanceUI() {
+  var label = document.getElementById('maintenance-status-label');
+  var btn   = document.getElementById('btn-maintenance');
+  if (!label || !btn) return;
+  if (maintenanceOn) {
+    label.textContent = 'ONLINE — MAINTENANCE MODE';
+    label.style.color = 'var(--red2)';
+    btn.textContent   = 'DISABLE';
+    btn.style.borderColor = 'var(--red2)';
+    btn.style.color       = 'var(--red2)';
+  } else {
+    label.textContent = 'OFFLINE — NORMAL OPERATION';
+    label.style.color = 'var(--green2)';
+    btn.textContent   = 'ENABLE';
+    btn.style.borderColor = 'var(--green2)';
+    btn.style.color       = 'var(--green2)';
+  }
+}
+
+window.toggleMaintenance = async function() {
+  var newState = !maintenanceOn;
+  var confirmed = confirm(newState
+    ? 'Enable maintenance mode? All visitors will see the offline screen.'
+    : 'Disable maintenance mode? The site will go live again.');
+  if (!confirmed) return;
+
+  var res = await api('maintenance', { method: 'POST', body: { enabled: newState } });
+  if (res.ok) {
+    maintenanceOn = newState;
+    updateMaintenanceUI();
+    toast(newState ? '🔴 Maintenance mode ENABLED' : '🟢 Maintenance mode DISABLED',
+          newState ? 'error' : 'success');
+  } else {
+    toast('Failed to update maintenance mode.', 'error');
+  }
+};
+
+window.saveMaintenanceMessage = async function() {
+  var msg = document.getElementById('maintenance-msg-input').value.trim();
+  var res = await api('maintenance', { method: 'POST', body: { enabled: maintenanceOn, message: msg } });
+  if (res.ok) toast('Message saved.', 'success');
+  else toast('Failed to save message.', 'error');
+};
+
 // ════════════════════════════════════════════════════════════
 //  INIT — check for existing session
 // ════════════════════════════════════════════════════════════
 (async function init() {
+  // Check maintenance mode first
+  try {
+    var mRes = await fetch('/api/maintenance');
+    var mData = await mRes.json();
+    if (mData.maintenance) {
+      // Check if current user is admin before redirecting
+      var savedUser = localStorage.getItem('ks_user');
+      var isAdmin = savedUser ? JSON.parse(savedUser).is_admin : false;
+      if (!isAdmin) {
+        window.location.href = '/maintenance.html';
+        return;
+      }
+    }
+  } catch(e) {}
+
   const savedToken = localStorage.getItem('ks_token');
   const savedUser  = localStorage.getItem('ks_user');
   if (savedToken && savedUser) {
@@ -2349,7 +2658,11 @@ async function handleSyncFile(file) {
     currentUser  = JSON.parse(savedUser);
     // Verify token still valid
     const { ok } = await api('lands');
-    if (ok) { enterApp(); return; }
+    if (ok) {
+      enterApp();
+      if (currentUser.is_admin) checkMaintenance();
+      return;
+    }
     stopPolling();
     clearSession();
   }
