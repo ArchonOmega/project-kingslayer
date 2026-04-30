@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KINGSLAYER // ADMIN ACCESS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:    #080a0e;
+      --bg2:   #0c0f16;
+      --bg3:   #111520;
+      --border:#1c2235;
+      --gold:  #c8a84b;
+      --gold2: #e8c86a;
+      --red:   #c0392b;
+      --green: #27ae60;
+      --text:  #d4d8e2;
+      --muted: #445060;
+      --mono:  'Share Tech Mono', monospace;
+      --display: 'Bebas Neue', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(200,168,75,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200,168,75,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    .panel {
+      width: 380px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+      padding: 2.5rem;
+      position: relative;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .corner { position: absolute; width: 10px; height: 10px; }
+    .corner.tl { top:0; left:0; border-top: 1px solid var(--gold); border-left: 1px solid var(--gold); }
+    .corner.br { bottom:0; right:0; border-bottom: 1px solid var(--gold); border-right: 1px solid var(--gold); }
+
+    .eyebrow {
+      font-size: 0.6rem;
+      letter-spacing: 0.4em;
+      color: var(--muted);
+      text-align: center;
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    h1 {
+      font-family: var(--display);
+      font-size: 2.2rem;
+      letter-spacing: 0.08em;
+      color: #fff;
+      text-align: center;
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+
+    h1 em { color: var(--gold); font-style: normal; }
+
+    .sub {
+      font-size: 0.58rem;
+      letter-spacing: 0.25em;
+      color: var(--muted);
+      text-align: center;
+      display: block;
+      margin-bottom: 2rem;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 1rem; }
+
+    .field label {
+      font-size: 0.62rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .field input {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      padding: 0.55rem 0.75rem;
+      outline: none;
+      transition: border-color 0.2s;
+      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+      width: 100%;
+    }
+
+    .field input:focus { border-color: var(--gold); }
+    .field input::placeholder { color: var(--muted); }
+
+    .btn {
+      width: 100%;
+      background: var(--gold);
+      color: #000;
+      border: none;
+      font-family: var(--display);
+      font-size: 1.1rem;
+      letter-spacing: 0.15em;
+      padding: 0.65rem;
+      cursor: pointer;
+      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+      transition: background 0.2s;
+      margin-top: 0.5rem;
+    }
+
+    .btn:hover { background: var(--gold2); }
+    .btn:disabled { opacity: 0.5; cursor: default; }
+
+    .msg {
+      font-size: 0.7rem;
+      text-align: center;
+      padding: 0.5rem;
+      margin-top: 0.75rem;
+      display: none;
+      border-radius: 2px;
+    }
+
+    .msg.error   { color: var(--red);   border: 1px solid rgba(192,57,43,0.3); background: rgba(192,57,43,0.08); display: block; }
+    .msg.success { color: var(--green); border: 1px solid rgba(39,174,96,0.3);  background: rgba(39,174,96,0.08);  display: block; }
+
+    .back {
+      display: block;
+      text-align: center;
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      text-decoration: none;
+      margin-top: 1.25rem;
+      transition: color 0.15s;
+    }
+
+    .back:hover { color: var(--gold); }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <div class="corner tl"></div>
+    <div class="corner br"></div>
+
+    <span class="eyebrow">⚔ RESTRICTED ACCESS</span>
+    <h1>KING<em>SLAYER</em></h1>
+    <span class="sub">ADMIN OVERRIDE LOGIN</span>
+
+    <div class="field">
+      <label>Username</label>
+      <input type="text" id="username" placeholder="admin username" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+
+    <div class="msg" id="msg"></div>
+    <button class="btn" id="btn-login">AUTHENTICATE</button>
+    <a class="back" href="/">← Back to main site</a>
+  </div>
+
+  <script>
+    // Skip maintenance check entirely — this page is the admin bypass
+    async function doLogin() {
+      var username = document.getElementById('username').value.trim();
+      var password = document.getElementById('password').value;
+      var msg      = document.getElementById('msg');
+      var btn      = document.getElementById('btn-login');
+
+      if (!username || !password) {
+        msg.textContent = 'Username and password required.';
+        msg.className   = 'msg error';
+        return;
+      }
+
+      btn.disabled    = true;
+      btn.textContent = 'AUTHENTICATING...';
+      msg.className   = 'msg';
+
+      try {
+        var res  = await fetch('/api/auth?action=login', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ username: username, password: password }),
+        });
+        var data = await res.json();
+
+        if (!res.ok) {
+          msg.textContent = data.error || 'Login failed.';
+          msg.className   = 'msg error';
+          btn.disabled    = false;
+          btn.textContent = 'AUTHENTICATE';
+          return;
+        }
+
+        if (!data.user.is_admin) {
+          msg.textContent = 'This page is for admins only.';
+          msg.className   = 'msg error';
+          btn.disabled    = false;
+          btn.textContent = 'AUTHENTICATE';
+          return;
+        }
+
+        // Save session
+        localStorage.setItem('ks_token', data.token);
+        localStorage.setItem('ks_user',  JSON.stringify(data.user));
+
+        msg.textContent = 'Access granted. Redirecting...';
+        msg.className   = 'msg success';
+
+        setTimeout(function() { window.location.href = '/'; }, 800);
+
+      } catch(e) {
+        msg.textContent = 'Network error. Try again.';
+        msg.className   = 'msg error';
+        btn.disabled    = false;
+        btn.textContent = 'AUTHENTICATE';
+      }
+    }
+
+    document.getElementById('btn-login').addEventListener('click', doLogin);
+    document.getElementById('password').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') doLogin();
+    });
+    document.getElementById('username').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') doLogin();
+    });
+  </script>
+</body>
+</html>
