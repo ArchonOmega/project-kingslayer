@@ -6,8 +6,28 @@ const { requireAuth } = require('./_auth');
 
 function sanitizeStr(s) {
   if (!s) return '';
-  s = s.replace(/[\x00-\x1F\x7F]/g, '').trim();
-  return s;
+  s = s.replace(/\r/g, 'r');
+  s = s.replace(/[\n\t\x00-\x0C\x0E-\x1F\x7F]/g, '');
+  return s.trim();
+}
+
+// SL sometimes drops the letter 'r' from usernames entirely.
+// Map known corrupted usernames to their correct values for our clan.
+const USERNAME_CORRECTIONS = {
+  'seena5579':   'serena5579',
+  'meukii':      'merukii',
+  'theagnaok1':  'theragnarok1',
+  'theagnarok1': 'theragnarok1',
+  'theragnaok1': 'theragnarok1',
+  'laezimi':     'laezimir',
+};
+
+function correctReportedBy(reportedBy) {
+  if (!reportedBy) return reportedBy;
+  return reportedBy.replace(/\(([^)]+)\)\s*$/, (match, username) => {
+    const lower = username.trim().toLowerCase();
+    return '(' + (USERNAME_CORRECTIONS[lower] || username.trim()) + ')';
+  });
 }
 
 async function logShield(region, landName, slurl, reportedBy) {
@@ -65,7 +85,7 @@ module.exports = async function handler(req, res) {
     const region      = sanitizeStr(_b.region);
     const land        = sanitizeStr(_b.land);
     const link        = sanitizeStr(_b.link);
-    const reported_by = sanitizeStr(_b.reported_by);
+    const reported_by = correctReportedBy(sanitizeStr(_b.reported_by));
     if (!region) return res.status(400).json({ error: 'region required' });
 
     const now = new Date().toISOString();
