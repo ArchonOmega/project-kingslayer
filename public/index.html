@@ -585,6 +585,28 @@
     .status-badge.claimed .status-dot   { background: var(--green2); box-shadow: 0 0 4px var(--green2); }
     .status-badge.unclaimed .status-dot { background: var(--red2);   box-shadow: 0 0 4px var(--red2); }
 
+    /* Claimable variant — unclaimed land whose 6h lock has expired */
+    .status-badge.claimable {
+      color: #f39c12;
+      background: rgba(243,156,18,0.12);
+      border: 1px solid rgba(243,156,18,0.3);
+    }
+    .status-badge.claimable .status-dot {
+      background: #f39c12;
+      box-shadow: 0 0 4px #f39c12;
+    }
+    .lock-timer {
+      display: inline-block;
+      margin-left: 0.4rem;
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .lock-timer.locked    { color: var(--red2); }
+    .lock-timer.claimable { color: #f39c12; }
+
     .td-region {
       font-family: var(--mono);
       font-weight: 500;
@@ -1950,8 +1972,8 @@ async function pollLands() {
   if (!ok) { setLiveStatus('live', 'LIVE'); return; }
 
   // Check if anything actually changed by comparing a quick hash of statuses
-  const newSig = data.lands.map(l => l.id + l.status + (l.claimed_by||'') + (l.shield_verified_at||'')).join('|');
-  const oldSig = allLands.map(l => l.id + l.status + (l.claimed_by||'') + (l.shield_verified_at||'')).join('|');
+  const newSig = data.lands.map(l => l.id + l.status + (l.claimed_by||'') + (l.shield_verified_at||'') + (l.enemy_claimed_at||'')).join('|');
+  const oldSig = allLands.map(l => l.id + l.status + (l.claimed_by||'') + (l.shield_verified_at||'') + (l.enemy_claimed_at||'')).join('|');
 
   if (newSig !== oldSig) {
     allLands = data.lands;
@@ -2106,13 +2128,35 @@ function renderLands() {
     const dateStr   = land.first_seen ? land.first_seen.slice(0, 10) : '—';
 
     const tr = document.createElement('tr');
+    // Compute enemy claim lock status (6 hours from enemy_claimed_at)
+    const LOCK_MS = 6 * 60 * 60 * 1000;
+    let badgeVariant = land.status;       // 'claimed' or 'unclaimed'
+    let lockHtml = '';
+    if (!isClaimed && land.enemy_claimed_at) {
+      const claimedAt = new Date(land.enemy_claimed_at).getTime();
+      const now       = Date.now();
+      const elapsed   = now - claimedAt;
+      const remaining = LOCK_MS - elapsed;
+      if (remaining > 0) {
+        // Still locked
+        const hrs  = Math.floor(remaining / 3600000);
+        const mins = Math.floor((remaining % 3600000) / 60000);
+        lockHtml = '<span class="lock-timer locked">🔒 ' + hrs + 'h ' + mins + 'm</span>';
+      } else {
+        // Lock expired — claimable
+        badgeVariant = 'claimable';
+        lockHtml = '<span class="lock-timer claimable">✅ Claimable</span>';
+      }
+    }
+
     tr.className = 'status-' + land.status;
     tr.innerHTML = `
       <td>
-        <span class="status-badge ${land.status}">
+        <span class="status-badge ${badgeVariant}">
           <span class="status-dot"></span>
           ${isClaimed ? 'CLAIMED' : 'UNCLAIMED'}
         </span>
+        ${lockHtml}
       </td>
       <td class="td-region">${land.region}</td>
       <td class="td-land">${land.land_name || '<span style="color:var(--muted)">—</span>'}</td>

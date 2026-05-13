@@ -1,24 +1,47 @@
 // api/hud-claim.js
 const { supabase } = require('./_supabase');
 
-// Strip control characters and trim whitespace from region names
 function sanitizeStr(s) {
   if (!s) return '';
-  // SL sends carriage return (0x0D) in place of the letter 'r' in some strings.
-  // Replace it with 'r' before stripping other control characters.
+  // SL's llGetRegionName/llGetUsername sometimes send \r in place of 'r'.
   s = s.replace(/\r/g, 'r');
-  // Strip remaining control characters except we already handled \r above
-  s = s.replace(/[\n\t\x00-\x0C\x0E-\x1F\x7F]/g, '').trim();
-  return s;
+  s = s.replace(/[\n\t\x00-\x0C\x0E-\x1F\x7F]/g, '');
+  return s.trim();
 }
 
+// SL's llGetUsername() sometimes drops the letter 'r' entirely (not as \r, just missing).
+// Map known corrupted usernames back to the correct ones for our clan members.
+const USERNAME_CORRECTIONS = {
+  'seena5579':   'serena5579',
+  'meukii':      'merukii',
+  'theagnaok1':  'theragnarok1',
+  'theagnarok1': 'theragnarok1',
+  'theragnaok1': 'theragnarok1',
+  'laezimi':     'laezimir',
+};
+
+function correctUsername(name) {
+  if (!name) return name;
+  const lower = name.toLowerCase();
+  return USERNAME_CORRECTIONS[lower] || name;
+}
+
+function correctReportedBy(reportedBy) {
+  if (!reportedBy) return reportedBy;
+  // reported_by format is "Display Name (username)"
+  // Extract username, correct it, then rebuild the string
+  return reportedBy.replace(/\(([^)]+)\)\s*$/, (match, username) => {
+    const corrected = correctUsername(username.trim());
+    return '(' + corrected + ')';
+  });
+}
 
 async function logActivity(event, region, land, slurl, reported_by, enemy_clan) {
   await supabase.from('activity_log').insert({
     event,
     region,
-    land_name:   land       || '',
-    slurl:       slurl      || '',
+    land_name:   land        || '',
+    slurl:       slurl       || '',
     reported_by: reported_by || 'Unknown',
     enemy_clan:  enemy_clan  || '',
   });
@@ -31,7 +54,7 @@ module.exports = async function handler(req, res) {
 
   // ── GET — check current status of a region ───────────────
   if (req.method === 'GET') {
-    const { region } = req.query;
+    const region = sanitizeStr(req.query.region || '');
     if (!region) return res.status(400).json({ error: 'region required' });
 
     const { data, error } = await supabase
@@ -52,13 +75,14 @@ module.exports = async function handler(req, res) {
 
   // ── POST — record a claim/lost/contested event ───────────
   if (req.method === 'POST') {
-    const _b = req.body || {};
+    const _b          = req.body || {};
     const event       = sanitizeStr(_b.event);
     const land        = sanitizeStr(_b.land);
     const region      = sanitizeStr(_b.region);
     const link        = sanitizeStr(_b.link);
-    const reported_by = sanitizeStr(_b.reported_by);
+    const reported_by = correctReportedBy(sanitizeStr(_b.reported_by));
     const enemy_clan  = sanitizeStr(_b.enemy_clan);
+
     if (!region) return res.status(400).json({ error: 'region required' });
 
     if (event === 'claimed') {
@@ -72,16 +96,16 @@ module.exports = async function handler(req, res) {
         await supabase.from('lands').update({
           status:     'claimed',
           claimed_by: reported_by || '',
-          land_name:  land  || '',
-          slurl:      link  || '',
+          land_name:  land        || '',
+          slurl:      link        || '',
           claimed_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         }).eq('id', existing.id);
       } else {
         await supabase.from('lands').insert({
           region,
-          land_name:     land  || '',
-          slurl:         link  || '',
+          land_name:     land        || '',
+          slurl:         link        || '',
           status:        'claimed',
           claimed_by:    reported_by || '',
           enemy_claimer: '',
@@ -90,13 +114,11 @@ module.exports = async function handler(req, res) {
         });
       }
 
-      // Deduct a crystal from the reporting member
+      // Deduct a crystal — match by sl_username first, fall back to username
       if (reported_by) {
-        // reported_by format is "Display Name (username)" — extract username
         const usernameMatch = reported_by.match(/\(([^)]+)\)\s*$/);
         const username = usernameMatch ? usernameMatch[1].trim() : reported_by;
 
-        // Try matching by sl_username first, fall back to username
         let { data: member } = await supabase
           .from('users')
           .select('id, crystals, is_elite')
@@ -104,50 +126,50 @@ module.exports = async function handler(req, res) {
           .single();
 
         if (!member) {
-          // Fall back to website username
-          const { data: memberByUsername } = await supabase
+          const { data: fallback } = await supabase
             .from('users')
             .select('id, crystals, is_elite')
             .eq('username', username.toLowerCase())
             .single();
-          member = memberByUsername;
+          member = fallback;
         }
 
         if (member) {
-          const newCount = Math.max(0, (member.crystals || 0) - 1);
           await supabase
             .from('users')
-            .update({ crystals: newCount })
+            .update({ crystals: Math.max(0, (member.crystals || 0) - 1) })
             .eq('id', member.id);
         }
       }
 
-      // Log activity
       await logActivity('claimed', region, land, link, reported_by, '');
-      // Fetch updated crystal count to return to HUD
+
+      // Return updated crystal count
       let crystalCount = null;
       if (reported_by) {
         const usernameMatch = reported_by.match(/\(([^)]+)\)\s*$/);
         const username = usernameMatch ? usernameMatch[1].trim() : reported_by;
-        let { data: updatedMember } = await supabase
+
+        let { data: updated } = await supabase
           .from('users')
-          .select('crystals, is_elite')
+          .select('crystals')
           .eq('sl_username', username.toLowerCase())
           .single();
-        if (!updatedMember) {
+
+        if (!updated) {
           const { data: fallback } = await supabase
             .from('users')
-            .select('crystals, is_elite')
+            .select('crystals')
             .eq('username', username.toLowerCase())
             .single();
-          updatedMember = fallback;
+          updated = fallback;
         }
-        if (updatedMember) {
-          crystalCount = updatedMember.crystals;
-        }
+
+        if (updated) crystalCount = updated.crystals;
       }
+
       return res.status(200).json({
-        message: 'Land claimed and recorded.',
+        message:            'Land claimed and recorded.',
         crystals_remaining: crystalCount,
       });
     }
@@ -159,34 +181,35 @@ module.exports = async function handler(req, res) {
         .eq('region', region)
         .single();
 
+      const lostNow = new Date().toISOString();
       if (existing) {
         await supabase.from('lands').update({
-          status:        'unclaimed',
-          claimed_by:    '',
-          claimed_at:    null,
-          enemy_claimer: enemy_clan || '',
-          updated_at:    new Date().toISOString(),
+          status:           'unclaimed',
+          claimed_by:       '',
+          claimed_at:       null,
+          enemy_claimer:    enemy_clan || '',
+          enemy_claimed_at: lostNow,
+          updated_at:       lostNow,
         }).eq('id', existing.id);
       } else {
         await supabase.from('lands').insert({
           region,
-          land_name:     land  || '',
-          slurl:         link  || '',
-          status:        'unclaimed',
-          claimed_by:    '',
-          enemy_claimer: enemy_clan || '',
-          first_seen:    new Date().toISOString(),
-          claimed_at:    null,
+          land_name:        land        || '',
+          slurl:            link        || '',
+          status:           'unclaimed',
+          claimed_by:       '',
+          enemy_claimer:    enemy_clan  || '',
+          enemy_claimed_at: lostNow,
+          first_seen:       lostNow,
+          claimed_at:       null,
         });
       }
 
-      // Log activity
       await logActivity('lost', region, land, link, reported_by, enemy_clan);
       return res.status(200).json({ message: 'Land marked as lost.' });
     }
 
     if (event === 'contested') {
-      // Log activity even for contested
       await logActivity('contested', region, land, link, reported_by, '');
       return res.status(200).json({ message: 'Contested alert received.' });
     }

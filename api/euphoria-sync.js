@@ -2,11 +2,52 @@
 const { supabase } = require('./_supabase');
 const { requireAdmin } = require('./_auth');
 
-const EVW_MEMBERS = new Set([
-  'theragnarok1 resident', 'merukii resident', 'lucifer seraphim',
-  'kittie doll', 'saltypotion resident', 'serena5579 resident',
-  'vaphnova hexem', 'ghostiegrimm resident', 'thicc snacc', 'laezimir resident'
+// Hardcoded fallback list (lowercase). Used as a safety net in case the
+// dynamic lookup misses someone. The dynamic detection below is the
+// primary source of truth.
+const EVW_MEMBERS_FALLBACK = new Set([
+  'theragnarok1', 'merukii', 'lucifer.seraphim',
+  'kittie.doll', 'saltypotion', 'serena5579',
+  'vaphnova.hexem', 'ghostiegrimm', 'thicc.snacc', 'laezimir'
 ]);
+
+// Build the live set of known clan member usernames at sync time.
+// Sources:
+//   1. users.username (website login)
+//   2. users.sl_username (SL username)
+//   3. activity_log.reported_by — extract the username inside the parens
+async function buildKnownMembers() {
+  const known = new Set();
+
+  // From users table
+  const { data: users } = await supabase
+    .from('users')
+    .select('username, sl_username')
+    .eq('is_approved', true);
+
+  for (const u of users || []) {
+    if (u.username)    known.add(u.username.toLowerCase().trim());
+    if (u.sl_username) known.add(u.sl_username.toLowerCase().trim());
+  }
+
+  // From activity_log — anyone who has ever used the HUD is one of us
+  const { data: logs } = await supabase
+    .from('activity_log')
+    .select('reported_by')
+    .not('reported_by', 'is', null);
+
+  for (const row of logs || []) {
+    if (!row.reported_by) continue;
+    // Format: "Display Name (username)" — extract the username from inside ()
+    const m = row.reported_by.match(/\(([^)]+)\)\s*$/);
+    if (m) known.add(m[1].toLowerCase().trim());
+  }
+
+  // Always include the fallback list too
+  for (const name of EVW_MEMBERS_FALLBACK) known.add(name);
+
+  return known;
+}
 
 function norm(s) { return (s || '').trim().toLowerCase(); }
 
@@ -94,6 +135,9 @@ module.exports = async function handler(req, res) {
   }
   const deduped = Object.values(latestByRegion);
 
+  // Build dynamic set of known clan members from users + activity_log
+  const knownMembers = await buildKnownMembers();
+
   // Fetch all existing lands
   const { data: existingLands, error: fetchError } = await supabase
     .from('lands').select('id, region, status, enemy_claimer, updated_at, claimed_at');
@@ -107,21 +151,22 @@ module.exports = async function handler(req, res) {
 
   for (const rec of deduped) {
     const key      = norm(rec.region);
-    const isEVW    = EVW_MEMBERS.has(norm(rec.claimer));
+    const isEVW    = knownMembers.has(norm(rec.claimer));
     const existing = dbMap[key];
     const claimerVal = isEVW ? '' : (rec.claimer || '');
 
     if (!existing) {
       toInsert.push({
-        region:        rec.region,
-        land_name:     '',
-        slurl:         rec.slurl || '',
-        status:        isEVW ? 'claimed' : 'unclaimed',
-        claimed_by:    '',
-        enemy_claimer: claimerVal,
-        first_seen:    rec.timestamp,
-        claimed_at:    isEVW ? rec.timestamp : null,
-        updated_at:    rec.timestamp,
+        region:           rec.region,
+        land_name:        '',
+        slurl:            rec.slurl || '',
+        status:           isEVW ? 'claimed' : 'unclaimed',
+        claimed_by:       '',
+        enemy_claimer:    claimerVal,
+        enemy_claimed_at: !isEVW ? rec.timestamp : null,
+        first_seen:       rec.timestamp,
+        claimed_at:       isEVW ? rec.timestamp : null,
+        updated_at:       rec.timestamp,
       });
     } else {
       const dbUpdatedAt  = existing.updated_at ? new Date(existing.updated_at) : new Date(0);
@@ -133,13 +178,15 @@ module.exports = async function handler(req, res) {
       }
       if (existing.status === 'claimed' && logIsNewer && !isEVW) {
         toUpdate.push({ id: existing.id, status: 'unclaimed', enemy_claimer: claimerVal,
-          claimed_by: '', claimed_at: null, updated_at: rec.timestamp,
+          claimed_by: '', claimed_at: null, enemy_claimed_at: rec.timestamp,
+          updated_at: rec.timestamp,
           slurl: rec.slurl || existing.slurl || '' });
       } else if (existing.status === 'claimed' && logIsNewer && isEVW) {
         evwOwned.push(rec.region);
       } else if (existing.status === 'unclaimed') {
         if (logIsNewer && !isEVW) {
           toUpdate.push({ id: existing.id, enemy_claimer: claimerVal,
+            enemy_claimed_at: rec.timestamp,
             slurl: rec.slurl || existing.slurl || '', updated_at: rec.timestamp });
         } else if (logIsNewer && isEVW) {
           toUpdate.push({ id: existing.id, status: 'claimed', claimed_at: rec.timestamp,
