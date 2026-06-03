@@ -1483,9 +1483,12 @@
       </nav>
     </div>
     <div class="topbar-right">
-      <div class="user-info">
+      <div class="user-info" id="user-info-menu" style="cursor:pointer;position:relative" onclick="toggleUserMenu()">
         <strong id="topbar-username">—</strong>
         <span id="topbar-role">MEMBER</span>
+        <div id="user-dropdown" style="display:none;position:absolute;top:100%;right:0;margin-top:0.5rem;background:var(--bg2);border:1px solid var(--border);min-width:160px;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,0.4)">
+          <button onclick="event.stopPropagation();openChangePassword()" style="width:100%;text-align:left;background:none;border:none;color:var(--text);font-family:var(--mono);font-size:0.72rem;padding:0.6rem 0.9rem;cursor:pointer">🔑 Change Password</button>
+        </div>
       </div>
       <div class="live-indicator" id="live-indicator">
         <div class="live-dot" id="live-dot"></div>
@@ -2309,14 +2312,33 @@ async function loadAdmin() {
       <td><span class="${u.is_admin ? 'badge-admin' : 'badge-member'}">${u.is_admin ? 'ADMIN' : 'MEMBER'}</span></td>
       <td>${u.created_at ? u.created_at.slice(0,10) : '—'}</td>
       <td>
+        <button class="btn-reject" style="font-size:0.6rem;padding:0.2rem 0.5rem;border-color:var(--gold);color:var(--gold)" onclick="resetUserPassword('${u.id}', '${u.username}')">🔑 Reset PW</button>
         ${!u.is_admin
-          ? `<button class="btn-reject" style="font-size:0.6rem;padding:0.2rem 0.5rem" onclick="removeUser('${u.id}', '${u.username}')">Remove</button>`
-          : '<span style="color:var(--muted);font-family:var(--mono);font-size:0.65rem">—</span>'
+          ? `<button class="btn-reject" style="font-size:0.6rem;padding:0.2rem 0.5rem;margin-left:0.3rem" onclick="removeUser('${u.id}', '${u.username}')">Remove</button>`
+          : ''
         }
       </td>
     </tr>
   `).join('');
 }
+
+window.resetUserPassword = async function(id, username) {
+  const newPw = prompt('Enter a temporary password for ' + username + ':\n\n(They will use this to log in. Min 6 characters. This will also log them out of any active sessions.)');
+  if (newPw === null) return; // cancelled
+  if (newPw.length < 6) {
+    toast('Password must be at least 6 characters.', 'error');
+    return;
+  }
+  const res = await api('auth?action=reset-password', {
+    method: 'POST',
+    body: { user_id: id, new_password: newPw }
+  });
+  if (res.ok) {
+    toast('🔑 Password reset for ' + username + '. Give them the new password.', 'success');
+  } else {
+    toast(res.data.error || 'Failed to reset password.', 'error');
+  }
+};
 
 window.approveUser = async function(id, approve) {
   const { ok } = await api('admin/users', {
@@ -2771,6 +2793,71 @@ function renderSyncHistory(logs) {
   }).join('');
 }
 
+
+// ── User menu + change password ──────────────────────────────
+window.toggleUserMenu = function() {
+  var dd = document.getElementById('user-dropdown');
+  if (dd) dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+};
+
+// Close dropdown when clicking elsewhere
+document.addEventListener('click', function(e) {
+  var menu = document.getElementById('user-info-menu');
+  var dd   = document.getElementById('user-dropdown');
+  if (dd && menu && !menu.contains(e.target)) dd.style.display = 'none';
+});
+
+window.openChangePassword = function() {
+  var dd = document.getElementById('user-dropdown');
+  if (dd) dd.style.display = 'none';
+  document.getElementById('cpw-current').value = '';
+  document.getElementById('cpw-new').value     = '';
+  document.getElementById('cpw-confirm').value = '';
+  document.getElementById('cpw-msg').textContent = '';
+  document.getElementById('change-pw-modal').style.display = 'flex';
+};
+
+window.closeChangePassword = function() {
+  document.getElementById('change-pw-modal').style.display = 'none';
+};
+
+window.submitChangePassword = async function() {
+  var cur     = document.getElementById('cpw-current').value;
+  var nw      = document.getElementById('cpw-new').value;
+  var confirm = document.getElementById('cpw-confirm').value;
+  var msg     = document.getElementById('cpw-msg');
+
+  if (!cur || !nw || !confirm) {
+    msg.style.color = 'var(--red2)';
+    msg.textContent = 'All fields are required.';
+    return;
+  }
+  if (nw.length < 6) {
+    msg.style.color = 'var(--red2)';
+    msg.textContent = 'New password must be at least 6 characters.';
+    return;
+  }
+  if (nw !== confirm) {
+    msg.style.color = 'var(--red2)';
+    msg.textContent = 'New passwords do not match.';
+    return;
+  }
+
+  var res = await api('auth?action=change-password', {
+    method: 'POST',
+    body: { current_password: cur, new_password: nw }
+  });
+
+  if (res.ok) {
+    msg.style.color = 'var(--green2)';
+    msg.textContent = 'Password changed successfully!';
+    setTimeout(closeChangePassword, 1200);
+  } else {
+    msg.style.color = 'var(--red2)';
+    msg.textContent = res.data.error || 'Failed to change password.';
+  }
+};
+
 // ════════════════════════════════════════════════════════════
 //  INIT — check for existing session
 // ════════════════════════════════════════════════════════════
@@ -2808,5 +2895,23 @@ function renderSyncHistory(logs) {
   showScreen('screen-auth');
 })();
 </script>
+
+  <!-- Change Password Modal -->
+  <div id="change-pw-modal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.7);align-items:center;justify-content:center">
+    <div style="background:var(--bg2);border:1px solid var(--border);padding:2rem;width:340px;max-width:90vw;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px))">
+      <div style="font-family:var(--display);font-size:1.4rem;letter-spacing:0.06em;color:#fff;margin-bottom:1.25rem">CHANGE PASSWORD</div>
+      <div style="display:flex;flex-direction:column;gap:0.75rem">
+        <input id="cpw-current" type="password" placeholder="Current password" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:0.8rem;padding:0.5rem 0.7rem;outline:none">
+        <input id="cpw-new" type="password" placeholder="New password (min 6 chars)" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:0.8rem;padding:0.5rem 0.7rem;outline:none">
+        <input id="cpw-confirm" type="password" placeholder="Confirm new password" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:0.8rem;padding:0.5rem 0.7rem;outline:none">
+      </div>
+      <div id="cpw-msg" style="font-family:var(--mono);font-size:0.68rem;margin-top:0.75rem;min-height:1rem"></div>
+      <div style="display:flex;gap:0.5rem;margin-top:1rem">
+        <button onclick="submitChangePassword()" style="flex:1;background:var(--gold);color:#000;border:none;font-family:var(--display);font-size:1rem;letter-spacing:0.1em;padding:0.5rem;cursor:pointer">UPDATE</button>
+        <button onclick="closeChangePassword()" style="flex:1;background:none;border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:0.72rem;padding:0.5rem;cursor:pointer">CANCEL</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

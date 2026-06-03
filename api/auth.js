@@ -5,7 +5,7 @@
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const { supabase } = require('./_supabase');
-const { requireAuth } = require('./_auth');
+const { requireAuth, requireAdmin } = require('./_auth');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST')
@@ -91,5 +91,63 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ message: 'Logged out' });
   }
 
-  return res.status(400).json({ error: 'Unknown action. Use ?action=register|login|logout' });
+  // ── RESET PASSWORD (admin sets a member's password) ──────
+  if (action === 'reset-password') {
+    const auth = await requireAdmin(req);
+    if (auth.error) return res.status(auth.status).json({ error: auth.error });
+
+    const { user_id, new_password } = req.body || {};
+    if (!user_id || !new_password)
+      return res.status(400).json({ error: 'user_id and new_password are required' });
+    if (new_password.length < 6)
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+
+    const password_hash = await bcrypt.hash(new_password, 12);
+    const { error } = await supabase
+      .from('users')
+      .update({ password_hash })
+      .eq('id', user_id);
+
+    if (error)
+      return res.status(500).json({ error: 'Failed to reset password: ' + error.message });
+
+    // Invalidate existing sessions so the old login can't persist
+    await supabase.from('sessions').delete().eq('user_id', user_id);
+
+    return res.status(200).json({ message: 'Password reset successfully.' });
+  }
+
+  // ── CHANGE PASSWORD (member changes their own) ───────────
+  if (action === 'change-password') {
+    const auth = await requireAuth(req);
+    if (auth.error) return res.status(auth.status).json({ error: auth.error });
+
+    const { current_password, new_password } = req.body || {};
+    if (!current_password || !new_password)
+      return res.status(400).json({ error: 'Current and new password are required' });
+    if (new_password.length < 6)
+      return res.status(400).json({ error: 'New password must be at least 6 characters' });
+
+    const { data: user } = await supabase
+      .from('users').select('password_hash').eq('id', auth.user.id).single();
+    if (!user)
+      return res.status(404).json({ error: 'User not found' });
+
+    const valid = await bcrypt.compare(current_password, user.password_hash);
+    if (!valid)
+      return res.status(401).json({ error: 'Current password is incorrect' });
+
+    const password_hash = await bcrypt.hash(new_password, 12);
+    const { error } = await supabase
+      .from('users')
+      .update({ password_hash })
+      .eq('id', auth.user.id);
+
+    if (error)
+      return res.status(500).json({ error: 'Failed to change password: ' + error.message });
+
+    return res.status(200).json({ message: 'Password changed successfully.' });
+  }
+
+  return res.status(400).json({ error: 'Unknown action. Use ?action=register|login|logout|reset-password|change-password' });
 };
