@@ -1475,11 +1475,11 @@
       <div class="topbar-logo">PROJECT <em>KINGSLAYER</em></div>
       <div class="topbar-divider"></div>
       <nav class="nav-tabs">
-        <button class="nav-tab active" data-page="lands">⚔ Lands</button>
-        <button class="nav-tab" data-page="intel" id="nav-intel">◈ Intel</button>
-        <button class="nav-tab admin-tab" data-page="admin" id="nav-admin" style="display:none">⬡ Admin</button>
-        <button class="nav-tab" data-page="crystals" id="nav-crystals">💎 Crystals</button>
-        <button class="nav-tab admin-tab" data-page="sync" id="nav-sync" style="display:none">⇅ Sync</button>
+        <button class="nav-tab active" data-page="lands" data-i18n="nav.lands">⚔ Lands</button>
+        <button class="nav-tab" data-page="intel" id="nav-intel" data-i18n="nav.intel">◈ Intel</button>
+        <button class="nav-tab admin-tab" data-page="admin" id="nav-admin" style="display:none" data-i18n="nav.admin">⬡ Admin</button>
+        <button class="nav-tab" data-page="crystals" id="nav-crystals" data-i18n="nav.crystals">💎 Crystals</button>
+        <button class="nav-tab admin-tab" data-page="sync" id="nav-sync" style="display:none" data-i18n="nav.sync">⇅ Sync</button>
       </nav>
     </div>
     <div class="topbar-right">
@@ -1487,14 +1487,15 @@
         <strong id="topbar-username">—</strong>
         <span id="topbar-role">MEMBER</span>
         <div id="user-dropdown" style="display:none;position:absolute;top:100%;right:0;margin-top:0.5rem;background:var(--bg2);border:1px solid var(--border);min-width:160px;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,0.4)">
-          <button onclick="event.stopPropagation();openChangePassword()" style="width:100%;text-align:left;background:none;border:none;color:var(--text);font-family:var(--mono);font-size:0.72rem;padding:0.6rem 0.9rem;cursor:pointer">🔑 Change Password</button>
+          <button onclick="event.stopPropagation();openChangePassword()" style="width:100%;text-align:left;background:none;border:none;color:var(--text);font-family:var(--mono);font-size:0.72rem;padding:0.6rem 0.9rem;cursor:pointer" data-i18n="topbar.changePw">🔑 Change Password</button>
         </div>
       </div>
       <div class="live-indicator" id="live-indicator">
         <div class="live-dot" id="live-dot"></div>
         <span id="live-text">STANDBY</span>
       </div>
-      <button class="btn-logout" id="btn-logout">[ LOGOUT ]</button>
+      <button class="btn-logout" id="lang-toggle" onclick="toggleLanguage()" style="margin-right:0.5rem">ES</button>
+      <button class="btn-logout" id="btn-logout" data-i18n="topbar.logout">[ LOGOUT ]</button>
     </div>
   </div>
 
@@ -1502,17 +1503,17 @@
   <div class="statusbar">
     <div class="stat-pill">
       <span class="num gold" id="stat-total">—</span>
-      <span>TOTAL REGIONS</span>
+      <span data-i18n="stats.totalRegions">TOTAL REGIONS</span>
     </div>
     <span class="stat-sep">|</span>
     <div class="stat-pill">
       <span class="num green" id="stat-claimed">—</span>
-      <span>UNDER EVW CONTROL</span>
+      <span data-i18n="stats.underControl">UNDER EVW CONTROL</span>
     </div>
     <span class="stat-sep">|</span>
     <div class="stat-pill">
       <span class="num red" id="stat-unclaimed">—</span>
-      <span>ENEMY / UNCLAIMED</span>
+      <span data-i18n="stats.enemyUnclaimed">ENEMY / UNCLAIMED</span>
     </div>
     <span class="stat-sep">|</span>
     <div class="progress-wrap">
@@ -1530,7 +1531,7 @@
         <svg class="search-icon" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
         </svg>
-        <input class="search-input" type="search" id="lands-search" placeholder="Search region, land, claimer...">
+        <input class="search-input" type="search" id="lands-search" placeholder="Search region, land, claimer..." data-i18n-ph="lands.searchPlaceholder">
       </div>
       <div class="filter-group">
         <button class="filter-btn active" data-filter="all">All</button>
@@ -1557,15 +1558,15 @@
       <table id="lands-table" style="display:none">
         <thead>
           <tr>
-            <th>Status</th>
-            <th>Region</th>
-            <th>Land Name</th>
-            <th>Enemy Claimer</th>
-            <th>Claimed By (EVW)</th>
-            <th>First Seen</th>
-            <th>Teleport</th>
-            <th>Shield</th>
-            <th>Action</th>
+            <th data-i18n="lands.status">Status</th>
+            <th data-i18n="lands.region">Region</th>
+            <th data-i18n="lands.landName">Land Name</th>
+            <th data-i18n="lands.enemyClaimer">Enemy Claimer</th>
+            <th data-i18n="lands.claimedBy">Claimed By (EVW)</th>
+            <th data-i18n="lands.firstSeen">First Seen</th>
+            <th data-i18n="lands.teleport">Teleport</th>
+            <th data-i18n="lands.shield">Shield</th>
+            <th data-i18n="lands.action">Action</th>
           </tr>
         </thead>
         <tbody id="lands-tbody"></tbody>
@@ -1583,7 +1584,7 @@
 
       <!-- Maintenance toggle -->
       <div>
-        <div class="admin-section-title">⚙ System Control</div>
+        <div class="admin-section-title" data-i18n="admin.systemControl">⚙ System Control</div>
         <div style="background:var(--bg3);border:1px solid var(--border);padding:1rem 1.2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
           <div>
             <div style="font-family:var(--mono);font-size:0.8rem;color:#fff;margin-bottom:0.25rem">Maintenance Mode</div>
@@ -1609,7 +1610,7 @@
       </div>
 
       <div>
-        <div class="admin-section-title">⏳ Pending Access Requests</div>
+        <div class="admin-section-title" data-i18n="admin.pendingRequests">⏳ Pending Access Requests</div>
         <div id="pending-list">
           <div class="loader">
             <div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div>
@@ -1619,15 +1620,15 @@
       </div>
 
       <div>
-        <div class="admin-section-title">👥 All Members</div>
+        <div class="admin-section-title" data-i18n="admin.allMembers">👥 All Members</div>
         <table class="members-table">
           <thead>
             <tr>
-              <th>Username</th>
-              <th>SL Username</th>
-              <th>Role</th>
-              <th>Joined</th>
-              <th>Actions</th>
+              <th data-i18n="admin.username">Username</th>
+              <th data-i18n="admin.slUsername">SL Username</th>
+              <th data-i18n="admin.role">Role</th>
+              <th data-i18n="admin.joined">Joined</th>
+              <th data-i18n="admin.actions">Actions</th>
             </tr>
           </thead>
           <tbody id="members-tbody"></tbody>
@@ -1644,7 +1645,7 @@
       <!-- Leaderboard -->
       <div class="intel-card">
         <div class="intel-card-header">
-          <span class="intel-card-title">★ OPERATIVE LEADERBOARD</span>
+          <span class="intel-card-title" data-i18n="intel.leaderboard">★ OPERATIVE LEADERBOARD</span>
           <div class="period-toggle">
             <button class="period-btn active" data-period="alltime">All Time</button>
             <button class="period-btn" data-period="30days">30 Days</button>
@@ -1661,7 +1662,7 @@
       <!-- Activity Feed -->
       <div class="intel-card">
         <div class="intel-card-header">
-          <span class="intel-card-title">⚡ RECENT ACTIVITY</span>
+          <span class="intel-card-title" data-i18n="intel.recentActivity">⚡ RECENT ACTIVITY</span>
           <span style="font-family:var(--mono);font-size:0.62rem;color:var(--muted)" id="feed-count"></span>
         </div>
         <div class="intel-card-body" id="feed-body">
@@ -1697,7 +1698,7 @@
     <div class="admin-grid">
 
       <div>
-        <div class="admin-section-title">⇅ Euphoria Channel Sync</div>
+        <div class="admin-section-title" data-i18n="sync.title">⇅ Euphoria Channel Sync</div>
         <p style="font-family:var(--mono);font-size:0.72rem;color:var(--text2);margin-bottom:1.5rem;line-height:1.7">
           Export the Euphoria Discord channel using DiscordChatExporter (JSON format), then drop the file below.<br>
           New enemy lands will be added. Existing EVW-claimed lands will only be updated if the log entry is newer than our last recorded update.
@@ -1941,6 +1942,7 @@ function enterApp() {
   initIntelPage();
   loadLands();
   if (currentUser.is_admin) loadAdmin();
+  applyLanguage(currentLang);
 }
 
 // ════════════════════════════════════════════════════════════
@@ -2148,7 +2150,7 @@ function renderLands() {
       } else {
         // Lock expired — claimable
         badgeVariant = 'claimable';
-        lockHtml = '<span class="lock-timer claimable">✅ Claimable</span>';
+        lockHtml = '<span class="lock-timer claimable">' + t('lands.claimable') + '</span>';
       }
     }
 
@@ -2157,7 +2159,7 @@ function renderLands() {
       <td>
         <span class="status-badge ${badgeVariant}">
           <span class="status-dot"></span>
-          ${isClaimed ? 'CLAIMED' : 'UNCLAIMED'}
+          ${isClaimed ? t('lands.claimed') : t('lands.unclaimed')}
         </span>
         ${lockHtml}
       </td>
@@ -2858,10 +2860,123 @@ window.submitChangePassword = async function() {
   }
 };
 
+
+// ════════════════════════════════════════════════════════════
+//  INTERNATIONALIZATION (i18n)
+// ════════════════════════════════════════════════════════════
+const TRANSLATIONS = {
+  en: {
+    'nav.lands': '⚔ Lands', 'nav.intel': '◈ Intel', 'nav.admin': '⬡ Admin',
+    'nav.crystals': '💎 Crystals', 'nav.sync': '⇅ Sync',
+    'topbar.logout': '[ LOGOUT ]', 'topbar.changePw': '🔑 Change Password',
+    'topbar.admin': '★ ADMIN', 'topbar.operative': 'OPERATIVE',
+    'auth.tagline': 'TERRITORY COMMAND SYSTEM // EUPHORIA',
+    'auth.login': 'Login', 'auth.request': 'Request Access',
+    'auth.username': 'Username', 'auth.password': 'Password',
+    'auth.authenticate': 'AUTHENTICATE', 'auth.slUsername': 'Second Life Username',
+    'auth.submitRequest': 'SUBMIT REQUEST',
+    'lands.status': 'Status', 'lands.region': 'Region', 'lands.landName': 'Land Name',
+    'lands.enemyClaimer': 'Enemy Claimer', 'lands.claimedBy': 'Claimed By (EVW)',
+    'lands.firstSeen': 'First Seen', 'lands.teleport': 'Teleport', 'lands.shield': 'Shield',
+    'lands.action': 'Action', 'lands.claimed': 'CLAIMED', 'lands.unclaimed': 'UNCLAIMED',
+    'lands.claimable': '✅ Claimable', 'lands.searchPlaceholder': 'Search regions...',
+    'stats.totalRegions': 'TOTAL REGIONS', 'stats.underControl': 'UNDER EVW CONTROL',
+    'stats.enemyUnclaimed': 'ENEMY / UNCLAIMED', 'stats.control': 'CONTROL',
+    'intel.leaderboard': '★ OPERATIVE LEADERBOARD', 'intel.recentActivity': '⚡ RECENT ACTIVITY',
+    'intel.allTime': 'ALL TIME', 'intel.30days': '30 DAYS',
+    'intel.claimed': 'CLAIMED', 'intel.lost': 'LOST', 'intel.conto': 'CONTD',
+    'intel.events': 'events', 'intel.noActivity': 'No activity recorded yet.',
+    'crystals.title': '💎 CRYSTAL TRACKER', 'crystals.resets': 'Resets 12AM PST daily',
+    'admin.systemControl': '⚙ System Control', 'admin.maintenanceMode': 'Maintenance Mode',
+    'admin.maintenanceDesc': 'Redirects all visitors to the maintenance screen. Admins can still log in.',
+    'admin.pendingRequests': '⏳ Pending Access Requests', 'admin.allMembers': '👥 All Members',
+    'admin.username': 'Username', 'admin.slUsername': 'SL Username', 'admin.role': 'Role',
+    'admin.joined': 'Joined', 'admin.actions': 'Actions',
+    'sync.title': '⇅ Euphoria Channel Sync', 'sync.report': 'Sync Report',
+    'sync.history': '📋 SYNC HISTORY',
+    'cpw.title': 'CHANGE PASSWORD', 'cpw.current': 'Current password',
+    'cpw.new': 'New password (min 6 chars)', 'cpw.confirm': 'Confirm new password',
+    'cpw.update': 'UPDATE', 'cpw.cancel': 'CANCEL',
+  },
+  es: {
+    'nav.lands': '⚔ Tierras', 'nav.intel': '◈ Intel', 'nav.admin': '⬡ Admin',
+    'nav.crystals': '💎 Cristales', 'nav.sync': '⇅ Sinc.',
+    'topbar.logout': '[ SALIR ]', 'topbar.changePw': '🔑 Cambiar Contraseña',
+    'topbar.admin': '★ ADMIN', 'topbar.operative': 'OPERATIVO',
+    'auth.tagline': 'SISTEMA DE COMANDO TERRITORIAL // EUPHORIA',
+    'auth.login': 'Iniciar Sesión', 'auth.request': 'Solicitar Acceso',
+    'auth.username': 'Usuario', 'auth.password': 'Contraseña',
+    'auth.authenticate': 'AUTENTICAR', 'auth.slUsername': 'Usuario de Second Life',
+    'auth.submitRequest': 'ENVIAR SOLICITUD',
+    'lands.status': 'Estado', 'lands.region': 'Región', 'lands.landName': 'Nombre',
+    'lands.enemyClaimer': 'Reclamante Enemigo', 'lands.claimedBy': 'Reclamado Por (EVW)',
+    'lands.firstSeen': 'Visto Primero', 'lands.teleport': 'Teleporte', 'lands.shield': 'Escudo',
+    'lands.action': 'Acción', 'lands.claimed': 'RECLAMADO', 'lands.unclaimed': 'SIN RECLAMAR',
+    'lands.claimable': '✅ Disponible', 'lands.searchPlaceholder': 'Buscar regiones...',
+    'stats.totalRegions': 'REGIONES TOTALES', 'stats.underControl': 'BAJO CONTROL EVW',
+    'stats.enemyUnclaimed': 'ENEMIGO / SIN RECLAMAR', 'stats.control': 'CONTROL',
+    'intel.leaderboard': '★ TABLA DE OPERATIVOS', 'intel.recentActivity': '⚡ ACTIVIDAD RECIENTE',
+    'intel.allTime': 'HISTÓRICO', 'intel.30days': '30 DÍAS',
+    'intel.claimed': 'RECLAM.', 'intel.lost': 'PERD.', 'intel.conto': 'DISP.',
+    'intel.events': 'eventos', 'intel.noActivity': 'No hay actividad registrada todavía.',
+    'crystals.title': '💎 RASTREADOR DE CRISTALES', 'crystals.resets': 'Se reinicia a las 12AM PST',
+    'admin.systemControl': '⚙ Control del Sistema', 'admin.maintenanceMode': 'Modo Mantenimiento',
+    'admin.maintenanceDesc': 'Redirige a todos los visitantes a la pantalla de mantenimiento. Los admins aún pueden entrar.',
+    'admin.pendingRequests': '⏳ Solicitudes Pendientes', 'admin.allMembers': '👥 Todos los Miembros',
+    'admin.username': 'Usuario', 'admin.slUsername': 'Usuario SL', 'admin.role': 'Rol',
+    'admin.joined': 'Se Unió', 'admin.actions': 'Acciones',
+    'sync.title': '⇅ Sincronización de Euphoria', 'sync.report': 'Reporte de Sinc.',
+    'sync.history': '📋 HISTORIAL DE SINC.',
+    'cpw.title': 'CAMBIAR CONTRASEÑA', 'cpw.current': 'Contraseña actual',
+    'cpw.new': 'Nueva contraseña (mín 6)', 'cpw.confirm': 'Confirmar nueva contraseña',
+    'cpw.update': 'ACTUALIZAR', 'cpw.cancel': 'CANCELAR',
+  }
+};
+
+let currentLang = 'en';
+
+function t(key) {
+  const dict = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
+  return dict[key] || TRANSLATIONS.en[key] || key;
+}
+
+function applyLanguage(lang) {
+  currentLang = (lang === 'es') ? 'es' : 'en';
+  try { localStorage.setItem('ks_lang', currentLang); } catch(e) {}
+
+  document.querySelectorAll('[data-i18n]').forEach(function(el) {
+    el.textContent = t(el.getAttribute('data-i18n'));
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el) {
+    el.placeholder = t(el.getAttribute('data-i18n-ph'));
+  });
+
+  var toggle = document.getElementById('lang-toggle');
+  if (toggle) toggle.textContent = currentLang === 'en' ? 'ES' : 'EN';
+
+  if (typeof allLands !== 'undefined' && allLands.length && typeof renderLands === 'function') renderLands();
+  var role = document.getElementById('topbar-role');
+  if (role && typeof currentUser !== 'undefined' && currentUser) {
+    role.textContent = currentUser.is_admin ? t('topbar.admin') : t('topbar.operative');
+  }
+}
+
+window.toggleLanguage = function() {
+  applyLanguage(currentLang === 'en' ? 'es' : 'en');
+};
+
+
 // ════════════════════════════════════════════════════════════
 //  INIT — check for existing session
 // ════════════════════════════════════════════════════════════
 (async function init() {
+  // Apply saved language preference
+  try {
+    var savedLang = localStorage.getItem('ks_lang');
+    if (savedLang) applyLanguage(savedLang);
+    else applyLanguage('en');
+  } catch(e) { applyLanguage('en'); }
+
   // Check maintenance mode first
   try {
     var mRes = await fetch('/api/maintenance');
@@ -2899,16 +3014,16 @@ window.submitChangePassword = async function() {
   <!-- Change Password Modal -->
   <div id="change-pw-modal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.7);align-items:center;justify-content:center">
     <div style="background:var(--bg2);border:1px solid var(--border);padding:2rem;width:340px;max-width:90vw;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px))">
-      <div style="font-family:var(--display);font-size:1.4rem;letter-spacing:0.06em;color:#fff;margin-bottom:1.25rem">CHANGE PASSWORD</div>
+      <div style="font-family:var(--display);font-size:1.4rem;letter-spacing:0.06em;color:#fff;margin-bottom:1.25rem" data-i18n="cpw.title">CHANGE PASSWORD</div>
       <div style="display:flex;flex-direction:column;gap:0.75rem">
-        <input id="cpw-current" type="password" placeholder="Current password" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:0.8rem;padding:0.5rem 0.7rem;outline:none">
-        <input id="cpw-new" type="password" placeholder="New password (min 6 chars)" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:0.8rem;padding:0.5rem 0.7rem;outline:none">
-        <input id="cpw-confirm" type="password" placeholder="Confirm new password" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:0.8rem;padding:0.5rem 0.7rem;outline:none">
+        <input id="cpw-current" type="password" placeholder="Current password" data-i18n-ph="cpw.current" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:0.8rem;padding:0.5rem 0.7rem;outline:none">
+        <input id="cpw-new" type="password" placeholder="New password (min 6 chars)" data-i18n-ph="cpw.new" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:0.8rem;padding:0.5rem 0.7rem;outline:none">
+        <input id="cpw-confirm" type="password" placeholder="Confirm new password" data-i18n-ph="cpw.confirm" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:0.8rem;padding:0.5rem 0.7rem;outline:none">
       </div>
       <div id="cpw-msg" style="font-family:var(--mono);font-size:0.68rem;margin-top:0.75rem;min-height:1rem"></div>
       <div style="display:flex;gap:0.5rem;margin-top:1rem">
-        <button onclick="submitChangePassword()" style="flex:1;background:var(--gold);color:#000;border:none;font-family:var(--display);font-size:1rem;letter-spacing:0.1em;padding:0.5rem;cursor:pointer">UPDATE</button>
-        <button onclick="closeChangePassword()" style="flex:1;background:none;border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:0.72rem;padding:0.5rem;cursor:pointer">CANCEL</button>
+        <button onclick="submitChangePassword()" style="flex:1;background:var(--gold);color:#000;border:none;font-family:var(--display);font-size:1rem;letter-spacing:0.1em;padding:0.5rem;cursor:pointer" data-i18n="cpw.update">UPDATE</button>
+        <button onclick="closeChangePassword()" style="flex:1;background:none;border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:0.72rem;padding:0.5rem;cursor:pointer" data-i18n="cpw.cancel">CANCEL</button>
       </div>
     </div>
   </div>
