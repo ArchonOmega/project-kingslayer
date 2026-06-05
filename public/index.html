@@ -1459,15 +1459,36 @@
       letter-spacing: 0.12em;
     }
     .lb-rank-badge {
-      font-size: 0.6rem;
-      margin-top: 0.15rem;
+      margin-top: 0.2rem;
+      margin-bottom: 0.1rem;
     }
+    .lb-rank-badge .rank-badge {
+      font-size: 0.92rem;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }
+    /* Stronger glow on leaderboard ranks so they pop (per-tier color) */
+    .lb-rank-badge .rank-common    { filter: drop-shadow(0 0 5px rgba(154,160,176,0.6)); }
+    .lb-rank-badge .rank-uncommon  { filter: drop-shadow(0 0 6px rgba(74,222,128,0.7)); }
+    .lb-rank-badge .rank-rare      { filter: drop-shadow(0 0 6px rgba(59,157,240,0.7)); }
+    .lb-rank-badge .rank-epic      { filter: drop-shadow(0 0 7px rgba(168,85,247,0.8)); }
+    .lb-rank-badge .rank-legendary { filter: drop-shadow(0 0 8px rgba(243,156,18,0.85)); }
+    .lb-rank-badge .rank-mythic    { filter: drop-shadow(0 0 9px rgba(200,168,75,0.9)); }
 
     /* ── My Stats page ── */
     .mystats-wrap {
       flex: 1;
+      min-height: 0;
       overflow-y: auto;
       padding: 2rem 1.5rem 3rem;
+      width: 100%;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    .mystats-wrap::-webkit-scrollbar { width: 6px; }
+    .mystats-wrap::-webkit-scrollbar-track { background: transparent; }
+    .mystats-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    .mystats-inner {
       max-width: 900px;
       margin: 0 auto;
       width: 100%;
@@ -1870,10 +1891,12 @@
 
   <!-- ── MY STATS PAGE ── -->
   <div class="page" id="page-mystats">
-    <div class="mystats-wrap" id="mystats-content">
+    <div class="mystats-wrap">
+      <div class="mystats-inner" id="mystats-content">
       <div class="loader" style="padding:3rem">
         <div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div>
         <span>LOADING...</span>
+      </div>
       </div>
     </div>
   </div>
@@ -2683,7 +2706,7 @@ function renderLeaderboard(rows) {
         <div class="lb-rank ${rankClass[i] || ''}">${i + 1}</div>
         <div class="lb-info">
           <div class="lb-name">${r.member}</div>
-          <div class="lb-rank-badge">${rankBadgeHtml(r.claimed, 'small')}</div>
+          <div class="lb-rank-badge">${rankBadgeHtml(r.claimed, '')}</div>
           <div class="lb-bar-wrap">
             <div class="lb-bar" style="width:${pct}%"></div>
           </div>
