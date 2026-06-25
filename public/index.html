@@ -1617,6 +1617,10 @@
       transition: opacity 0.2s;
     }
     .ms-tier-pip.reached { opacity: 1; }
+
+    /* ── Shield verification — admin-only visibility ── */
+    .shield-col { display: none; }
+    body.is-admin .shield-col { display: table-cell; }
   </style>
 </head>
 <body>
@@ -1774,7 +1778,7 @@
             <th data-i18n="lands.claimedBy">Claimed By (EVW)</th>
             <th data-i18n="lands.firstSeen">First Seen</th>
             <th data-i18n="lands.teleport">Teleport</th>
-            <th data-i18n="lands.shield">Shield</th>
+            <th class="shield-col" data-i18n="lands.shield">Shield</th>
             <th data-i18n="lands.action">Action</th>
           </tr>
         </thead>
@@ -2160,6 +2164,9 @@ function enterApp() {
   $('topbar-role').textContent     = currentUser.is_admin ? '★ ADMIN' : 'OPERATIVE';
   $('nav-admin').style.display     = currentUser.is_admin ? '' : 'none';
   $('nav-sync').style.display      = currentUser.is_admin ? '' : 'none';
+  // Shield verification is admin-only — toggle a body class to hide it for everyone else
+  if (currentUser.is_admin) document.body.classList.add('is-admin');
+  else document.body.classList.remove('is-admin');
   initSyncPage();
   initIntelPage();
   loadLands();
@@ -2401,8 +2408,10 @@ function renderLands() {
           : '<span style="color:var(--muted)">—</span>'
         }
       </td>
-      <td class="td-shield">
-        ${isClaimed ? buildShieldCell(land) : '<span style="color:var(--muted);font-family:var(--mono);font-size:0.65rem">—</span>'}
+      <td class="td-shield shield-col">
+        ${(currentUser && currentUser.is_admin)
+          ? (isClaimed ? buildShieldCell(land) : '<span style="color:var(--muted);font-family:var(--mono);font-size:0.65rem">—</span>')
+          : ''}
       </td>
       <td>
         <button class="btn-toggle ${isClaimed ? 'unclaim' : ''}" data-id="${land.id}" data-status="${land.status}">
@@ -2731,6 +2740,12 @@ function renderLeaderboard(rows) {
 
 function renderFeed(events) {
   const body = $('feed-body');
+
+  // Shield verification is admin-only — strip shield events for everyone else
+  if (!currentUser || !currentUser.is_admin) {
+    events = events.filter(function(ev) { return ev.event !== 'shield'; });
+  }
+
   $('feed-count').textContent = events.length + ' events';
 
   if (!events.length) {
