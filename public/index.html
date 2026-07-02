@@ -2616,15 +2616,23 @@ async function loadMyStats() {
   }
 
   const rows = data.leaderboard || [];
-  // Match current user by the username inside the parens of r.member
-  const myUsername = (currentUser.username || '').toLowerCase();
-  const mySl       = (currentUser.sl_username || '').toLowerCase();
+  // Match current user by username, tolerant of formatting differences.
+  // SL usernames may be written as "noa.nightfall", "Noa Nightfall", or
+  // "noa nightfall" in different places — normalise all of them by lowercasing
+  // and stripping dots/spaces so they compare equal.
+  function normUser(s) {
+    return (s || '').toLowerCase().replace(/[.\s]+/g, '').trim();
+  }
+  const myUsername = normUser(currentUser.username);
+  const mySl       = normUser(currentUser.sl_username);
 
   let mine = null;
   for (const r of rows) {
-    const m = (r.member || '').match(/\(([^)]+)\)\s*$/);
-    const uname = m ? m[1].toLowerCase().trim() : (r.member || '').toLowerCase();
-    if (uname === myUsername || (mySl && uname === mySl)) { mine = r; break; }
+    const uname = normUser(r.username);
+    if ((mySl && uname === mySl) || (myUsername && uname === myUsername)) {
+      mine = r;
+      break;
+    }
   }
 
   const claimed   = mine ? mine.claimed   : 0;
