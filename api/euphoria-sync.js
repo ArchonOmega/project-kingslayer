@@ -158,7 +158,6 @@ module.exports = async function handler(req, res) {
     if (!existing) {
       toInsert.push({
         region:           rec.region,
-        land_name:        '',
         slurl:            rec.slurl || '',
         status:           isEVW ? 'claimed' : 'unclaimed',
         claimed_by:       '',
@@ -199,7 +198,13 @@ module.exports = async function handler(req, res) {
   let inserted = 0, updated = 0;
 
   if (toInsert.length) {
-    const { error } = await supabase.from('lands').insert(toInsert);
+    // Use upsert (on the unique `region` column) instead of a plain insert.
+    // If a region already exists — e.g. it was in the DB under a spelling our
+    // in-memory match missed — this updates it rather than throwing a
+    // duplicate-key error, which makes the sync robust to those edge cases.
+    const { error } = await supabase
+      .from('lands')
+      .upsert(toInsert, { onConflict: 'region', ignoreDuplicates: false });
     if (error) errors.push('Insert error: ' + error.message);
     else inserted = toInsert.length;
   }
