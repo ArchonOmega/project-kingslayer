@@ -1693,6 +1693,7 @@
         <button class="nav-tab" data-page="crystals" id="nav-crystals" data-i18n="nav.crystals">💎 Crystals</button>
         <button class="nav-tab" data-page="mystats" id="nav-mystats" data-i18n="nav.mystats">★ My Stats</button>
         <button class="nav-tab admin-tab" data-page="sync" id="nav-sync" style="display:none" data-i18n="nav.sync">⇅ Sync</button>
+        <button class="nav-tab admin-tab" data-page="hudauth" id="nav-hudauth" style="display:none" data-i18n="nav.hudauth">🔐 HUD Auth</button>
       </nav>
     </div>
     <div class="topbar-right">
@@ -1846,6 +1847,45 @@
           </thead>
           <tbody id="members-tbody"></tbody>
         </table>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── HUD AUTH PAGE ── -->
+  <div class="page" id="page-hudauth">
+    <div class="admin-grid">
+
+      <div>
+        <div class="admin-section-title" data-i18n="hudauth.title">🔐 HUD Authorization</div>
+        <div style="background:var(--bg3);border:1px solid var(--border);padding:1rem 1.2rem">
+          <div style="font-family:var(--mono);font-size:0.65rem;color:var(--muted);margin-bottom:0.6rem" data-i18n="hudauth.addDesc">Authorize an operative by SL username. Authorized members can attach the Territory HUD; everyone else is detached on sight.</div>
+          <div style="display:flex;gap:0.5rem;align-items:center">
+            <input id="hudauth-username-input" type="text" placeholder="SL username (e.g. noa.nightfall)" data-i18n-ph="hudauth.ph"
+              style="flex:1;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:0.72rem;padding:0.4rem 0.7rem;outline:none">
+            <button class="btn-approve" onclick="addHudAuth()" data-i18n="hudauth.authorize">✔ Authorize</button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="admin-section-title" data-i18n="hudauth.pending">⏳ Pending HUD Requests</div>
+        <div id="hudauth-pending">
+          <div class="loader">
+            <div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div>
+            <span>LOADING...</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="admin-section-title" data-i18n="hudauth.approved">✅ Authorized Operatives</div>
+        <div id="hudauth-approved"></div>
+      </div>
+
+      <div>
+        <div class="admin-section-title" data-i18n="hudauth.deniedTitle">⛔ Denied</div>
+        <div id="hudauth-denied"></div>
       </div>
 
     </div>
@@ -2164,6 +2204,7 @@ function enterApp() {
   $('topbar-role').textContent     = currentUser.is_admin ? '★ ADMIN' : 'OPERATIVE';
   $('nav-admin').style.display     = currentUser.is_admin ? '' : 'none';
   $('nav-sync').style.display      = currentUser.is_admin ? '' : 'none';
+  $('nav-hudauth').style.display   = currentUser.is_admin ? '' : 'none';
   // Shield verification is admin-only — toggle a body class to hide it for everyone else
   if (currentUser.is_admin) document.body.classList.add('is-admin');
   else document.body.classList.remove('is-admin');
@@ -2491,6 +2532,7 @@ document.querySelectorAll('.nav-tab').forEach(tab => {
     showPage('page-' + tab.dataset.page);
     if (tab.dataset.page === 'admin' && currentUser && currentUser.is_admin) { checkMaintenance(); }
     if (tab.dataset.page === 'sync' && currentUser && currentUser.is_admin) { loadSyncHistory(); }
+    if (tab.dataset.page === 'hudauth' && currentUser && currentUser.is_admin) { loadHudAuth(); }
     if (tab.dataset.page === 'crystals') {
       loadCrystals();
     }
@@ -3290,13 +3332,122 @@ function rankBadgeHtml(claims, size) {
          '">' + r.title + '</span>';
 }
 
+
+// ── HUD Authorization (admin) ────────────────────────────────
+function hudAuthEsc(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+async function loadHudAuth() {
+  const pend = $('hudauth-pending');
+  const appr = $('hudauth-approved');
+  const deni = $('hudauth-denied');
+
+  const { ok, data } = await api('auth?action=hud-list', { method: 'POST' });
+  if (!ok) {
+    pend.innerHTML = '<div style="font-family:var(--mono);font-size:0.7rem;color:var(--red2);padding:0.5rem 0">Could not load HUD authorizations.</div>';
+    appr.innerHTML = '';
+    deni.innerHTML = '';
+    return;
+  }
+
+  const entries  = data.entries || [];
+  const pending  = entries.filter(e => e.status === 'pending');
+  const approved = entries.filter(e => e.status === 'approved');
+  const denied   = entries.filter(e => e.status === 'denied');
+  const fmt = d => d ? new Date(d).toLocaleString() : '—';
+  const btnStyle = 'font-size:0.6rem;padding:0.2rem 0.5rem';
+
+  if (!pending.length) {
+    pend.innerHTML = '<div style="font-family:var(--mono);font-size:0.7rem;color:var(--muted);padding:0.5rem 0">' + t('hudauth.none') + '</div>';
+  } else {
+    pend.innerHTML = '<table class="members-table"><thead><tr>'
+      + '<th>' + t('hudauth.slUsername') + '</th><th>' + t('hudauth.displayName') + '</th><th>' + t('hudauth.requested') + '</th><th>' + t('hudauth.actions') + '</th>'
+      + '</tr></thead><tbody>'
+      + pending.map(e =>
+          '<tr><td style="color:#fff">' + hudAuthEsc(e.username) + '</td>'
+        + '<td>' + hudAuthEsc(e.display_name || '—') + '</td>'
+        + '<td style="font-family:var(--mono);font-size:0.68rem">' + fmt(e.requested_at) + '</td>'
+        + '<td><button class="btn-approve" style="' + btnStyle + '" onclick="hudAuthAction(\'' + e.username + '\',\'approve\')">✔ ' + t('hudauth.approve') + '</button> '
+        + '<button class="btn-reject" style="' + btnStyle + '" onclick="hudAuthAction(\'' + e.username + '\',\'deny\')">✖ ' + t('hudauth.deny') + '</button></td></tr>'
+        ).join('')
+      + '</tbody></table>';
+  }
+
+  if (!approved.length) {
+    appr.innerHTML = '<div style="font-family:var(--mono);font-size:0.7rem;color:var(--muted);padding:0.5rem 0">—</div>';
+  } else {
+    appr.innerHTML = '<table class="members-table"><thead><tr>'
+      + '<th>' + t('hudauth.slUsername') + '</th><th>' + t('hudauth.decidedBy') + '</th><th>' + t('hudauth.date') + '</th><th>' + t('hudauth.actions') + '</th>'
+      + '</tr></thead><tbody>'
+      + approved.map(e =>
+          '<tr><td style="color:#fff">' + hudAuthEsc(e.username) + '</td>'
+        + '<td style="font-family:var(--mono);font-size:0.68rem">' + hudAuthEsc(e.decided_by || '—') + '</td>'
+        + '<td style="font-family:var(--mono);font-size:0.68rem">' + fmt(e.decided_at) + '</td>'
+        + '<td><button class="btn-reject" style="' + btnStyle + '" onclick="hudAuthAction(\'' + e.username + '\',\'deny\')">✖ ' + t('hudauth.revoke') + '</button></td></tr>'
+        ).join('')
+      + '</tbody></table>';
+  }
+
+  if (!denied.length) {
+    deni.innerHTML = '<div style="font-family:var(--mono);font-size:0.7rem;color:var(--muted);padding:0.5rem 0">—</div>';
+  } else {
+    deni.innerHTML = '<table class="members-table"><thead><tr>'
+      + '<th>' + t('hudauth.slUsername') + '</th><th>' + t('hudauth.decidedBy') + '</th><th>' + t('hudauth.date') + '</th><th>' + t('hudauth.actions') + '</th>'
+      + '</tr></thead><tbody>'
+      + denied.map(e =>
+          '<tr><td style="color:#fff">' + hudAuthEsc(e.username) + '</td>'
+        + '<td style="font-family:var(--mono);font-size:0.68rem">' + hudAuthEsc(e.decided_by || '—') + '</td>'
+        + '<td style="font-family:var(--mono);font-size:0.68rem">' + fmt(e.decided_at) + '</td>'
+        + '<td><button class="btn-approve" style="' + btnStyle + '" onclick="hudAuthAction(\'' + e.username + '\',\'approve\')">✔ ' + t('hudauth.approve') + '</button> '
+        + '<button class="btn-reject" style="' + btnStyle + '" onclick="hudAuthAction(\'' + e.username + '\',\'remove\')">🗑 ' + t('hudauth.remove') + '</button></td></tr>'
+        ).join('')
+      + '</tbody></table>';
+  }
+}
+
+window.hudAuthAction = async function(username, op) {
+  if (op === 'deny' && !confirm('Block "' + username + '" from attaching the HUD?')) return;
+  if (op === 'remove' && !confirm('Remove "' + username + '" from the list entirely?\n\nTheir next attach will file a fresh pending request.')) return;
+  const res = await api('auth?action=hud-manage', { method: 'POST', body: { username: username, op: op } });
+  if (res.ok) {
+    toast('🔐 ' + (res.data.message || 'Updated.'), 'success');
+    loadHudAuth();
+  } else {
+    toast(res.data.error || 'Action failed.', 'error');
+  }
+};
+
+window.addHudAuth = async function() {
+  const input = $('hudauth-username-input');
+  const uname = (input.value || '').trim();
+  if (!uname) { toast(t('hudauth.enterName'), 'error'); return; }
+  const res = await api('auth?action=hud-manage', { method: 'POST', body: { username: uname, op: 'add' } });
+  if (res.ok) {
+    input.value = '';
+    toast('🔐 ' + uname + ' authorized.', 'success');
+    loadHudAuth();
+  } else {
+    toast(res.data.error || 'Failed to authorize.', 'error');
+  }
+};
+
 // ════════════════════════════════════════════════════════════
 //  INTERNATIONALIZATION (i18n)
 // ════════════════════════════════════════════════════════════
 const TRANSLATIONS = {
   en: {
     'nav.lands': '⚔ Lands', 'nav.intel': '◈ Intel', 'nav.admin': '⬡ Admin',
-    'nav.crystals': '💎 Crystals', 'nav.sync': '⇅ Sync', 'nav.mystats': '★ My Stats',
+    'nav.crystals': '💎 Crystals', 'nav.sync': '⇅ Sync', 'nav.mystats': '★ My Stats', 'nav.hudauth': '🔐 HUD Auth',
+    'hudauth.title': '🔐 HUD Authorization',
+    'hudauth.addDesc': 'Authorize an operative by SL username. Authorized members can attach the Territory HUD; everyone else is detached on sight.',
+    'hudauth.ph': 'SL username (e.g. noa.nightfall)', 'hudauth.authorize': '✔ Authorize',
+    'hudauth.pending': '⏳ Pending HUD Requests', 'hudauth.approved': '✅ Authorized Operatives', 'hudauth.deniedTitle': '⛔ Denied',
+    'hudauth.none': 'No pending requests.', 'hudauth.slUsername': 'SL Username', 'hudauth.displayName': 'Display Name',
+    'hudauth.requested': 'Requested', 'hudauth.decidedBy': 'Decided By', 'hudauth.date': 'Date', 'hudauth.actions': 'Actions',
+    'hudauth.approve': 'Approve', 'hudauth.deny': 'Deny', 'hudauth.revoke': 'Revoke', 'hudauth.remove': 'Remove',
+    'hudauth.enterName': 'Enter an SL username first.',
     'mystats.landsClaimed': 'LANDS CLAIMED', 'mystats.claimed': 'Claimed', 'mystats.lost': 'Lost', 'mystats.contested': 'Contested', 'mystats.progression': 'RANK PROGRESSION',
     'topbar.logout': '[ LOGOUT ]', 'topbar.changePw': '🔑 Change Password',
     'topbar.admin': '★ ADMIN', 'topbar.operative': 'OPERATIVE',
@@ -3330,7 +3481,15 @@ const TRANSLATIONS = {
   },
   es: {
     'nav.lands': '⚔ Tierras', 'nav.intel': '◈ Intel', 'nav.admin': '⬡ Admin',
-    'nav.crystals': '💎 Cristales', 'nav.sync': '⇅ Sinc.', 'nav.mystats': '★ Mis Estadísticas',
+    'nav.crystals': '💎 Cristales', 'nav.sync': '⇅ Sinc.', 'nav.mystats': '★ Mis Estadísticas', 'nav.hudauth': '🔐 Aut. HUD',
+    'hudauth.title': '🔐 Autorización del HUD',
+    'hudauth.addDesc': 'Autoriza a un operativo por su usuario de SL. Los miembros autorizados pueden ponerse el HUD Territorial; los demás son desconectados al instante.',
+    'hudauth.ph': 'Usuario SL (ej. noa.nightfall)', 'hudauth.authorize': '✔ Autorizar',
+    'hudauth.pending': '⏳ Solicitudes de HUD Pendientes', 'hudauth.approved': '✅ Operativos Autorizados', 'hudauth.deniedTitle': '⛔ Denegados',
+    'hudauth.none': 'No hay solicitudes pendientes.', 'hudauth.slUsername': 'Usuario SL', 'hudauth.displayName': 'Nombre',
+    'hudauth.requested': 'Solicitado', 'hudauth.decidedBy': 'Decidido Por', 'hudauth.date': 'Fecha', 'hudauth.actions': 'Acciones',
+    'hudauth.approve': 'Aprobar', 'hudauth.deny': 'Denegar', 'hudauth.revoke': 'Revocar', 'hudauth.remove': 'Eliminar',
+    'hudauth.enterName': 'Escribe primero un usuario de SL.',
     'mystats.landsClaimed': 'TIERRAS RECLAMADAS', 'mystats.claimed': 'Reclamadas', 'mystats.lost': 'Perdidas', 'mystats.contested': 'Disputadas', 'mystats.progression': 'PROGRESIÓN DE RANGO',
     'topbar.logout': '[ SALIR ]', 'topbar.changePw': '🔑 Cambiar Contraseña',
     'topbar.admin': '★ ADMIN', 'topbar.operative': 'OPERATIVO',
