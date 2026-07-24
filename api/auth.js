@@ -149,5 +149,82 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ message: 'Password changed successfully.' });
   }
 
-  return res.status(400).json({ error: 'Unknown action. Use ?action=register|login|logout|reset-password|change-password' });
+  // ── HUD AUTH CHECK (called by the HUD security core on attach) ──
+  if (action === 'hud-check') {
+    if ((req.headers['x-hud-secret'] || '') !== process.env.HUD_SECRET)
+      return res.status(401).json({ error: 'Unauthorized' });
+
+    // SL sometimes drops the letter 'r' from usernames — same corrections
+    // map used by hud-claim.js and shield.js.
+    const USERNAME_CORRECTIONS = {
+      'seena5579':   'serena5579',
+      'meukii':      'merukii',
+      'theagnaok1':  'theragnarok1',
+      'theagnarok1': 'theragnarok1',
+      'theragnaok1': 'theragnarok1',
+      'laezimi':     'laezimir',
+    };
+    // Tolerant comparison: lowercase, strip dots/spaces (matches My Stats logic)
+    const norm = (s) => (s || '').toLowerCase().replace(/[.\s]+/g, '').trim();
+
+    let username = ((req.body || {}).username || '').toLowerCase().trim();
+    if (!username) return res.status(400).json({ error: 'username required' });
+    if (USERNAME_CORRECTIONS[username]) username = USERNAME_CORRECTIONS[username];
+    const display_name = ((req.body || {}).display_name || '').trim();
+
+    const { data: rows } = await supabase.from('hud_auth').select('username, status');
+    const match = (rows || []).find((r) => norm(r.username) === norm(username));
+    if (match) return res.status(200).json({ status: match.status });
+
+    // First-time attach — file a pending authorization request for admins
+    await supabase.from('hud_auth').insert({ username, display_name, status: 'pending' });
+    return res.status(200).json({ status: 'pending' });
+  }
+
+  // ── HUD AUTH LIST (admin — feeds the HUD Auth page) ──────
+  if (action === 'hud-list') {
+    const auth = await requireAdmin(req);
+    if (auth.error) return res.status(auth.status).json({ error: auth.error });
+    const { data, error } = await supabase
+      .from('hud_auth').select('*')
+      .order('requested_at', { ascending: false });
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ entries: data || [] });
+  }
+
+  // ── HUD AUTH MANAGE (admin — approve / deny / add / remove) ──
+  if (action === 'hud-manage') {
+    const auth = await requireAdmin(req);
+    if (auth.error) return res.status(auth.status).json({ error: auth.error });
+
+    const { username, op } = req.body || {};
+    const uname = (username || '').toLowerCase().trim();
+    if (!uname || !op)
+      return res.status(400).json({ error: 'username and op required' });
+    const decidedBy = (auth.user && auth.user.username) || 'admin';
+    const now = new Date().toISOString();
+
+    if (op === 'approve' || op === 'add') {
+      const { error } = await supabase.from('hud_auth').upsert(
+        { username: uname, status: 'approved', decided_at: now, decided_by: decidedBy },
+        { onConflict: 'username' });
+      if (error) return res.status(500).json({ error: error.message });
+      return res.status(200).json({ message: uname + ' authorized.' });
+    }
+    if (op === 'deny') {
+      const { error } = await supabase.from('hud_auth').upsert(
+        { username: uname, status: 'denied', decided_at: now, decided_by: decidedBy },
+        { onConflict: 'username' });
+      if (error) return res.status(500).json({ error: error.message });
+      return res.status(200).json({ message: uname + ' denied.' });
+    }
+    if (op === 'remove') {
+      const { error } = await supabase.from('hud_auth').delete().eq('username', uname);
+      if (error) return res.status(500).json({ error: error.message });
+      return res.status(200).json({ message: uname + ' removed from the list.' });
+    }
+    return res.status(400).json({ error: 'Unknown op. Use approve|deny|add|remove' });
+  }
+
+  return res.status(400).json({ error: 'Unknown action. Use ?action=register|login|logout|reset-password|change-password|hud-check|hud-list|hud-manage' });
 };
