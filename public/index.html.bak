@@ -3,232 +3,509 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PROJECT KINGSLAYER — Target List</title>
+  <title>PROJECT KINGSLAYER // EVW COMMAND</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Bebas+Neue&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:        #0a0b0d;
-      --bg2:       #0f1114;
-      --bg3:       #151820;
-      --border:    #1e2330;
-      --accent:    #c8a84b;
-      --accent2:   #e8c86a;
-      --red:       #c0392b;
-      --green:     #27ae60;
-      --orange:    #e67e22;
-      --text:      #d4d8e2;
-      --muted:     #555e72;
-      --claimed:   #1a2e1a;
-      --mono:      'Share Tech Mono', monospace;
-      --display:   'Bebas Neue', sans-serif;
-      --body:      'Inter', sans-serif;
+      --bg:       #080a0e;
+      --bg2:      #0c0f16;
+      --bg3:      #111520;
+      --bg4:      #161b28;
+      --border:   #1c2235;
+      --border2:  #243050;
+      --gold:     #c8a84b;
+      --gold2:    #e8c86a;
+      --gold-dim: #7a6530;
+      --red:      #c0392b;
+      --red2:     #e74c3c;
+      --green:    #1a8a4a;
+      --green2:   #27ae60;
+      --cyan:     #1a9aaa;
+      --cyan2:    #2ec4d6;
+      --text:     #c8cdd8;
+      --text2:    #8892a4;
+      --muted:    #445060;
+      --display:  'Bebas Neue', sans-serif;
+      --mono:     'Share Tech Mono', monospace;
+      --ui:       'Rajdhani', sans-serif;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { height: 100%; }
 
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: var(--body);
-      min-height: 100vh;
-      overflow-x: hidden;
+      font-family: var(--ui);
+      font-size: 15px;
+      overflow: hidden;
+      height: 100vh;
     }
 
+    /* ── Animated grid background ── */
     body::before {
       content: '';
-      position: fixed;
-      inset: 0;
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(200,168,75,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200,168,75,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Scanlines ── */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
       background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0,0,0,0.08) 2px,
-        rgba(0,0,0,0.08) 4px
+        0deg, transparent, transparent 2px,
+        rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px
       );
       pointer-events: none;
-      z-index: 9999;
+      z-index: 9998;
     }
 
-    header {
-      border-bottom: 1px solid var(--border);
-      padding: 1.5rem 2rem;
-      background: var(--bg2);
-      display: flex;
+    /* ════════════════════════════════════════
+       SCREENS
+    ════════════════════════════════════════ */
+    .screen { display: none; position: fixed; inset: 0; z-index: 1; overflow: hidden; }
+    .screen.active { display: flex; }
+
+    /* ════════════════════════════════════════
+       AUTH SCREEN
+    ════════════════════════════════════════ */
+    #screen-auth {
       align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .header-left { display: flex; flex-direction: column; gap: 0.2rem; }
-
-    .header-eyebrow {
-      font-family: var(--mono);
-      font-size: 0.7rem;
-      color: var(--accent);
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      font-family: var(--display);
-      font-size: clamp(2rem, 5vw, 3.5rem);
-      letter-spacing: 0.05em;
-      color: #fff;
-      line-height: 1;
-    }
-
-    h1 span { color: var(--accent); }
-
-    .header-sub {
-      font-family: var(--mono);
-      font-size: 0.7rem;
-      color: var(--muted);
-      letter-spacing: 0.15em;
-    }
-
-    .stats-bar {
-      display: flex;
-      gap: 1.5rem;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .stat {
-      display: flex;
+      justify-content: center;
       flex-direction: column;
-      align-items: center;
-      gap: 0.15rem;
-      min-width: 60px;
+      gap: 0;
     }
 
-    .stat-num {
+    .auth-bg-text {
+      position: absolute;
       font-family: var(--display);
-      font-size: 2rem;
-      line-height: 1;
-      color: var(--accent2);
+      font-size: 22vw;
+      color: rgba(200,168,75,0.03);
+      user-select: none;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
     }
-    .stat-num.red  { color: var(--red); }
-    .stat-num.green{ color: var(--green); }
 
-    .stat-label {
+    .auth-panel {
+      position: relative;
+      width: 420px;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+      padding: 2.5rem;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .auth-logo {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .auth-logo .eyebrow {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--gold-dim);
+      letter-spacing: 0.4em;
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .auth-logo h1 {
+      font-family: var(--display);
+      font-size: 2.8rem;
+      letter-spacing: 0.08em;
+      line-height: 1;
+      color: #fff;
+    }
+
+    .auth-logo h1 em {
+      color: var(--gold);
+      font-style: normal;
+    }
+
+    .auth-logo .sub {
       font-family: var(--mono);
       font-size: 0.6rem;
       color: var(--muted);
+      letter-spacing: 0.25em;
+      margin-top: 0.4rem;
+      display: block;
+    }
+
+    .auth-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.75rem;
+    }
+
+    .auth-tab {
+      flex: 1;
+      font-family: var(--mono);
+      font-size: 0.7rem;
       letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0.6rem;
+      text-align: center;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      background: none;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+    }
+
+    .auth-tab.active {
+      color: var(--gold);
+      border-bottom-color: var(--gold);
+    }
+
+    .auth-tab:hover:not(.active) { color: var(--text2); }
+
+    .auth-form { display: flex; flex-direction: column; gap: 1rem; }
+    .auth-form.hidden { display: none; }
+
+    .field-group { display: flex; flex-direction: column; gap: 0.35rem; }
+
+    .field-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--text2);
       text-transform: uppercase;
     }
 
-    .stat-divider {
-      width: 1px;
-      height: 40px;
+    .field-input {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      padding: 0.6rem 0.75rem;
+      outline: none;
+      transition: border-color 0.2s;
+      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+      width: 100%;
+    }
+
+    .field-input:focus { border-color: var(--gold); }
+    .field-input::placeholder { color: var(--muted); }
+
+    .btn-primary {
+      background: var(--gold);
+      color: #000;
+      border: none;
+      font-family: var(--display);
+      font-size: 1.1rem;
+      letter-spacing: 0.15em;
+      padding: 0.65rem 1.5rem;
+      cursor: pointer;
+      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+      transition: all 0.2s;
+      margin-top: 0.5rem;
+    }
+
+    .btn-primary:hover { background: var(--gold2); transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+
+    .auth-message {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      text-align: center;
+      padding: 0.6rem;
+      border-radius: 2px;
+      display: none;
+    }
+
+    .auth-message.error   { color: var(--red2); border: 1px solid rgba(231,76,60,0.3); background: rgba(192,57,43,0.1); display: block; }
+    .auth-message.success { color: var(--green2); border: 1px solid rgba(39,174,96,0.3); background: rgba(26,138,74,0.1); display: block; }
+    .auth-message.info    { color: var(--cyan2); border: 1px solid rgba(46,196,214,0.3); background: rgba(26,154,170,0.1); display: block; }
+
+    /* ════════════════════════════════════════
+       MAIN APP SCREEN
+    ════════════════════════════════════════ */
+    #screen-app {
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      height: 54px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      gap: 1rem;
+      position: relative;
+      z-index: 10;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .topbar-logo {
+      font-family: var(--display);
+      font-size: 1.4rem;
+      letter-spacing: 0.1em;
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    .topbar-logo em { color: var(--gold); font-style: normal; }
+
+    .topbar-divider {
+      width: 1px; height: 24px;
       background: var(--border);
     }
 
-    .progress-wrap {
-      padding: 0.75rem 2rem;
-      background: var(--bg2);
-      border-bottom: 1px solid var(--border);
+    .nav-tabs {
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    .nav-tab {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      padding: 0.35rem 0.9rem;
+      cursor: pointer;
+      border: 1px solid transparent;
+      border-bottom: 2px solid transparent;
+      background: none;
+      transition: all 0.15s;
+      text-transform: uppercase;
+    }
+
+    .nav-tab:hover { color: var(--text2); border-color: var(--border); }
+
+    .nav-tab.active {
+      color: var(--gold);
+      border-color: var(--border);
+      border-bottom-color: var(--gold);
+      background: var(--bg3);
+    }
+
+    .nav-tab.admin-tab { color: var(--red2); }
+    .nav-tab.admin-tab:hover { border-color: rgba(231,76,60,0.3); }
+    .nav-tab.admin-tab.active { color: var(--red2); border-bottom-color: var(--red2); }
+
+    .topbar-right {
       display: flex;
       align-items: center;
       gap: 1rem;
+      margin-left: auto;
+    }
+
+    .user-info {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--text2);
+      text-align: right;
+    }
+
+    .user-info strong { color: var(--gold); display: block; font-size: 0.72rem; }
+
+    .btn-logout {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      background: none;
+      border: 1px solid var(--border);
+      padding: 0.3rem 0.7rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-transform: uppercase;
+    }
+
+    .btn-logout:hover { color: var(--red2); border-color: var(--red2); }
+
+    /* ── Status bar ── */
+    .statusbar {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      padding: 0 1.5rem;
+      height: 36px;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .stat-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: var(--text2);
+      white-space: nowrap;
+    }
+
+    .stat-pill .num {
+      font-family: var(--display);
+      font-size: 1rem;
+      line-height: 1;
+    }
+
+    .stat-pill .num.gold  { color: var(--gold); }
+    .stat-pill .num.green { color: var(--green2); }
+    .stat-pill .num.red   { color: var(--red2); }
+    .stat-pill .num.cyan  { color: var(--cyan2); }
+
+    .stat-sep { color: var(--border2); }
+
+    .progress-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
     }
 
     .progress-bar {
       flex: 1;
-      height: 6px;
+      max-width: 200px;
+      height: 4px;
       background: var(--border);
-      border-radius: 3px;
+      border-radius: 2px;
       overflow: hidden;
     }
 
     .progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, var(--accent), var(--green));
-      border-radius: 3px;
-      transition: width 0.4s ease;
+      background: linear-gradient(90deg, var(--gold), var(--green2));
+      border-radius: 2px;
+      transition: width 0.5s ease;
     }
 
-    .progress-text {
+    .progress-label {
       font-family: var(--mono);
-      font-size: 0.7rem;
+      font-size: 0.62rem;
       color: var(--muted);
       white-space: nowrap;
     }
 
-    .controls {
-      padding: 1rem 2rem;
+    /* ── Page panels ── */
+    .page { display: none; flex: 1; overflow: hidden; flex-direction: column; }
+    .page.active { display: flex; }
+
+    /* ── Controls bar ── */
+    .controls-bar {
+      flex-shrink: 0;
       display: flex;
-      gap: 0.75rem;
       align-items: center;
-      flex-wrap: wrap;
-      background: var(--bg);
+      gap: 0.75rem;
+      padding: 0.75rem 1.5rem;
       border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
     }
 
     .search-wrap {
       position: relative;
       flex: 1;
-      min-width: 200px;
-      max-width: 400px;
+      min-width: 180px;
+      max-width: 340px;
     }
 
-    .search-wrap svg {
+    .search-icon {
       position: absolute;
-      left: 0.75rem;
+      left: 0.65rem;
       top: 50%;
       transform: translateY(-50%);
       color: var(--muted);
+      pointer-events: none;
     }
 
-    input[type="search"] {
+    .search-input {
       width: 100%;
       background: var(--bg3);
       border: 1px solid var(--border);
       color: var(--text);
       font-family: var(--mono);
-      font-size: 0.8rem;
-      padding: 0.5rem 0.75rem 0.5rem 2.25rem;
-      border-radius: 4px;
+      font-size: 0.78rem;
+      padding: 0.45rem 0.75rem 0.45rem 2rem;
       outline: none;
       transition: border-color 0.2s;
+      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
     }
 
-    input[type="search"]:focus { border-color: var(--accent); }
-    input[type="search"]::placeholder { color: var(--muted); }
+    .search-input:focus { border-color: var(--gold); }
+    .search-input::placeholder { color: var(--muted); }
 
-    .filter-btns { display: flex; gap: 0.5rem; }
+    .filter-group { display: flex; gap: 0.35rem; }
 
     .filter-btn {
       font-family: var(--mono);
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       letter-spacing: 0.1em;
-      padding: 0.4rem 0.9rem;
-      border-radius: 3px;
+      padding: 0.35rem 0.8rem;
       border: 1px solid var(--border);
       background: var(--bg3);
       color: var(--muted);
       cursor: pointer;
       transition: all 0.15s;
+      text-transform: uppercase;
     }
 
-    .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
-    .filter-btn.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
+    .filter-btn:hover { color: var(--text2); border-color: var(--border2); }
+    .filter-btn.active { background: var(--gold); color: #000; border-color: var(--gold); }
 
     .sort-select {
       font-family: var(--mono);
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       background: var(--bg3);
       border: 1px solid var(--border);
       color: var(--text);
-      padding: 0.4rem 0.75rem;
-      border-radius: 3px;
+      padding: 0.35rem 0.7rem;
       outline: none;
       cursor: pointer;
     }
 
-    .table-wrap { padding: 1.5rem 2rem; }
+    .row-count {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--muted);
+      margin-left: auto;
+      white-space: nowrap;
+    }
+
+    /* ── Table ── */
+    .table-scroll {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: auto;
+    }
+
+    .table-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .table-scroll::-webkit-scrollbar-track { background: var(--bg2); }
+    .table-scroll::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
 
     table {
       width: 100%;
@@ -236,368 +513,3110 @@
       font-size: 0.85rem;
     }
 
-    thead tr { border-bottom: 2px solid var(--accent); }
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: var(--bg2);
+    }
+
+    thead tr { border-bottom: 2px solid var(--gold-dim); }
 
     th {
       font-family: var(--mono);
-      font-size: 0.65rem;
+      font-size: 0.62rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: var(--accent);
-      padding: 0.5rem 1rem 0.75rem;
+      color: var(--gold);
+      padding: 0.6rem 1rem;
       text-align: left;
-      cursor: pointer;
-      user-select: none;
       white-space: nowrap;
+      user-select: none;
     }
-
-    th:hover { color: var(--accent2); }
 
     tbody tr {
       border-bottom: 1px solid var(--border);
-      transition: background 0.15s;
-      cursor: pointer;
+      transition: background 0.1s;
     }
 
     tbody tr:hover { background: var(--bg3); }
 
-    tbody tr.is-claimed {
-      background: var(--claimed);
-      opacity: 0.6;
+    tbody tr.status-claimed { background: rgba(26,138,74,0.06); }
+    tbody tr.status-claimed:hover { background: rgba(26,138,74,0.12); }
+    tbody tr.status-unclaimed { background: rgba(192,57,43,0.04); }
+    tbody tr.status-unclaimed:hover { background: rgba(192,57,43,0.08); }
+
+    td {
+      padding: 0.65rem 1rem;
+      vertical-align: middle;
     }
 
-    td { padding: 0.75rem 1rem; vertical-align: middle; }
-
-    td.td-check { width: 44px; text-align: center; }
-
-    .check-box {
-      width: 20px;
-      height: 20px;
-      border: 2px solid var(--muted);
-      border-radius: 3px;
+    .status-badge {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      transition: all 0.15s;
+      gap: 0.35rem;
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      padding: 0.2rem 0.55rem;
+      border-radius: 2px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .status-badge.claimed {
+      color: var(--green2);
+      background: rgba(39,174,96,0.12);
+      border: 1px solid rgba(39,174,96,0.25);
+    }
+
+    .status-badge.unclaimed {
+      color: var(--red2);
+      background: rgba(231,76,60,0.12);
+      border: 1px solid rgba(231,76,60,0.25);
+    }
+
+    .status-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
       flex-shrink: 0;
     }
 
-    .check-box.checked {
-      background: var(--green);
-      border-color: var(--green);
+    .status-badge.claimed .status-dot   { background: var(--green2); box-shadow: 0 0 4px var(--green2); }
+    .status-badge.unclaimed .status-dot { background: var(--red2);   box-shadow: 0 0 4px var(--red2); }
+
+    /* Claimable variant — unclaimed land whose 6h lock has expired */
+    .status-badge.claimable {
+      color: #f39c12;
+      background: rgba(243,156,18,0.12);
+      border: 1px solid rgba(243,156,18,0.3);
     }
-
-    .check-box svg { display: none; }
-    .check-box.checked svg { display: block; }
-
-    td.td-region { font-family: var(--mono); font-weight: 500; color: #fff; }
-    tr.is-claimed td.td-region { text-decoration: line-through; color: var(--muted); }
-
-    td.td-claimer { color: var(--muted); font-size: 0.78rem; }
-    td.td-claimed-by { font-size: 0.75rem; font-family: var(--mono); color: var(--green); }
-
-    td.td-date { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); white-space: nowrap; }
-
-    td.td-link a {
-      font-family: var(--mono);
-      font-size: 0.7rem;
-      color: var(--accent);
-      text-decoration: none;
-      padding: 0.25rem 0.5rem;
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      transition: all 0.15s;
+    .status-badge.claimable .status-dot {
+      background: #f39c12;
+      box-shadow: 0 0 4px #f39c12;
     }
-
-    .priority {
+    .lock-timer {
       display: inline-block;
+      margin-left: 0.4rem;
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .lock-timer.locked    { color: var(--red2); }
+    .lock-timer.claimable { color: #f39c12; }
+
+    .td-region {
+      font-family: var(--mono);
+      font-weight: 500;
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    .td-land { color: var(--text2); font-size: 0.82rem; }
+    .td-claimer { color: var(--text2); font-size: 0.8rem; }
+    .td-claimed-by { color: var(--green2); font-family: var(--mono); font-size: 0.78rem; }
+    .td-date { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); white-space: nowrap; }
+
+    .td-link a {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--gold);
+      text-decoration: none;
+      padding: 0.2rem 0.5rem;
+      border: 1px solid var(--border);
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .td-link a:hover {
+      border-color: var(--gold);
+      background: rgba(200,168,75,0.1);
+    }
+
+    /* toggle button for claimed status */
+    .btn-toggle {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      padding: 0.2rem 0.55rem;
+      border: 1px solid var(--border);
+      background: var(--bg3);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .btn-toggle:hover { border-color: var(--gold); color: var(--gold); }
+    .btn-toggle.unclaim:hover { border-color: var(--red2); color: var(--red2); }
+
+    /* empty state */
+    .empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.8rem;
+    }
+
+    .empty-state .big { font-family: var(--display); font-size: 3rem; color: var(--border2); }
+
+    /* ════════════════════════════════════════
+       ADMIN PAGE
+    ════════════════════════════════════════ */
+    .admin-grid {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .admin-section-title {
+      font-family: var(--display);
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .pending-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--gold);
+      padding: 0.9rem 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      animation: fadeUp 0.3s ease both;
+    }
+
+    .pending-info { display: flex; flex-direction: column; gap: 0.2rem; }
+
+    .pending-name {
+      font-family: var(--mono);
+      font-size: 0.9rem;
+      color: #fff;
+    }
+
+    .pending-meta {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+    }
+
+    .pending-actions { display: flex; gap: 0.5rem; }
+
+    .btn-approve {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      padding: 0.35rem 0.85rem;
+      border: 1px solid var(--green2);
+      background: rgba(39,174,96,0.1);
+      color: var(--green2);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-transform: uppercase;
+    }
+
+    .btn-approve:hover { background: rgba(39,174,96,0.25); }
+
+    .btn-reject {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      padding: 0.35rem 0.85rem;
+      border: 1px solid var(--red2);
+      background: rgba(231,76,60,0.1);
+      color: var(--red2);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-transform: uppercase;
+    }
+
+    .btn-reject:hover { background: rgba(231,76,60,0.25); }
+
+    .members-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .members-table th {
+      font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.2em;
+      color: var(--gold); padding: 0.5rem 0.75rem; text-align: left;
+      border-bottom: 1px solid var(--border2); text-transform: uppercase;
+    }
+    .members-table td {
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--mono); font-size: 0.78rem; color: var(--text2);
+    }
+    .members-table tr:hover td { background: var(--bg3); }
+
+    .badge-admin {
+      font-size: 0.6rem; padding: 0.15rem 0.4rem;
+      background: rgba(200,168,75,0.15); color: var(--gold);
+      border: 1px solid rgba(200,168,75,0.3); letter-spacing: 0.1em;
+    }
+
+    .badge-member {
+      font-size: 0.6rem; padding: 0.15rem 0.4rem;
+      background: rgba(46,196,214,0.1); color: var(--cyan2);
+      border: 1px solid rgba(46,196,214,0.25); letter-spacing: 0.1em;
+    }
+
+    /* ════════════════════════════════════════
+       TOAST
+    ════════════════════════════════════════ */
+    #toast {
+      position: fixed;
+      bottom: 1.5rem; right: 1.5rem;
+      background: var(--bg3);
+      border: 1px solid var(--gold);
+      border-left: 3px solid var(--gold);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      padding: 0.7rem 1.1rem;
+      z-index: 9999;
+      opacity: 0;
+      transform: translateX(20px);
+      transition: all 0.3s;
+      pointer-events: none;
+      max-width: 320px;
+    }
+
+    #toast.show { opacity: 1; transform: translateX(0); }
+    #toast.error { border-color: var(--red2); }
+    #toast.success { border-color: var(--green2); }
+
+    /* ── Loader ── */
+    .loader {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.5rem; padding: 3rem;
+      font-family: var(--mono); font-size: 0.75rem; color: var(--muted);
+    }
+
+    .loader-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--gold);
+      animation: blink 1.2s infinite;
+    }
+
+    .loader-dot:nth-child(2) { animation-delay: 0.2s; }
+    .loader-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes blink {
+      0%, 100% { opacity: 0.2; } 50% { opacity: 1; }
+    }
+
+    /* ── Corner decorations ── */
+    .corner-tl, .corner-br {
+      position: absolute;
+      width: 12px; height: 12px;
+      pointer-events: none;
+    }
+
+    .corner-tl {
+      top: 0; left: 0;
+      border-top: 2px solid var(--gold-dim);
+      border-left: 2px solid var(--gold-dim);
+    }
+
+    .corner-br {
+      bottom: 0; right: 0;
+      border-bottom: 2px solid var(--gold-dim);
+      border-right: 2px solid var(--gold-dim);
+    }
+
+    /* pending claim-by inline edit */
+    .inline-edit {
+      background: transparent;
+      border: none;
+      border-bottom: 1px dashed var(--border2);
+      color: var(--green2);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      outline: none;
+      width: 140px;
+      padding: 0.1rem 0;
+    }
+    .inline-edit:focus { border-bottom-color: var(--gold); }
+    .inline-edit::placeholder { color: var(--muted); }
+
+    @media (max-width: 700px) {
+      .topbar { padding: 0 0.75rem; }
+      .td-date, .td-land, .td-claimer { display: none; }
+      .auth-panel { width: 95vw; padding: 1.5rem; }
+    }
+
+    /* ── Live indicator ── */
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .live-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: background 0.3s;
+      flex-shrink: 0;
+    }
+
+    .live-dot.syncing { background: var(--gold);   box-shadow: 0 0 6px var(--gold); }
+    .live-dot.updated { background: var(--green2); box-shadow: 0 0 6px var(--green2); }
+    .live-dot.live    { background: var(--green2); box-shadow: 0 0 6px var(--green2);
+                        animation: livepulse 2s infinite; }
+
+    @keyframes livepulse {
+      0%, 100% { opacity: 1; } 50% { opacity: 0.4; }
+    }
+
+    /* ── Sync page ── */
+    .sync-dropzone {
+      border: 2px dashed var(--border2);
+      background: var(--bg3);
+      padding: 3rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+      position: relative;
+    }
+
+    .sync-dropzone:hover, .sync-dropzone.dragover {
+      border-color: var(--gold);
+      background: rgba(200,168,75,0.05);
+    }
+
+    .sync-dropzone .drop-icon {
+      font-family: var(--display);
+      font-size: 3rem;
+      color: var(--border2);
+      display: block;
+      margin-bottom: 0.75rem;
+      transition: color 0.2s;
+    }
+
+    .sync-dropzone:hover .drop-icon,
+    .sync-dropzone.dragover .drop-icon { color: var(--gold); }
+
+    .sync-dropzone .drop-label {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--text2);
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .sync-dropzone .drop-sub {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+    }
+
+    #sync-file-input { display: none; }
+
+    .sync-results {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--gold);
+      padding: 1.25rem 1.5rem;
+      display: none;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .sync-results.visible { display: flex; }
+
+    .sync-stat-row {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .sync-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      min-width: 80px;
+    }
+
+    .sync-stat .num {
+      font-family: var(--display);
+      font-size: 1.8rem;
+      line-height: 1;
+    }
+
+    .sync-stat .lbl {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .sync-detail-list {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--text2);
+      max-height: 200px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .sync-detail-list::-webkit-scrollbar { width: 4px; }
+    .sync-detail-list::-webkit-scrollbar-thumb { background: var(--border2); }
+
+    .sync-detail-item { padding: 0.15rem 0; border-bottom: 1px solid var(--border); }
+    .sync-detail-item.new     { color: var(--cyan2); }
+    .sync-detail-item.updated { color: var(--gold); }
+    .sync-detail-item.skipped { color: var(--muted); }
+    .sync-detail-item.error   { color: var(--red2); }
+
+    .sync-progress {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--gold);
+      display: none;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .sync-progress.visible { display: flex; }
+
+    /* ── Intel / Activity page ── */
+    .intel-grid {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .intel-grid { grid-template-columns: 1fr; }
+    }
+
+    .intel-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .intel-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .intel-card-title {
+      font-family: var(--display);
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+    }
+
+    .intel-card-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.5rem 0;
+    }
+
+    .intel-card-body::-webkit-scrollbar { width: 4px; }
+    .intel-card-body::-webkit-scrollbar-thumb { background: var(--border2); }
+
+    /* Period toggle */
+    .period-toggle {
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    .period-btn {
       font-family: var(--mono);
       font-size: 0.6rem;
       letter-spacing: 0.1em;
-      padding: 0.15rem 0.4rem;
+      padding: 0.2rem 0.55rem;
+      border: 1px solid var(--border);
+      background: none;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-transform: uppercase;
+    }
+
+    .period-btn.active {
+      background: var(--gold);
+      color: #000;
+      border-color: var(--gold);
+    }
+
+    /* Leaderboard */
+    .lb-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.65rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+
+    .lb-row:hover { background: var(--bg3); }
+
+    .lb-rank {
+      font-family: var(--display);
+      font-size: 1.4rem;
+      color: var(--muted);
+      width: 28px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .lb-rank.gold   { color: #ffd700; }
+    .lb-rank.silver { color: #c0c0c0; }
+    .lb-rank.bronze { color: #cd7f32; }
+
+    .lb-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      min-width: 0;
+    }
+
+    .lb-name {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .lb-bar-wrap {
+      height: 3px;
+      background: var(--border);
       border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .lb-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--green2));
+      border-radius: 2px;
+      transition: width 0.5s ease;
+    }
+
+    .lb-stats {
+      display: flex;
+      gap: 0.75rem;
+      flex-shrink: 0;
+      text-align: right;
+    }
+
+    .lb-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.1rem;
+      min-width: 36px;
+    }
+
+    .lb-stat .n {
+      font-family: var(--display);
+      font-size: 1rem;
+      line-height: 1;
+    }
+
+    .lb-stat .l {
+      font-family: var(--mono);
+      font-size: 0.55rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* Activity feed */
+    .feed-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.7rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+
+    .feed-item:hover { background: var(--bg3); }
+
+    .feed-icon {
+      font-size: 1rem;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    .feed-body { flex: 1; min-width: 0; }
+
+    .feed-headline {
+      font-family: var(--ui);
+      font-size: 0.82rem;
+      color: var(--text);
+      line-height: 1.4;
+    }
+
+    .feed-headline strong { color: #fff; }
+    .feed-headline .region { color: var(--gold); }
+    .feed-headline .enemy  { color: var(--red2); }
+
+    .feed-meta {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+    }
+
+    .feed-link {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--gold);
+      text-decoration: none;
       margin-left: 0.5rem;
     }
 
-    .priority.high   { background: rgba(192,57,43,0.2);  color: #e74c3c; border: 1px solid rgba(192,57,43,0.4); }
-    .priority.med    { background: rgba(230,126,34,0.2); color: #e67e22; border: 1px solid rgba(230,126,34,0.4); }
+    .feed-link:hover { text-decoration: underline; }
 
-    .claimedby-input {
-      background: transparent;
-      border: none;
-      border-bottom: 1px dashed var(--border);
-      color: var(--green);
+    /* Full-width leaderboard card */
+    .intel-card.full-width {
+      grid-column: 1 / -1;
+    }
+
+    /* Empty state */
+    .intel-empty {
+      padding: 2rem;
+      text-align: center;
       font-family: var(--mono);
       font-size: 0.75rem;
-      width: 130px;
-      outline: none;
+      color: var(--muted);
     }
 
-    #toast {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      background: var(--bg3);
-      border: 1px solid var(--accent);
-      color: var(--text);
+    /* ── Shield verification ── */
+    .shield-warn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
       font-family: var(--mono);
-      font-size: 0.78rem;
-      padding: 0.75rem 1.25rem;
-      border-radius: 4px;
-      opacity: 0;
-      transform: translateY(10px);
-      transition: all 0.3s;
-      z-index: 1000;
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      cursor: default;
+      opacity: 0.75;
     }
-    #toast.show { opacity: 1; transform: translateY(0); }
 
-    .row-count { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); padding: 0 2rem 0.5rem; }
+    .shield-warn .shield-icon { font-size: 0.7rem; }
 
-    @media (max-width: 768px) {
-      header { padding: 1rem; }
-      td.td-claimer, td.td-date { display: none; }
+    .btn-shield {
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.08em;
+      padding: 0.18rem 0.45rem;
+      border: 1px solid var(--border);
+      background: none;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-transform: uppercase;
+      white-space: nowrap;
     }
+
+    .btn-shield:hover {
+      border-color: var(--cyan2);
+      color: var(--cyan2);
+    }
+
+    .btn-shield.verified {
+      border-color: var(--green2);
+      color: var(--green2);
+      opacity: 0.7;
+    }
+
+    .td-shield { white-space: nowrap; }
+
+    /* ── Crystal tracker ── */
+    .crystal-card {
+      grid-column: 1 / -1;
+    }
+
+    .crystal-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.6rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+
+    .crystal-row:hover { background: var(--bg3); }
+    .crystal-row.is-self { border-left: 2px solid var(--gold); }
+
+    .crystal-name {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      color: #fff;
+      flex: 1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .crystal-name .elite-badge {
+      font-size: 0.55rem;
+      letter-spacing: 0.1em;
+      padding: 0.1rem 0.35rem;
+      background: rgba(200,168,75,0.15);
+      color: var(--gold);
+      border: 1px solid rgba(200,168,75,0.3);
+      margin-left: 0.4rem;
+      vertical-align: middle;
+    }
+
+    .crystal-counter {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .crystal-gems {
+      display: flex;
+      gap: 0.2rem;
+      align-items: center;
+    }
+
+    .gem {
+      width: 10px; height: 10px;
+      border-radius: 2px;
+      background: var(--border2);
+      transition: background 0.2s;
+    }
+
+    .gem.full { background: var(--cyan2); box-shadow: 0 0 4px var(--cyan2); }
+
+    .crystal-num {
+      font-family: var(--display);
+      font-size: 1.1rem;
+      color: var(--cyan2);
+      min-width: 18px;
+      text-align: center;
+      line-height: 1;
+    }
+
+    .crystal-num.empty { color: var(--muted); }
+
+    .crystal-max {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      color: var(--muted);
+    }
+
+    .btn-crystal {
+      width: 22px; height: 22px;
+      border: 1px solid var(--border);
+      background: var(--bg3);
+      color: var(--text2);
+      font-size: 0.9rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .btn-crystal:hover { border-color: var(--cyan2); color: var(--cyan2); }
+    .btn-crystal:disabled { opacity: 0.3; cursor: default; }
+
+    .elite-toggle {
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.08em;
+      padding: 0.15rem 0.4rem;
+      border: 1px solid var(--border);
+      background: none;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .elite-toggle.active {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(200,168,75,0.1);
+    }
+
+    .elite-toggle:hover { border-color: var(--gold-dim); color: var(--gold-dim); }
+
+    /* ── Sync history ── */
+    .sync-history-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      flex-wrap: wrap;
+      transition: background 0.1s;
+    }
+    .sync-history-row:hover { background: var(--bg3); }
+    .sync-history-row .sh-time { color: var(--muted); font-size: 0.65rem; white-space: nowrap; min-width: 130px; }
+    .sync-history-row .sh-by   { color: var(--text2); min-width: 100px; }
+    .sync-history-row .sh-src  { font-size: 0.6rem; padding: 0.1rem 0.35rem; border-radius: 2px; }
+    .sh-src.auto    { color: var(--cyan2); border: 1px solid rgba(46,196,214,0.3); background: rgba(46,196,214,0.08); }
+    .sh-src.manual  { color: var(--gold);  border: 1px solid rgba(200,168,75,0.3);  background: rgba(200,168,75,0.08); }
+    .sync-history-row .sh-stats { display: flex; gap: 0.75rem; margin-left: auto; }
+    .sh-stat { display: flex; flex-direction: column; align-items: center; gap: 0.1rem; min-width: 36px; }
+    .sh-stat .n { font-family: var(--display); font-size: 0.95rem; line-height: 1; }
+    .sh-stat .l { font-size: 0.52rem; color: var(--muted); letter-spacing: 0.1em; }
+    .sh-err { color: var(--red2); font-size: 0.65rem; margin-top: 0.2rem; width: 100%; }
+
+    /* ── Rank badges ── */
+    @keyframes rankSweep {
+      0%   { background-position: 200% center; }
+      100% { background-position: -200% center; }
+    }
+    .rank-badge {
+      display: inline-block;
+      font-family: var(--mono);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: rankSweep 4s linear infinite;
+      white-space: nowrap;
+    }
+    .rank-badge.rank-unranked {
+      background-image: none;
+      -webkit-text-fill-color: #9aa0b0;
+      color: #9aa0b0;
+      animation: none;
+      font-weight: 500;
+      opacity: 0.7;
+    }
+    .rank-badge.rank-common {
+      background-image: linear-gradient(90deg, #6b7280 0%, #9aa0b0 50%, #6b7280 100%);
+    }
+    .rank-badge.rank-uncommon {
+      background-image: linear-gradient(90deg, #16a34a 0%, #4ade80 50%, #16a34a 100%);
+    }
+    .rank-badge.rank-rare {
+      background-image: linear-gradient(90deg, #1e6fb8 0%, #3b9df0 50%, #1e6fb8 100%);
+    }
+    .rank-badge.rank-epic {
+      background-image: linear-gradient(90deg, #7e22ce 0%, #c084fc 50%, #7e22ce 100%);
+    }
+    .rank-badge.rank-legendary {
+      background-image: linear-gradient(90deg, #c2700a 0%, #fbbf24 50%, #c2700a 100%);
+    }
+    .rank-badge.rank-mythic {
+      background-image: linear-gradient(90deg, #9c7d2c 0%, #f0d875 50%, #c8a84b 100%);
+    }
+    .rank-badge.rank-small { font-size: 0.62rem; }
+    .rank-badge.rank-big {
+      font-size: 1.1rem;
+      letter-spacing: 0.12em;
+    }
+    .lb-rank-badge {
+      margin-top: 0.2rem;
+      margin-bottom: 0.1rem;
+    }
+    .lb-rank-badge .rank-badge {
+      font-size: 0.92rem;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }
+    /* Stronger glow on leaderboard ranks so they pop (per-tier color) */
+    .lb-rank-badge .rank-common    { filter: drop-shadow(0 0 5px rgba(154,160,176,0.6)); }
+    .lb-rank-badge .rank-uncommon  { filter: drop-shadow(0 0 6px rgba(74,222,128,0.7)); }
+    .lb-rank-badge .rank-rare      { filter: drop-shadow(0 0 6px rgba(59,157,240,0.7)); }
+    .lb-rank-badge .rank-epic      { filter: drop-shadow(0 0 7px rgba(168,85,247,0.8)); }
+    .lb-rank-badge .rank-legendary { filter: drop-shadow(0 0 8px rgba(243,156,18,0.85)); }
+    .lb-rank-badge .rank-mythic    { filter: drop-shadow(0 0 9px rgba(200,168,75,0.9)); }
+
+    /* ── My Stats page ── */
+    .mystats-wrap {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 2rem 1.5rem 3rem;
+      width: 100%;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    .mystats-wrap::-webkit-scrollbar { width: 6px; }
+    .mystats-wrap::-webkit-scrollbar-track { background: transparent; }
+    .mystats-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    .mystats-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .ms-hero {
+      text-align: center;
+      padding: 2rem 1rem 2.5rem;
+      position: relative;
+    }
+    .ms-hero-name {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      letter-spacing: 0.2em;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+    .ms-hero-rank {
+      margin-bottom: 2.5rem;
+    }
+    .ms-centerpiece {
+      display: flex;
+      justify-content: center;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-bottom: 0.3rem;
+    }
+    .ms-bignum {
+      font-family: var(--display);
+      font-size: clamp(5rem, 18vw, 11rem);
+      line-height: 0.85;
+      color: var(--gold);
+      text-shadow: 0 0 40px rgba(200,168,75,0.3);
+      letter-spacing: 0.02em;
+    }
+    .ms-bignum-label {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.4em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+    }
+    .ms-progress {
+      max-width: 480px;
+      margin: 0 auto 1rem;
+    }
+    .ms-progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+    .ms-progress-bar {
+      height: 4px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .ms-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+      transition: width 0.6s ease;
+    }
+    .ms-next {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 0.75rem;
+    }
+    .ms-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 2.5rem;
+    }
+    @media (max-width: 600px) { .ms-grid { grid-template-columns: 1fr; } }
+    .ms-stat {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+      text-align: center;
+      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+    }
+    .ms-stat-num {
+      font-family: var(--display);
+      font-size: 2.5rem;
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+    .ms-stat-label {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .ms-tiers {
+      margin-top: 2.5rem;
+    }
+    .ms-tiers-title {
+      font-family: var(--display);
+      font-size: 1.3rem;
+      letter-spacing: 0.1em;
+      color: #fff;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .ms-tier-track {
+      display: flex;
+      gap: 0.4rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .ms-tier-pip {
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      padding: 0.3rem 0.7rem;
+      border: 1px solid var(--border);
+      opacity: 0.4;
+      transition: opacity 0.2s;
+    }
+    .ms-tier-pip.reached { opacity: 1; }
+
+    /* ── Shield verification — admin-only visibility ── */
+    .shield-col { display: none; }
+    body.is-admin .shield-col { display: table-cell; }
   </style>
 </head>
 <body>
 
-<header>
-  <div class="header-left">
-    <div class="header-eyebrow">⚔ EVW CLAN — CLASSIFIED INTEL</div>
-    <h1>PROJECT <span>KINGSLAYER</span></h1>
-    <div class="header-sub">TARGET ACQUISITION LIST // EUPHORIA REALM CAPTURE</div>
-  </div>
-  <div class="stats-bar">
-    <div class="stat"><span class="stat-num" id="stat-total">—</span><span class="stat-label">Targets</span></div>
-    <div class="stat-divider"></div>
-    <div class="stat"><span class="stat-num green" id="stat-done">0</span><span class="stat-label">Claimed</span></div>
-    <div class="stat-divider"></div>
-    <div class="stat"><span class="stat-num red" id="stat-remaining">—</span><span class="stat-label">Remaining</span></div>
-  </div>
-</header>
+<!-- ════════════════ AUTH SCREEN ════════════════ -->
+<div class="screen active" id="screen-auth">
+  <div class="auth-bg-text">EVW</div>
 
-<div class="progress-wrap">
-  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
-  <div class="progress-text" id="progress-text">0% complete</div>
-</div>
+  <div class="auth-panel">
+    <div class="corner-tl"></div>
+    <div class="corner-br"></div>
 
-<div class="controls">
-  <div class="search-wrap">
-    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-    </svg>
-    <input type="search" id="search" placeholder="Search region or claimer...">
-  </div>
-  <div class="filter-btns">
-    <button class="filter-btn active" data-filter="all">All</button>
-    <button class="filter-btn" data-filter="pending">Pending</button>
-    <button class="filter-btn" data-filter="claimed">Claimed</button>
-  </div>
-  <select class="sort-select" id="sort-select">
-    <option value="date-asc">Date (oldest first)</option>
-    <option value="date-desc">Date (newest first)</option>
-    <option value="region-asc">Region A–Z</option>
-    <option value="region-desc">Region Z–A</option>
-    <option value="claimer-asc">Enemy Claimer A–Z</option>
-  </select>
-</div>
+    <div class="auth-logo">
+      <span class="eyebrow">⚔ EVW CLAN // CLASSIFIED</span>
+      <h1>PROJECT <em>KINGSLAYER</em></h1>
+      <span class="sub">TERRITORY COMMAND SYSTEM // EUPHORIA</span>
+    </div>
 
-<div class="row-count" id="row-count"></div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="login">Login</button>
+      <button class="auth-tab" data-tab="register">Request Access</button>
+    </div>
 
-<div class="table-wrap">
-  <table id="target-table">
-    <thead>
-      <tr>
-        <th class="td-check"></th>
-        <th data-col="region">Region</th>
-        <th data-col="claimer">Enemy Claimer</th>
-        <th data-col="claimed_by">Claimed By (EVW)</th>
-        <th data-col="timestamp">First Seen</th>
-        <th>Teleport</th>
-      </tr>
-    </thead>
-    <tbody id="tbody"></tbody>
-  </table>
-  <div class="empty-state" id="empty-state" style="display:none; text-align:center; padding:4rem; color:var(--muted); font-family:var(--mono);">
-    No targets match your filter.
+    <!-- Login form -->
+    <div class="auth-form" id="form-login">
+      <div class="field-group">
+        <label class="field-label">Username</label>
+        <input class="field-input" type="text" id="login-username" placeholder="your username" autocomplete="username">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Password</label>
+        <input class="field-input" type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div class="auth-message" id="login-msg"></div>
+      <button class="btn-primary" id="btn-login">AUTHENTICATE</button>
+    </div>
+
+    <!-- Register form -->
+    <div class="auth-form hidden" id="form-register">
+      <div class="field-group">
+        <label class="field-label">Username</label>
+        <input class="field-input" type="text" id="reg-username" placeholder="choose a username">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Password</label>
+        <input class="field-input" type="password" id="reg-password" placeholder="min. 6 characters">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Second Life Username <span style="color:var(--muted)">(optional)</span></label>
+        <input class="field-input" type="text" id="reg-sl" placeholder="your SL login name">
+      </div>
+      <div class="auth-message" id="reg-msg"></div>
+      <button class="btn-primary" id="btn-register">SUBMIT REQUEST</button>
+    </div>
   </div>
 </div>
 
+<!-- ════════════════ APP SCREEN ════════════════ -->
+<div class="screen" id="screen-app">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">PROJECT <em>KINGSLAYER</em></div>
+      <div class="topbar-divider"></div>
+      <nav class="nav-tabs">
+        <button class="nav-tab active" data-page="lands" data-i18n="nav.lands">⚔ Lands</button>
+        <button class="nav-tab" data-page="intel" id="nav-intel" data-i18n="nav.intel">◈ Intel</button>
+        <button class="nav-tab admin-tab" data-page="admin" id="nav-admin" style="display:none" data-i18n="nav.admin">⬡ Admin</button>
+        <button class="nav-tab" data-page="crystals" id="nav-crystals" data-i18n="nav.crystals">💎 Crystals</button>
+        <button class="nav-tab" data-page="mystats" id="nav-mystats" data-i18n="nav.mystats">★ My Stats</button>
+        <button class="nav-tab admin-tab" data-page="sync" id="nav-sync" style="display:none" data-i18n="nav.sync">⇅ Sync</button>
+        <button class="nav-tab admin-tab" data-page="hudauth" id="nav-hudauth" style="display:none" data-i18n="nav.hudauth">🔐 HUD Auth</button>
+      </nav>
+    </div>
+    <div class="topbar-right">
+      <div class="user-info" id="user-info-menu" style="cursor:pointer;position:relative" onclick="toggleUserMenu()">
+        <strong id="topbar-username">—</strong>
+        <span id="topbar-role">MEMBER</span>
+        <div id="user-dropdown" style="display:none;position:absolute;top:100%;right:0;margin-top:0.5rem;background:var(--bg2);border:1px solid var(--border);min-width:160px;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,0.4)">
+          <button onclick="event.stopPropagation();openChangePassword()" style="width:100%;text-align:left;background:none;border:none;color:var(--text);font-family:var(--mono);font-size:0.72rem;padding:0.6rem 0.9rem;cursor:pointer" data-i18n="topbar.changePw">🔑 Change Password</button>
+        </div>
+      </div>
+      <div class="live-indicator" id="live-indicator">
+        <div class="live-dot" id="live-dot"></div>
+        <span id="live-text">STANDBY</span>
+      </div>
+      <button class="btn-logout" id="lang-toggle" onclick="toggleLanguage()" style="margin-right:0.5rem">ES</button>
+      <button class="btn-logout" id="btn-logout" data-i18n="topbar.logout">[ LOGOUT ]</button>
+    </div>
+  </div>
+
+  <!-- Status bar -->
+  <div class="statusbar">
+    <div class="stat-pill">
+      <span class="num gold" id="stat-total">—</span>
+      <span data-i18n="stats.totalRegions">TOTAL REGIONS</span>
+    </div>
+    <span class="stat-sep">|</span>
+    <div class="stat-pill">
+      <span class="num green" id="stat-claimed">—</span>
+      <span data-i18n="stats.underControl">UNDER EVW CONTROL</span>
+    </div>
+    <span class="stat-sep">|</span>
+    <div class="stat-pill">
+      <span class="num red" id="stat-unclaimed">—</span>
+      <span data-i18n="stats.enemyUnclaimed">ENEMY / UNCLAIMED</span>
+    </div>
+    <span class="stat-sep">|</span>
+    <div class="progress-wrap">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+      <span class="progress-label" id="progress-label">0% CONTROL</span>
+    </div>
+  </div>
+
+  <!-- ── LANDS PAGE ── -->
+  <div class="page active" id="page-lands">
+    <div class="controls-bar">
+      <div class="search-wrap">
+        <svg class="search-icon" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input class="search-input" type="search" id="lands-search" placeholder="Search region, land, claimer..." data-i18n-ph="lands.searchPlaceholder">
+      </div>
+      <div class="filter-group">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="claimed">Claimed</button>
+        <button class="filter-btn" data-filter="unclaimed">Unclaimed</button>
+      </div>
+      <select class="sort-select" id="lands-sort">
+        <option value="region-asc">Region A–Z</option>
+        <option value="region-desc">Region Z–A</option>
+        <option value="date-desc">Newest first</option>
+        <option value="date-asc">Oldest first</option>
+        <option value="status">Status</option>
+      </select>
+      <span class="row-count" id="lands-count"></span>
+    </div>
+
+    <div class="table-scroll" id="lands-table-wrap">
+      <div class="loader" id="lands-loader">
+        <div class="loader-dot"></div>
+        <div class="loader-dot"></div>
+        <div class="loader-dot"></div>
+        <span>LOADING INTEL...</span>
+      </div>
+      <table id="lands-table" style="display:none">
+        <thead>
+          <tr>
+            <th data-i18n="lands.status">Status</th>
+            <th data-i18n="lands.region">Region</th>
+            <th data-i18n="lands.landName">Land Name</th>
+            <th data-i18n="lands.enemyClaimer">Enemy Claimer</th>
+            <th data-i18n="lands.claimedBy">Claimed By (EVW)</th>
+            <th data-i18n="lands.firstSeen">First Seen</th>
+            <th data-i18n="lands.teleport">Teleport</th>
+            <th class="shield-col" data-i18n="lands.shield">Shield</th>
+            <th data-i18n="lands.action">Action</th>
+          </tr>
+        </thead>
+        <tbody id="lands-tbody"></tbody>
+      </table>
+      <div class="empty-state" id="lands-empty" style="display:none">
+        <span class="big">◈</span>
+        <span>No records match your filter.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ADMIN PAGE ── -->
+  <div class="page" id="page-admin">
+    <div class="admin-grid">
+
+      <!-- Maintenance toggle -->
+      <div>
+        <div class="admin-section-title" data-i18n="admin.systemControl">⚙ System Control</div>
+        <div style="background:var(--bg3);border:1px solid var(--border);padding:1rem 1.2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+          <div>
+            <div style="font-family:var(--mono);font-size:0.8rem;color:#fff;margin-bottom:0.25rem">Maintenance Mode</div>
+            <div style="font-family:var(--mono);font-size:0.65rem;color:var(--muted)">Redirects all visitors to the maintenance screen. Admins can still log in.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:0.75rem">
+            <span id="maintenance-status-label" style="font-family:var(--mono);font-size:0.65rem;color:var(--muted)">CHECKING...</span>
+            <button id="btn-maintenance" onclick="toggleMaintenance()"
+              style="font-family:var(--mono);font-size:0.7rem;letter-spacing:0.1em;padding:0.4rem 1rem;border:1px solid var(--border);background:var(--bg3);color:var(--muted);cursor:pointer;text-transform:uppercase;transition:all 0.15s">
+              —
+            </button>
+          </div>
+        </div>
+        <div style="margin-top:0.75rem;display:flex;gap:0.5rem;align-items:center">
+          <input id="maintenance-msg-input" type="text"
+            placeholder="Custom message for visitors (optional)"
+            style="flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:0.72rem;padding:0.4rem 0.7rem;outline:none">
+          <button onclick="saveMaintenanceMessage()"
+            style="font-family:var(--mono);font-size:0.65rem;padding:0.4rem 0.75rem;border:1px solid var(--border);background:var(--bg3);color:var(--muted);cursor:pointer;white-space:nowrap">
+            Save Message
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <div class="admin-section-title" data-i18n="admin.pendingRequests">⏳ Pending Access Requests</div>
+        <div id="pending-list">
+          <div class="loader">
+            <div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div>
+            <span>LOADING...</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="admin-section-title" data-i18n="admin.allMembers">👥 All Members</div>
+        <table class="members-table">
+          <thead>
+            <tr>
+              <th data-i18n="admin.username">Username</th>
+              <th data-i18n="admin.slUsername">SL Username</th>
+              <th data-i18n="admin.role">Role</th>
+              <th data-i18n="admin.joined">Joined</th>
+              <th data-i18n="admin.actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="members-tbody"></tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── HUD AUTH PAGE ── -->
+  <div class="page" id="page-hudauth">
+    <div class="admin-grid">
+
+      <div>
+        <div class="admin-section-title" data-i18n="hudauth.title">🔐 HUD Authorization</div>
+        <div style="background:var(--bg3);border:1px solid var(--border);padding:1rem 1.2rem">
+          <div style="font-family:var(--mono);font-size:0.65rem;color:var(--muted);margin-bottom:0.6rem" data-i18n="hudauth.addDesc">Authorize an operative by SL username. Authorized members can attach the Territory HUD; everyone else is detached on sight.</div>
+          <div style="display:flex;gap:0.5rem;align-items:center">
+            <input id="hudauth-username-input" type="text" placeholder="SL username (e.g. noa.nightfall)" data-i18n-ph="hudauth.ph"
+              style="flex:1;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:0.72rem;padding:0.4rem 0.7rem;outline:none">
+            <button class="btn-approve" onclick="addHudAuth()" data-i18n="hudauth.authorize">✔ Authorize</button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="admin-section-title" data-i18n="hudauth.pending">⏳ Pending HUD Requests</div>
+        <div id="hudauth-pending">
+          <div class="loader">
+            <div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div>
+            <span>LOADING...</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="admin-section-title" data-i18n="hudauth.approved">✅ Authorized Operatives</div>
+        <div id="hudauth-approved"></div>
+      </div>
+
+      <div>
+        <div class="admin-section-title" data-i18n="hudauth.deniedTitle">⛔ Denied</div>
+        <div id="hudauth-denied"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── INTEL PAGE ── -->
+  <div class="page" id="page-intel">
+    <div class="intel-grid">
+
+      <!-- Leaderboard -->
+      <div class="intel-card">
+        <div class="intel-card-header">
+          <span class="intel-card-title" data-i18n="intel.leaderboard">★ OPERATIVE LEADERBOARD</span>
+          <div class="period-toggle">
+            <button class="period-btn active" data-period="alltime">All Time</button>
+            <button class="period-btn" data-period="30days">30 Days</button>
+          </div>
+        </div>
+        <div class="intel-card-body" id="lb-body">
+          <div class="loader" style="padding:2rem">
+            <div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div>
+            <span>LOADING...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity Feed -->
+      <div class="intel-card">
+        <div class="intel-card-header">
+          <span class="intel-card-title" data-i18n="intel.recentActivity">⚡ RECENT ACTIVITY</span>
+          <span style="font-family:var(--mono);font-size:0.62rem;color:var(--muted)" id="feed-count"></span>
+        </div>
+        <div class="intel-card-body" id="feed-body">
+          <div class="loader" style="padding:2rem">
+            <div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div>
+            <span>LOADING...</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+
+  <!-- ── CRYSTALS PAGE ── -->
+
+  <!-- ── MY STATS PAGE ── -->
+  <div class="page" id="page-mystats">
+    <div class="mystats-wrap">
+      <div class="mystats-inner" id="mystats-content">
+      <div class="loader" style="padding:3rem">
+        <div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div>
+        <span>LOADING...</span>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page" id="page-crystals">
+    <div class="admin-grid">
+      <div>
+        <div class="admin-section-title">💎 CRYSTAL TRACKER <span style="font-family:var(--mono);font-size:0.65rem;color:var(--muted);font-weight:normal">— Resets 12AM PST daily</span></div>
+        <div id="crystal-body">
+          <div class="loader">
+            <div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div>
+            <span>LOADING...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SYNC PAGE ── -->
+  <div class="page" id="page-sync">
+    <div class="admin-grid">
+
+      <div>
+        <div class="admin-section-title" data-i18n="sync.title">⇅ Euphoria Channel Sync</div>
+        <p style="font-family:var(--mono);font-size:0.72rem;color:var(--text2);margin-bottom:1.5rem;line-height:1.7">
+          Export the Euphoria Discord channel using DiscordChatExporter (JSON format), then drop the file below.<br>
+          New enemy lands will be added. Existing EVW-claimed lands will only be updated if the log entry is newer than our last recorded update.
+        </p>
+
+        <div class="sync-dropzone" id="sync-dropzone">
+          <span class="drop-icon">⬇</span>
+          <span class="drop-label">Drop Euphoria JSON export here</span>
+          <span class="drop-sub">or click to browse — JSON files only</span>
+        </div>
+        <input type="file" id="sync-file-input" accept=".json">
+
+        <div class="sync-progress" id="sync-progress" style="margin-top:1rem">
+          <div class="loader-dot"></div>
+          <div class="loader-dot"></div>
+          <div class="loader-dot"></div>
+          <span id="sync-progress-text">Parsing file...</span>
+        </div>
+      </div>
+
+      <div class="sync-results" id="sync-results">
+        <div class="admin-section-title" style="margin-bottom:0">Sync Report</div>
+
+        <div class="sync-stat-row">
+          <div class="sync-stat">
+            <span class="num gold"  id="sync-stat-parsed">0</span>
+            <span class="lbl">Records Parsed</span>
+          </div>
+          <div class="sync-stat">
+            <span class="num" style="color:var(--cyan2)" id="sync-stat-inserted">0</span>
+            <span class="lbl">New Lands Added</span>
+          </div>
+          <div class="sync-stat">
+            <span class="num" style="color:var(--gold)" id="sync-stat-updated">0</span>
+            <span class="lbl">Lands Updated</span>
+          </div>
+          <div class="sync-stat">
+            <span class="num" style="color:var(--muted)" id="sync-stat-skipped">0</span>
+            <span class="lbl">Skipped</span>
+          </div>
+          <div class="sync-stat">
+            <span class="num" style="color:var(--green2)" id="sync-stat-evw">0</span>
+            <span class="lbl">EVW Owned</span>
+          </div>
+        </div>
+
+        <div id="sync-detail-new" style="display:none">
+          <div style="font-family:var(--mono);font-size:0.65rem;color:var(--cyan2);letter-spacing:0.15em;margin-bottom:0.4rem">
+            ✦ NEW LANDS ADDED
+          </div>
+          <div class="sync-detail-list" id="sync-list-new"></div>
+        </div>
+
+        <div id="sync-detail-updated" style="display:none">
+          <div style="font-family:var(--mono);font-size:0.65rem;color:var(--gold);letter-spacing:0.15em;margin-bottom:0.4rem">
+            ↻ LANDS UPDATED
+          </div>
+          <div class="sync-detail-list" id="sync-list-updated"></div>
+        </div>
+
+        <div id="sync-detail-errors" style="display:none">
+          <div style="font-family:var(--mono);font-size:0.65rem;color:var(--red2);letter-spacing:0.15em;margin-bottom:0.4rem">
+            ⚠ ERRORS
+          </div>
+          <div class="sync-detail-list" id="sync-list-errors"></div>
+        </div>
+
+        <div style="font-family:var(--mono);font-size:0.65rem;color:var(--muted);margin-top:0.5rem" id="sync-timestamp"></div>
+      </div>
+
+
+      <!-- Sync History -->
+      <div>
+        <div class="admin-section-title" style="margin-top:0.5rem">📋 SYNC HISTORY <span style="font-family:var(--mono);font-size:0.65rem;color:var(--muted);font-weight:normal">— last 50 runs</span></div>
+        <div id="sync-history-list">
+          <div class="loader">
+            <div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div>
+            <span>LOADING...</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- end screen-app -->
+
+<!-- Toast -->
 <div id="toast"></div>
 
 <script>
-// ── DATA ─────────────────────────────────────────────────────
-const TARGETS = [{"region": "Yaupon Plain", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Yaupon%20Plain/81/215/1504", "timestamp": "2026-03-31 14:58:57"}, {"region": "Achroma", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Achroma/121/18/62", "timestamp": "2026-04-16 23:10:53"}, {"region": "Ceneselli", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Ceneselli/130/156/77", "timestamp": "2026-04-20 17:50:03"}, {"region": "Cinnamon Bay", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Cinnamon%20Bay/166/87/21", "timestamp": "2026-04-20 18:13:21"}, {"region": "SoCal", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/SoCal/202/146/27", "timestamp": "2026-04-20 18:50:29"}, {"region": "Fiora", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Fiora/55/170/35", "timestamp": "2026-04-20 19:10:49"}, {"region": "Bluewater Isle", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Bluewater%20Isle/100/117/33", "timestamp": "2026-04-20 19:23:39"}, {"region": "Gold Hollow", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Gold%20Hollow/57/73/28", "timestamp": "2026-04-20 19:27:37"}, {"region": "Nameless", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Nameless/72/210/63", "timestamp": "2026-04-20 20:03:23"}, {"region": "Belle Arti", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Belle%20Arti/100/199/1493", "timestamp": "2026-04-20 20:31:23"}, {"region": "Spiazzo", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Spiazzo/32/87/40", "timestamp": "2026-04-20 20:57:16"}, {"region": "Slitheen", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Slitheen/32/78/2236", "timestamp": "2026-04-20 22:27:21"}, {"region": "KENNEDY", "claimer": "Tyler Seraphim", "slurl": "https://maps.secondlife.com/secondlife/KENNEDY/127/127/26", "timestamp": "2026-04-20 23:46:29"}, {"region": "Coronation Heights", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Coronation%20Heights/83/194/2000", "timestamp": "2026-04-21 00:55:51"}, {"region": "Mesa Island", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Mesa%20Island/230/149/3002", "timestamp": "2026-04-21 02:14:11"}, {"region": "Half Moon Cove", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Half%20Moon%20Cove/30/180/22", "timestamp": "2026-04-21 02:31:40"}, {"region": "Avarice", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Avarice/66/128/3523", "timestamp": "2026-04-21 04:12:17"}, {"region": "Barnes Wallow", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Barnes%20Wallow/133/127/23", "timestamp": "2026-04-21 04:40:56"}, {"region": "Sin City", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Sin%20City/128/128/20", "timestamp": "2026-04-21 04:58:48"}, {"region": "Pahvo", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Pahvo/134/134/44", "timestamp": "2026-04-21 05:06:53"}, {"region": "Crowberry", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Crowberry/128/128/9", "timestamp": "2026-04-21 05:15:29"}, {"region": "Predrow", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Predrow/50/110/2995", "timestamp": "2026-04-21 16:30:03"}, {"region": "Summit Valley", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Summit%20Valley/116/181/3653", "timestamp": "2026-04-21 19:03:30"}, {"region": "Dreamworld", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Dreamworld/94/235/21", "timestamp": "2026-04-21 22:29:41"}, {"region": "Artina", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Artina/99/96/4005", "timestamp": "2026-04-22 00:07:21"}, {"region": "Horizons Yurania", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Horizons%20Yurania/129/147/22", "timestamp": "2026-04-22 00:45:37"}, {"region": "Horizons Ariel", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Horizons%20Ariel/146/112/31", "timestamp": "2026-04-22 04:12:04"}, {"region": "Creach", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Creach/126/129/8", "timestamp": "2026-04-22 04:33:47"}, {"region": "Refraction", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Refraction/187/212/708", "timestamp": "2026-04-22 04:50:09"}, {"region": "Zurn", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Zurn/128/129/8", "timestamp": "2026-04-22 04:58:03"}, {"region": "Riverview Cove", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Riverview%20Cove/189/147/3201", "timestamp": "2026-04-22 05:27:59"}, {"region": "Portia Park", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Portia%20Park/130/128/25", "timestamp": "2026-04-22 06:20:45"}, {"region": "Jitterbug", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Jitterbug/128/125/23", "timestamp": "2026-04-22 06:29:14"}, {"region": "Everdream", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Everdream/121/140/7", "timestamp": "2026-04-22 06:35:26"}, {"region": "Ahimsa", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Ahimsa/66/120/20", "timestamp": "2026-04-22 06:40:05"}, {"region": "Matata", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Matata/136/123/3", "timestamp": "2026-04-22 06:43:02"}, {"region": "tiptoes", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/tiptoes/139/115/21", "timestamp": "2026-04-22 06:49:40"}, {"region": "Obasan Ohayo", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Obasan%20Ohayo/128/128/31", "timestamp": "2026-04-22 06:55:17"}, {"region": "Mystic River", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Mystic%20River/130/239/23", "timestamp": "2026-04-22 07:00:11"}, {"region": "Sinisong2", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Sinisong2/184/163/1000", "timestamp": "2026-04-22 07:06:12"}, {"region": "Eden Bunting", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Eden%20Bunting/123/124/5", "timestamp": "2026-04-22 07:11:17"}, {"region": "Taean", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Taean/140/130/81", "timestamp": "2026-04-22 07:16:48"}, {"region": "Oreo", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Oreo/124/143/21", "timestamp": "2026-04-22 07:23:54"}, {"region": "Zeds Pitch", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Zeds%20Pitch/113/124/42", "timestamp": "2026-04-22 07:31:04"}, {"region": "Glue Trap Maze", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Glue%20Trap%20Maze/154/127/22", "timestamp": "2026-04-22 07:36:59"}, {"region": "Tardfish", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Tardfish/143/139/23", "timestamp": "2026-04-22 07:37:26"}, {"region": "Jorn Province", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Jorn%20Province/14/15/23", "timestamp": "2026-04-22 07:42:22"}, {"region": "Santos", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Santos/82/21/24", "timestamp": "2026-04-22 07:48:31"}, {"region": "Cult Coven", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Cult%20Coven/205/55/32", "timestamp": "2026-04-22 16:23:06"}, {"region": "Loveless BloodMoon", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Loveless%20BloodMoon/234/205/21", "timestamp": "2026-04-22 16:32:01"}, {"region": "SkyBeam", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/SkyBeam/97/135/2501", "timestamp": "2026-04-22 17:22:23"}, {"region": "Ermus", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Ermus/55/171/3198", "timestamp": "2026-04-22 20:03:24"}, {"region": "Kickin Boots", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Kickin%20Boots/154/91/3892", "timestamp": "2026-04-23 05:00:35"}, {"region": "Tobys Bayou", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Tobys%20Bayou/219/244/21", "timestamp": "2026-04-23 05:14:00"}, {"region": "GEL Amusement Park", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/GEL%20Amusement%20Park/20/133/45", "timestamp": "2026-04-23 05:31:39"}, {"region": "SLife", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/SLife/119/162/22", "timestamp": "2026-04-23 06:07:41"}, {"region": "Anthology", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Anthology/183/164/1012", "timestamp": "2026-04-23 07:15:24"}, {"region": "Maitreya Isle", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/Maitreya%20Isle/139/175/43", "timestamp": "2026-04-23 11:03:05"}, {"region": "MadPea Base", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/MadPea%20Base/118/141/30", "timestamp": "2026-04-23 16:05:41"}, {"region": "WelcomeHub", "claimer": "Unknown", "slurl": "https://maps.secondlife.com/secondlife/WelcomeHub/14/218/26", "timestamp": "2026-04-23 18:09:28"}, {"region": "Aii", "claimer": "lilvampy Destiny", "slurl": "https://maps.secondlife.com/secondlife/Aii/153/160/1524", "timestamp": "2026-04-23 19:17:58"}, {"region": "Progeny Lounge", "claimer": "Merukii Resident", "slurl": "https://maps.secondlife.com/secondlife/Progeny%20Lounge/19/113/22", "timestamp": "2026-04-23 19:19:16"}, {"region": "Predrow", "claimer": "Lucifer Seraphim", "slurl": "https://maps.secondlife.com/secondlife/Predrow/53/110/2995", "timestamp": "2026-04-24 04:16:01"}, {"region": "Fuson", "claimer": "Serena5579 Resident", "slurl": "https://maps.secondlife.com/secondlife/Fuson/70/158/3374", "timestamp": "2026-04-24 04:31:07"}, {"region": "Barnes Wallow", "claimer": "theragnarok1 Resident", "slurl": "https://maps.secondlife.com/secondlife/Barnes%20Wallow/133/127/23", "timestamp": "2026-04-24 04:42:01"}, {"region": "Sin City", "claimer": "Lucifer Seraphim", "slurl": "https://maps.secondlife.com/secondlife/Sin%20City/121/132/28", "timestamp": "2026-04-24 05:04:48"}, {"region": "Pahvo", "claimer": "Serena5579 Resident", "slurl": "https://maps.secondlife.com/secondlife/Pahvo/135/135/44", "timestamp": "2026-04-24 05:18:04"}, {"region": "Nameless", "claimer": "Serena5579 Resident", "slurl": "https://maps.secondlife.com/secondlife/Nameless/80/221/65", "timestamp": "2026-04-24 05:35:29"}, {"region": "WelcomeHub", "claimer": "GhostieGrimm Resident", "slurl": "https://maps.secondlife.com/secondlife/WelcomeHub/36/204/26", "timestamp": "2026-04-24 07:06:17"}, {"region": "Maitreya Isle", "claimer": "GhostieGrimm Resident", "slurl": "https://maps.secondlife.com/secondlife/Maitreya%20Isle/126/121/23", "timestamp": "2026-04-24 07:18:58"}, {"region": "Pangea Estates", "claimer": "Aeryn Starchild", "slurl": "https://maps.secondlife.com/secondlife/Pangea%20Estates/209/219/48", "timestamp": "2026-04-24 07:19:28"}, {"region": "Chouchou", "claimer": "Simons0n Resident", "slurl": "https://maps.secondlife.com/secondlife/Chouchou/177/144/21", "timestamp": "2026-04-24 07:41:05"}, {"region": "Ay Caramba", "claimer": "Laezimir Resident", "slurl": "https://maps.secondlife.com/secondlife/Ay%20Caramba/90/61/25", "timestamp": "2026-04-24 09:23:38"}, {"region": "Drakaren", "claimer": "SPara001 Resident", "slurl": "https://maps.secondlife.com/secondlife/Drakaren/68/175/37", "timestamp": "2026-04-24 09:34:01"}, {"region": "Garmu", "claimer": "Jay Nightwish", "slurl": "https://maps.secondlife.com/secondlife/Garmu/120/134/9", "timestamp": "2026-04-24 09:56:46"}, {"region": "Henker", "claimer": "Jay Nightwish", "slurl": "https://maps.secondlife.com/secondlife/Henker/100/130/4", "timestamp": "2026-04-24 10:17:51"}, {"region": "Spellbound Manor", "claimer": "Jay Nightwish", "slurl": "https://maps.secondlife.com/secondlife/Spellbound%20Manor/165/11/1988", "timestamp": "2026-04-24 10:46:13"}, {"region": "Spellbound Manor", "claimer": "Dorian88 Resident", "slurl": "https://maps.secondlife.com/secondlife/Spellbound%20Manor/165/11/1988", "timestamp": "2026-04-24 19:00:11"}, {"region": "Henker", "claimer": "simoncino98 Resident", "slurl": "https://maps.secondlife.com/secondlife/Henker/101/132/6", "timestamp": "2026-04-24 19:11:50"}, {"region": "Maitreya Isle", "claimer": "Dorian88 Resident", "slurl": "https://maps.secondlife.com/secondlife/Maitreya%20Isle/131/135/23", "timestamp": "2026-04-24 19:30:15"}, {"region": "Stokhof", "claimer": "angelllofpassion Resident", "slurl": "https://maps.secondlife.com/secondlife/Stokhof/109/39/46", "timestamp": "2026-04-24 19:46:14"}, {"region": "Stokhof", "claimer": "SadWorid Resident", "slurl": "https://maps.secondlife.com/secondlife/Stokhof/107/55/46", "timestamp": "2026-04-24 19:51:00"}, {"region": "Pangea Estates", "claimer": "SadWorid Resident", "slurl": "https://maps.secondlife.com/secondlife/Pangea%20Estates/143/53/47", "timestamp": "2026-04-24 20:14:56"}, {"region": "NOTORIOUS Kingdom", "claimer": "SadWorid Resident", "slurl": "https://maps.secondlife.com/secondlife/NOTORIOUS%20Kingdom/204/32/2997", "timestamp": "2026-04-24 20:21:21"}, {"region": "Gold Hollow", "claimer": "blenda Twang", "slurl": "https://maps.secondlife.com/secondlife/Gold%20Hollow/47/76/28", "timestamp": "2026-04-24 20:35:35"}, {"region": "Mishiland", "claimer": "blenda Twang", "slurl": "https://maps.secondlife.com/secondlife/Mishiland/27/198/75", "timestamp": "2026-04-24 21:05:10"}, {"region": "GEL Community 21", "claimer": "VowofTruth Resident", "slurl": "https://maps.secondlife.com/secondlife/GEL%20Community%2021/180/194/1658", "timestamp": "2026-04-24 21:35:53"}, {"region": "Desert Moon", "claimer": "Elijah Baby", "slurl": "https://maps.secondlife.com/secondlife/Desert%20Moon/202/41/2028", "timestamp": "2026-04-25 00:25:13"}, {"region": "Spiazzo", "claimer": "Vextein Resident", "slurl": "https://maps.secondlife.com/secondlife/Spiazzo/37/89/40", "timestamp": "2026-04-25 01:50:58"}, {"region": "GABRIEL2", "claimer": "Vaphnova Hexem", "slurl": "https://maps.secondlife.com/secondlife/GABRIEL2/26/145/501", "timestamp": "2026-04-25 09:01:09"}, {"region": "Zaltu", "claimer": "blenda Twang", "slurl": "https://maps.secondlife.com/secondlife/Zaltu/181/225/99", "timestamp": "2026-04-25 19:20:06"}, {"region": "Odyssey", "claimer": "blenda Twang", "slurl": "https://maps.secondlife.com/secondlife/Odyssey/50/232/24", "timestamp": "2026-04-25 19:48:56"}, {"region": "Odyssey", "claimer": "Merukii Resident", "slurl": "https://maps.secondlife.com/secondlife/Odyssey/7/237/21", "timestamp": "2026-04-25 19:56:29"}, {"region": "Horizons Galatea", "claimer": "Renny Puppy", "slurl": "https://maps.secondlife.com/secondlife/Horizons%20Galatea/141/43/23", "timestamp": "2026-04-25 21:12:39"}, {"region": "Tainted Island", "claimer": "Jemerald Resident", "slurl": "https://maps.secondlife.com/secondlife/Tainted%20Island/148/60/1504", "timestamp": "2026-04-26 01:11:32"}, {"region": "Horizons Yurania", "claimer": "theragnarok1 Resident", "slurl": "https://maps.secondlife.com/secondlife/Horizons%20Yurania/129/169/22", "timestamp": "2026-04-26 03:24:57"}, {"region": "Zaltu", "claimer": "Serena5579 Resident", "slurl": "https://maps.secondlife.com/secondlife/Zaltu/186/248/98", "timestamp": "2026-04-26 03:45:45"}, {"region": "Aii", "claimer": "theragnarok1 Resident", "slurl": "https://maps.secondlife.com/secondlife/Aii/153/160/1525", "timestamp": "2026-04-26 05:14:11"}, {"region": "Soho Island", "claimer": "irielove Resident", "slurl": "https://maps.secondlife.com/secondlife/Soho%20Island/225/193/21", "timestamp": "2026-04-26 09:39:49"}, {"region": "Teegle", "claimer": "Aeryn Starchild", "slurl": "https://maps.secondlife.com/secondlife/Teegle/95/148/15", "timestamp": "2026-04-26 09:52:47"}, {"region": "Da Truth", "claimer": "irielove Resident", "slurl": "https://maps.secondlife.com/secondlife/Da%20Truth/142/191/23", "timestamp": "2026-04-26 09:54:37"}, {"region": "Equestrian", "claimer": "Aeryn Starchild", "slurl": "https://maps.secondlife.com/secondlife/Equestrian/168/85/22", "timestamp": "2026-04-26 10:11:37"}, {"region": "Sporbus", "claimer": "irielove Resident", "slurl": "https://maps.secondlife.com/secondlife/Sporbus/168/205/51", "timestamp": "2026-04-26 10:11:49"}, {"region": "Seraphic Shores", "claimer": "irielove Resident", "slurl": "https://maps.secondlife.com/secondlife/Seraphic%20Shores/126/141/21", "timestamp": "2026-04-26 10:18:35"}, {"region": "Transcendence", "claimer": "irielove Resident", "slurl": "https://maps.secondlife.com/secondlife/Transcendence/204/240/21", "timestamp": "2026-04-26 10:35:00"}, {"region": "Paraoro Bay", "claimer": "mattc Clave", "slurl": "https://maps.secondlife.com/secondlife/Paraoro%20Bay/68/151/1200", "timestamp": "2026-04-27 01:20:20"}, {"region": "Horizons Galatea", "claimer": "Lucifer Seraphim", "slurl": "https://maps.secondlife.com/secondlife/Horizons%20Galatea/127/123/30", "timestamp": "2026-04-27 02:42:55"}, {"region": "Succubus", "claimer": "angelllofpassion Resident", "slurl": "https://maps.secondlife.com/secondlife/Succubus/211/77/1007", "timestamp": "2026-04-27 13:25:53"}, {"region": "Vampyre", "claimer": "Semael7 Resident", "slurl": "https://maps.secondlife.com/secondlife/Vampyre/66/226/47", "timestamp": "2026-04-27 13:49:57"}, {"region": "Incubus", "claimer": "Semael7 Resident", "slurl": "https://maps.secondlife.com/secondlife/Incubus/55/95/56", "timestamp": "2026-04-27 14:05:41"}, {"region": "CORE", "claimer": "lilvampy Destiny", "slurl": "https://maps.secondlife.com/secondlife/CORE/145/100/3500", "timestamp": "2026-04-27 15:04:25"}, {"region": "Belphegor", "claimer": "lilvampy Destiny", "slurl": "https://maps.secondlife.com/secondlife/Belphegor/12/37/76", "timestamp": "2026-04-27 15:47:42"}, {"region": "Drakul", "claimer": "AkumaBoo Resident", "slurl": "https://maps.secondlife.com/secondlife/Drakul/79/87/503", "timestamp": "2026-04-27 22:45:10"}, {"region": "Dark Water", "claimer": "AkumaBoo Resident", "slurl": "https://maps.secondlife.com/secondlife/Dark%20Water/209/46/22", "timestamp": "2026-04-27 23:03:22"}, {"region": "Cassandra", "claimer": "AkumaBoo Resident", "slurl": "https://maps.secondlife.com/secondlife/Cassandra/40/38/51", "timestamp": "2026-04-27 23:20:01"}, {"region": "Incubus", "claimer": "Merukii Resident", "slurl": "https://maps.secondlife.com/secondlife/Incubus/54/93/56", "timestamp": "2026-04-28 00:34:51"}, {"region": "Zurn", "claimer": "Raven Shadowcry", "slurl": "https://maps.secondlife.com/secondlife/Zurn/128/129/8", "timestamp": "2026-04-28 03:12:10"}, {"region": "Creach", "claimer": "asema Cyberstar", "slurl": "https://maps.secondlife.com/secondlife/Creach/129/127/8", "timestamp": "2026-04-28 03:16:42"}, {"region": "Mirthwell", "claimer": "Raven Shadowcry", "slurl": "https://maps.secondlife.com/secondlife/Mirthwell/127/128/23", "timestamp": "2026-04-28 03:33:09"}];
+// ════════════════════════════════════════════════════════════
+//  CONFIG
+// ════════════════════════════════════════════════════════════
+const API = '';  // same origin — Vercel functions at /api/*
 
-// ── STATE (CLOUD VERSION) ────────────────────────────────────
-let state = {};
-let filter   = 'all';
-let searchQ  = '';
-let sortMode = 'date-asc';
+// ════════════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════════════
+let currentUser  = null;
+let sessionToken = null;
+let allLands     = [];
+let currentFilter = 'all';
+let currentSearch = '';
+let currentSort   = 'region-asc';
 
-async function loadState() {
-  try {
-    const res = await fetch('/api/targets');
-    state = await res.json();
-    renderTable();
-  } catch (err) { console.error("Cloud load error:", err); }
+// ════════════════════════════════════════════════════════════
+//  UTILS
+// ════════════════════════════════════════════════════════════
+function $(id) { return document.getElementById(id); }
+
+function toast(msg, type = '') {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = 'show ' + type;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.className = '', 2400);
 }
 
-async function saveState(newState) {
-  try {
-    state = newState;
-    await fetch('/api/targets', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(state)
-    });
-  } catch (err) { console.error("Cloud save error:", err); }
+async function api(path, opts = {}) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (sessionToken) headers['Authorization'] = 'Bearer ' + sessionToken;
+  const res = await fetch(API + '/api/' + path, {
+    ...opts,
+    headers: { ...headers, ...(opts.headers || {}) },
+    body: opts.body ? JSON.stringify(opts.body) : undefined,
+  });
+  const data = await res.json().catch(() => ({}));
+  return { ok: res.ok, status: res.status, data };
 }
 
-// ── HELPERS ──────────────────────────────────────────────────
-function getEntry(region) {
-  return state[region] || { claimed: false, claimedBy: '' };
+function saveSession(token, user) {
+  sessionToken = token;
+  currentUser  = user;
+  localStorage.setItem('ks_token', token);
+  localStorage.setItem('ks_user',  JSON.stringify(user));
 }
 
-async function setEntry(region, data) {
-  const updatedState = { ...state, [region]: { ...getEntry(region), ...data } };
-  await saveState(updatedState);
+function clearSession() {
+  sessionToken = null;
+  currentUser  = null;
+  localStorage.removeItem('ks_token');
+  localStorage.removeItem('ks_user');
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $(id).classList.add('active');
+}
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  $(id).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.page === id.replace('page-', ''));
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+//  AUTH
+// ════════════════════════════════════════════════════════════
+// Tab switching
+document.querySelectorAll('.auth-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    $('form-login').classList.toggle('hidden', tab.dataset.tab !== 'login');
+    $('form-register').classList.toggle('hidden', tab.dataset.tab !== 'register');
+    $('login-msg').className = 'auth-message';
+    $('reg-msg').className   = 'auth-message';
+  });
+});
+
+// Login
+$('btn-login').addEventListener('click', async () => {
+  const username = $('login-username').value.trim();
+  const password = $('login-password').value;
+  const msg = $('login-msg');
+  if (!username || !password) {
+    msg.textContent = 'Please enter username and password.';
+    msg.className = 'auth-message error'; return;
+  }
+  $('btn-login').textContent = 'AUTHENTICATING...';
+  $('btn-login').disabled = true;
+  const { ok, data } = await api('auth?action=login', { method: 'POST', body: { username, password } });
+  $('btn-login').textContent = 'AUTHENTICATE';
+  $('btn-login').disabled = false;
+  if (!ok) {
+    msg.textContent = data.error || 'Login failed.';
+    msg.className = 'auth-message error'; return;
+  }
+  saveSession(data.token, data.user);
+  enterApp();
+});
+
+// Allow Enter key on login
+[$('login-username'), $('login-password')].forEach(el =>
+  el.addEventListener('keydown', e => { if (e.key === 'Enter') $('btn-login').click(); })
+);
+
+// Register
+$('btn-register').addEventListener('click', async () => {
+  const username    = $('reg-username').value.trim();
+  const password    = $('reg-password').value;
+  const sl_username = $('reg-sl').value.trim();
+  const msg = $('reg-msg');
+  if (!username || !password) {
+    msg.textContent = 'Username and password are required.';
+    msg.className = 'auth-message error'; return;
+  }
+  $('btn-register').textContent = 'SUBMITTING...';
+  $('btn-register').disabled = true;
+  const { ok, data } = await api('auth?action=register', { method: 'POST', body: { username, password, sl_username } });
+  $('btn-register').textContent = 'SUBMIT REQUEST';
+  $('btn-register').disabled = false;
+  msg.textContent = data.message || data.error || '';
+  msg.className = 'auth-message ' + (ok ? 'success' : 'error');
+});
+
+// Logout
+$('btn-logout').addEventListener('click', async () => {
+  await api('auth?action=logout', { method: 'POST' });
+  stopPolling();
+  if (intelInterval) { clearInterval(intelInterval); intelInterval = null; }
+  clearSession();
+  showScreen('screen-auth');
+  $('form-login').querySelectorAll('input').forEach(i => i.value = '');
+  $('login-msg').className = 'auth-message';
+});
+
+// ════════════════════════════════════════════════════════════
+//  ENTER APP
+// ════════════════════════════════════════════════════════════
+function enterApp() {
+  showScreen('screen-app');
+  $('topbar-username').textContent = currentUser.username.toUpperCase();
+  $('topbar-role').textContent     = currentUser.is_admin ? '★ ADMIN' : 'OPERATIVE';
+  $('nav-admin').style.display     = currentUser.is_admin ? '' : 'none';
+  $('nav-sync').style.display      = currentUser.is_admin ? '' : 'none';
+  $('nav-hudauth').style.display   = currentUser.is_admin ? '' : 'none';
+  // Shield verification is admin-only — toggle a body class to hide it for everyone else
+  if (currentUser.is_admin) document.body.classList.add('is-admin');
+  else document.body.classList.remove('is-admin');
+  initSyncPage();
+  initIntelPage();
+  loadLands();
+  if (currentUser.is_admin) loadAdmin();
+  applyLanguage(currentLang);
+}
+
+// ════════════════════════════════════════════════════════════
+//  LANDS
+// ════════════════════════════════════════════════════════════
+let pollInterval    = null;
+const POLL_MS       = 10000; // poll every 10 seconds
+let lastUpdatedAt   = null;  // track last change to avoid unnecessary re-renders
+
+function setLiveStatus(state, text) {
+  const dot  = $('live-dot');
+  const label = $('live-text');
+  dot.className  = 'live-dot ' + state;
+  label.textContent = text;
+}
+
+function startPolling() {
+  if (pollInterval) return; // already running
+  setLiveStatus('live', 'LIVE');
+  pollInterval = setInterval(pollLands, POLL_MS);
+}
+
+function stopPolling() {
+  if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+  setLiveStatus('', 'OFFLINE');
+}
+
+async function pollLands() {
+  // Silent background refresh — don't show loader, don't disrupt user
+  setLiveStatus('syncing', 'SYNCING');
+  const { ok, data } = await api('lands');
+  if (!ok) { setLiveStatus('live', 'LIVE'); return; }
+
+  // Check if anything actually changed by comparing a quick hash of statuses
+  const newSig = data.lands.map(l => l.id + l.status + (l.claimed_by||'') + (l.shield_verified_at||'') + (l.enemy_claimed_at||'')).join('|');
+  const oldSig = allLands.map(l => l.id + l.status + (l.claimed_by||'') + (l.shield_verified_at||'') + (l.enemy_claimed_at||'')).join('|');
+
+  if (newSig !== oldSig) {
+    allLands = data.lands;
+    updateStats();
+    renderLands();
+    setLiveStatus('updated', 'UPDATED');
+    setTimeout(() => setLiveStatus('live', 'LIVE'), 1500);
+  } else {
+    setLiveStatus('live', 'LIVE');
+  }
+}
+
+async function loadLands() {
+  $('lands-loader').style.display = 'flex';
+  $('lands-table').style.display  = 'none';
+  $('lands-empty').style.display  = 'none';
+
+  const { ok, data } = await api('lands');
+  $('lands-loader').style.display = 'none';
+
+  if (!ok) { toast('Failed to load lands.', 'error'); return; }
+
+  allLands = data.lands;
+  updateStats();
+  renderLands();
+  $('lands-table').style.display = '';
+  startPolling();
 }
 
 function updateStats() {
-  const total     = TARGETS.length;
-  const claimed   = Object.values(state).filter(e => e.claimed).length;
-  const remaining = total - claimed;
-  const pct       = total > 0 ? Math.round((claimed / total) * 100) : 0;
-
-  document.getElementById('stat-total').textContent     = total;
-  document.getElementById('stat-done').textContent      = claimed;
-  document.getElementById('stat-remaining').textContent = remaining;
-  document.getElementById('progress-fill').style.width  = pct + '%';
-  document.getElementById('progress-text').textContent  = pct + '% complete';
+  const total     = allLands.length;
+  const claimed   = allLands.filter(l => l.status === 'claimed').length;
+  const unclaimed = total - claimed;
+  const pct       = total ? Math.round((claimed / total) * 100) : 0;
+  $('stat-total').textContent     = total;
+  $('stat-claimed').textContent   = claimed;
+  $('stat-unclaimed').textContent = unclaimed;
+  $('progress-fill').style.width  = pct + '%';
+  $('progress-label').textContent = pct + '% CONTROL';
 }
 
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
-}
-
-function getPriority(ts) {
-  if (!ts) return '';
-  const d = new Date(ts);
-  const now = new Date();
-  const days = (now - d) / (1000 * 86400);
-  if (days <= 3)  return 'high';
-  if (days <= 7)  return 'med';
-  return '';
-}
-
-function priorityLabel(p) {
-  if (p === 'high') return '<span class="priority high">HOT</span>';
-  if (p === 'med')  return '<span class="priority med">RECENT</span>';
-  return '';
-}
-
-// ── RENDER ───────────────────────────────────────────────────
 function getVisible() {
-  let list = [...TARGETS];
-  if (filter === 'pending') list = list.filter(t => !getEntry(t.region).claimed);
-  if (filter === 'claimed') list = list.filter(t => getEntry(t.region).claimed);
-  if (searchQ) {
-    const q = searchQ.toLowerCase();
-    list = list.filter(t => t.region.toLowerCase().includes(q) || (t.claimer || '').toLowerCase().includes(q));
+  let list = [...allLands];
+
+  if (currentFilter !== 'all')
+    list = list.filter(l => l.status === currentFilter);
+
+  if (currentSearch) {
+    const q = currentSearch.toLowerCase();
+    list = list.filter(l =>
+      (l.region        || '').toLowerCase().includes(q) ||
+      (l.land_name     || '').toLowerCase().includes(q) ||
+      (l.enemy_claimer || '').toLowerCase().includes(q) ||
+      (l.claimed_by    || '').toLowerCase().includes(q)
+    );
   }
+
   list.sort((a, b) => {
-    switch (sortMode) {
-      case 'date-asc': return (a.timestamp||'').localeCompare(b.timestamp||'');
-      case 'date-desc': return (b.timestamp||'').localeCompare(a.timestamp||'');
-      case 'region-asc': return a.region.localeCompare(b.region);
-      case 'region-desc': return b.region.localeCompare(a.region);
-      case 'claimer-asc': return (a.claimer||'').localeCompare(b.claimer||'');
+    switch (currentSort) {
+      case 'region-asc':  return (a.region||'').localeCompare(b.region||'');
+      case 'region-desc': return (b.region||'').localeCompare(a.region||'');
+      case 'date-desc':   return (b.first_seen||'').localeCompare(a.first_seen||'');
+      case 'date-asc':    return (a.first_seen||'').localeCompare(b.first_seen||'');
+      case 'status':      return (a.status||'').localeCompare(b.status||'');
       default: return 0;
     }
   });
+
   return list;
 }
 
-function renderTable() {
-  const visible = getVisible();
-  const tbody   = document.getElementById('tbody');
-  const empty   = document.getElementById('empty-state');
-  const rc      = document.getElementById('row-count');
+// ── Shield helpers ──────────────────────────────────────────
+const SHIELD_WARN_MS = 6 * 60 * 60 * 1000; // 6 hours
 
+function buildShieldCell(land) {
+  var verifiedAt = land.shield_verified_at ? new Date(land.shield_verified_at) : null;
+  var claimedAt  = land.claimed_at         ? new Date(land.claimed_at)         : null;
+  var refTime    = verifiedAt || claimedAt || null;
+  var now        = Date.now();
+  var age        = refTime ? now - refTime.getTime() : null;
+  var stale      = (age === null) || (age > SHIELD_WARN_MS);
+  var verifiedBy = land.shield_verified_by || '';
+  var timeLabel  = refTime ? formatTimeAgo(refTime.toISOString()) : 'never';
+
+  var warnHtml = '';
+  if (stale) {
+    var tipText = 'Last verified: ' + timeLabel + (verifiedBy ? ' by ' + verifiedBy : '');
+    warnHtml = '<span class="shield-warn" title="' + tipText + '">'
+             + '<span class="shield-icon">\u{1F550}</span>' + timeLabel
+             + '</span> ';
+  }
+
+  var btnLabel = stale ? '\u{1F6E1} Verify' : '\u{1F6E1} \u2713';
+  var btnClass = stale ? 'btn-shield' : 'btn-shield verified';
+  var btnTitle = stale
+    ? 'Mark shield as 100%'
+    : 'Verified ' + timeLabel + (verifiedBy ? ' by ' + verifiedBy : '');
+
+  return warnHtml
+    + '<button class="' + btnClass + '"'
+    + ' data-id="' + land.id + '"'
+    + ' title="' + btnTitle + '"'
+    + ' onclick="verifyShield(this,\'' + land.id + '\')">'
+    + btnLabel
+    + '</button>';
+}
+
+window.verifyShield = async function(btn, id) {
+  btn.disabled    = true;
+  btn.textContent = '...';
+  var res = await api('shield?source=web', { method: 'POST', body: { id: id } });
+  if (!res.ok) {
+    btn.disabled    = false;
+    btn.textContent = '\u{1F6E1} Verify';
+    toast('Failed to verify shield.', 'error');
+    return;
+  }
+  var land = allLands.find(function(l) { return l.id === id; });
+  if (land) {
+    land.shield_verified_at = res.data.shield_verified_at;
+    land.shield_verified_by = res.data.shield_verified_by;
+  }
+  var row      = btn.closest('tr');
+  var shieldTd = row ? row.querySelector('.td-shield') : null;
+  if (shieldTd && land) {
+    shieldTd.innerHTML = buildShieldCell(land);
+  }
+  toast('\u{1F6E1} Shield verified for ' + (land ? land.region : id), 'success');
+};
+
+
+function renderLands() {
+  const visible = getVisible();
+  const tbody   = $('lands-tbody');
+  const empty   = $('lands-empty');
+  const table   = $('lands-table');
   tbody.innerHTML = '';
+
   if (!visible.length) {
-    empty.style.display = 'block';
-    rc.textContent = '';
-    updateStats();
+    table.style.display = 'none';
+    empty.style.display = 'flex';
+    $('lands-count').textContent = '0 records';
     return;
   }
 
+  table.style.display = '';
   empty.style.display = 'none';
-  rc.textContent = `Showing ${visible.length} of ${TARGETS.length} targets`;
+  $('lands-count').textContent = `${visible.length} / ${allLands.length} regions`;
 
-  visible.forEach(t => {
-    const entry    = getEntry(t.region);
-    const claimed  = entry.claimed;
-    const priority = claimed ? '' : getPriority(t.timestamp);
-    const dateStr  = t.timestamp ? t.timestamp.slice(0, 10) : '—';
+  visible.forEach(land => {
+    const isClaimed = land.status === 'claimed';
+    const dateStr   = land.first_seen ? land.first_seen.slice(0, 10) : '—';
 
     const tr = document.createElement('tr');
-    tr.className = claimed ? 'is-claimed' : '';
+    // Compute enemy claim lock status (6 hours from enemy_claimed_at)
+    const LOCK_MS = 6 * 60 * 60 * 1000;
+    let badgeVariant = land.status;       // 'claimed' or 'unclaimed'
+    let lockHtml = '';
+    if (!isClaimed && land.enemy_claimed_at) {
+      const claimedAt = new Date(land.enemy_claimed_at).getTime();
+      const now       = Date.now();
+      const elapsed   = now - claimedAt;
+      const remaining = LOCK_MS - elapsed;
+      if (remaining > 0) {
+        // Still locked
+        const hrs  = Math.floor(remaining / 3600000);
+        const mins = Math.floor((remaining % 3600000) / 60000);
+        lockHtml = '<span class="lock-timer locked">🔒 ' + hrs + 'h ' + mins + 'm</span>';
+      } else {
+        // Lock expired — claimable
+        badgeVariant = 'claimable';
+        lockHtml = '<span class="lock-timer claimable">' + t('lands.claimable') + '</span>';
+      }
+    }
+
+    tr.className = 'status-' + land.status;
     tr.innerHTML = `
-      <td class="td-check">
-        <div class="check-box ${claimed ? 'checked' : ''}" data-region="${t.region}">
-          <svg width="12" height="12" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
+      <td>
+        <span class="status-badge ${badgeVariant}">
+          <span class="status-dot"></span>
+          ${isClaimed ? t('lands.claimed') : t('lands.unclaimed')}
+        </span>
+        ${lockHtml}
       </td>
-      <td class="td-region">${t.region}${priorityLabel(priority)}</td>
-      <td class="td-claimer">${t.claimer}</td>
+      <td class="td-region">${land.region}</td>
+      <td class="td-land">${land.land_name || '<span style="color:var(--muted)">—</span>'}</td>
+      <td class="td-claimer">${land.enemy_claimer || '<span style="color:var(--muted)">—</span>'}</td>
       <td class="td-claimed-by">
-        <input class="claimedby-input" type="text" value="${entry.claimedBy || ''}" data-region="${t.region}" ${!claimed ? 'disabled style="display:none"' : ''}>
+        ${isClaimed
+          ? `<input class="inline-edit" data-id="${land.id}" placeholder="who claimed?" value="${land.claimed_by || ''}">`
+          : '<span style="color:var(--muted)">—</span>'
+        }
       </td>
       <td class="td-date">${dateStr}</td>
-      <td class="td-link"><a href="${t.slurl}" target="_blank">↗ TP</a></td>
+      <td class="td-link">
+        ${land.slurl
+          ? `<a href="${land.slurl}" target="_blank">↗ TP</a>`
+          : '<span style="color:var(--muted)">—</span>'
+        }
+      </td>
+      <td class="td-shield shield-col">
+        ${(currentUser && currentUser.is_admin)
+          ? (isClaimed ? buildShieldCell(land) : '<span style="color:var(--muted);font-family:var(--mono);font-size:0.65rem">—</span>')
+          : ''}
+      </td>
+      <td>
+        <button class="btn-toggle ${isClaimed ? 'unclaim' : ''}" data-id="${land.id}" data-status="${land.status}">
+          ${isClaimed ? '✗ Unclaim' : '✔ Claim'}
+        </button>
+      </td>
     `;
     tbody.appendChild(tr);
   });
 
-  tbody.querySelectorAll('.check-box').forEach(box => {
-    box.addEventListener('click', async () => {
-      const region = box.dataset.region;
-      const nowClaimed = !getEntry(region).claimed;
-      await setEntry(region, { claimed: nowClaimed });
-      showToast(nowClaimed ? `✔ ${region} claimed` : `↩ ${region} unclaimed`);
-      renderTable();
+  // Toggle claim status
+  tbody.querySelectorAll('.btn-toggle').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id        = btn.dataset.id;
+      const newStatus = btn.dataset.status === 'claimed' ? 'unclaimed' : 'claimed';
+      btn.disabled = true;
+      btn.textContent = '...';
+      const { ok } = await api('lands', {
+        method: 'PATCH',
+        body: { id, status: newStatus }
+      });
+      if (ok) {
+        const land = allLands.find(l => l.id === id);
+        if (land) land.status = newStatus;
+        updateStats();
+        renderLands();
+        toast(newStatus === 'claimed' ? '✔ Land claimed!' : '✗ Land unclaimed.', newStatus === 'claimed' ? 'success' : '');
+      } else {
+        btn.disabled = false;
+        btn.textContent = btn.dataset.status === 'claimed' ? '✗ Unclaim' : '✔ Claim';
+        toast('Update failed.', 'error');
+      }
     });
   });
 
-  tbody.querySelectorAll('.claimedby-input').forEach(inp => {
-    inp.addEventListener('blur', async () => {
-      await setEntry(inp.dataset.region, { claimedBy: inp.value });
+  // Inline claimed-by edit
+  tbody.querySelectorAll('.inline-edit').forEach(inp => {
+    let debounce;
+    inp.addEventListener('input', () => {
+      clearTimeout(debounce);
+      debounce = setTimeout(async () => {
+        const id = inp.dataset.id;
+        await api('lands', { method: 'PATCH', body: { id, claimed_by: inp.value } });
+        const land = allLands.find(l => l.id === id);
+        if (land) land.claimed_by = inp.value;
+      }, 700);
+    });
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { inp.blur(); toast('Saved!'); }
     });
   });
-
-  updateStats();
 }
 
-// ── CONTROLS ─────────────────────────────────────────────────
+// Controls
 document.querySelectorAll('.filter-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    filter = btn.dataset.filter;
-    renderTable();
+    currentFilter = btn.dataset.filter;
+    renderLands();
   });
 });
 
-document.getElementById('search').addEventListener('input', e => { searchQ = e.target.value.trim(); renderTable(); });
-document.getElementById('sort-select').addEventListener('change', e => { sortMode = e.target.value; renderTable(); });
+$('lands-search').addEventListener('input', e => {
+  currentSearch = e.target.value.trim();
+  renderLands();
+});
 
-// ── INIT ─────────────────────────────────────────────────────
-loadState();
+$('lands-sort').addEventListener('change', e => {
+  currentSort = e.target.value;
+  renderLands();
+});
+
+// Nav tabs
+document.querySelectorAll('.nav-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    showPage('page-' + tab.dataset.page);
+    if (tab.dataset.page === 'admin' && currentUser && currentUser.is_admin) { checkMaintenance(); }
+    if (tab.dataset.page === 'sync' && currentUser && currentUser.is_admin) { loadSyncHistory(); }
+    if (tab.dataset.page === 'hudauth' && currentUser && currentUser.is_admin) { loadHudAuth(); }
+    if (tab.dataset.page === 'crystals') {
+      loadCrystals();
+    }
+    if (tab.dataset.page === 'mystats') {
+      loadMyStats();
+    }
+    if (tab.dataset.page === 'intel') {
+      loadIntel();
+      loadCrystals();
+      // Auto-refresh intel every 30s while on the tab
+      if (intelInterval) clearInterval(intelInterval);
+      intelInterval = setInterval(function() { loadIntel(); loadCrystals(); }, 30000);
+    } else {
+      if (intelInterval) { clearInterval(intelInterval); intelInterval = null; }
+    }
+  });
+});
+
+// ════════════════════════════════════════════════════════════
+//  ADMIN
+// ════════════════════════════════════════════════════════════
+async function loadAdmin() {
+  const { ok, data } = await api('admin/users');
+  if (!ok) return;
+
+  const users   = data.users || [];
+  const pending = users.filter(u => !u.is_approved);
+  const members = users.filter(u => u.is_approved);
+
+  // Pending
+  const pendingList = $('pending-list');
+  if (!pending.length) {
+    pendingList.innerHTML = '<div style="font-family:var(--mono);font-size:0.75rem;color:var(--muted);padding:1rem 0">No pending requests.</div>';
+  } else {
+    pendingList.innerHTML = pending.map(u => `
+      <div class="pending-card" id="pending-${u.id}">
+        <div class="pending-info">
+          <div class="pending-name">${u.username}</div>
+          <div class="pending-meta">SL: ${u.sl_username || '—'} &nbsp;|&nbsp; Requested: ${u.created_at ? u.created_at.slice(0,10) : '—'}</div>
+        </div>
+        <div class="pending-actions">
+          <button class="btn-approve" onclick="approveUser('${u.id}', true)">✔ Approve</button>
+          <button class="btn-reject"  onclick="approveUser('${u.id}', false)">✗ Reject</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Members table
+  const tbody = $('members-tbody');
+  tbody.innerHTML = members.map(u => `
+    <tr>
+      <td style="color:#fff">${u.username}</td>
+      <td>${u.sl_username || '—'}</td>
+      <td><span class="${u.is_admin ? 'badge-admin' : 'badge-member'}">${u.is_admin ? 'ADMIN' : 'MEMBER'}</span></td>
+      <td>${u.created_at ? u.created_at.slice(0,10) : '—'}</td>
+      <td>
+        <button class="btn-reject" style="font-size:0.6rem;padding:0.2rem 0.5rem;border-color:var(--gold);color:var(--gold)" onclick="resetUserPassword('${u.id}', '${u.username}')">🔑 Reset PW</button>
+        ${!u.is_admin
+          ? `<button class="btn-reject" style="font-size:0.6rem;padding:0.2rem 0.5rem;margin-left:0.3rem" onclick="removeUser('${u.id}', '${u.username}')">Remove</button>`
+          : ''
+        }
+      </td>
+    </tr>
+  `).join('');
+}
+
+window.resetUserPassword = async function(id, username) {
+  const newPw = prompt('Enter a temporary password for ' + username + ':\n\n(They will use this to log in. Min 6 characters. This will also log them out of any active sessions.)');
+  if (newPw === null) return; // cancelled
+  if (newPw.length < 6) {
+    toast('Password must be at least 6 characters.', 'error');
+    return;
+  }
+  const res = await api('auth?action=reset-password', {
+    method: 'POST',
+    body: { user_id: id, new_password: newPw }
+  });
+  if (res.ok) {
+    toast('🔑 Password reset for ' + username + '. Give them the new password.', 'success');
+  } else {
+    toast(res.data.error || 'Failed to reset password.', 'error');
+  }
+};
+
+window.approveUser = async function(id, approve) {
+  const { ok } = await api('admin/users', {
+    method: 'PATCH',
+    body: { id, action: approve ? 'approve' : 'reject' }
+  });
+  if (ok) {
+    toast(approve ? '✔ User approved.' : '✗ Request rejected.', approve ? 'success' : '');
+    loadAdmin();
+  } else {
+    toast('Action failed.', 'error');
+  }
+};
+
+window.removeUser = async function(id, username) {
+  if (!confirm(`Remove ${username} from the clan? This cannot be undone.`)) return;
+  const { ok } = await api('admin/users', { method: 'PATCH', body: { id, action: 'remove' } });
+  if (ok) { toast('User removed.', 'error'); loadAdmin(); }
+  else toast('Failed to remove user.', 'error');
+};
+
+
+
+// ════════════════════════════════════════════════════════════
+//  INTEL PAGE
+// ════════════════════════════════════════════════════════════
+let intelPeriod   = 'alltime';
+let intelLoaded   = false;
+let intelInterval = null;
+
+// ── My Stats page ────────────────────────────────────────────
+async function loadMyStats() {
+  const el = document.getElementById('mystats-content');
+  // Pull all-time leaderboard so the rank reflects total claims
+  const { ok, data } = await api('activity?period=alltime');
+  if (!ok) {
+    el.innerHTML = '<div class="intel-empty">Could not load your stats.</div>';
+    return;
+  }
+
+  const rows = data.leaderboard || [];
+  // Match current user by username, tolerant of formatting differences.
+  // SL usernames may be written as "noa.nightfall", "Noa Nightfall", or
+  // "noa nightfall" in different places — normalise all of them by lowercasing
+  // and stripping dots/spaces so they compare equal.
+  function normUser(s) {
+    return (s || '').toLowerCase().replace(/[.\s]+/g, '').trim();
+  }
+  const myUsername = normUser(currentUser.username);
+  const mySl       = normUser(currentUser.sl_username);
+
+  let mine = null;
+  for (const r of rows) {
+    const uname = normUser(r.username);
+    if ((mySl && uname === mySl) || (myUsername && uname === myUsername)) {
+      mine = r;
+      break;
+    }
+  }
+
+  const claimed   = mine ? mine.claimed   : 0;
+  const lost      = mine ? mine.lost      : 0;
+  const contested = mine ? mine.contested : 0;
+  const rank      = getRank(claimed);
+
+  // Progress toward next rank
+  let progressHtml = '';
+  if (rank.next) {
+    const span    = rank.next - rank.min;
+    const into    = claimed - rank.min;
+    const pct     = Math.max(0, Math.min(100, Math.round((into / span) * 100)));
+    const toGo     = rank.next - claimed;
+    progressHtml =
+      '<div class="ms-progress">' +
+        '<div class="ms-progress-labels">' +
+          '<span>' + rank.title.toUpperCase() + '</span>' +
+          '<span>' + (rank.nextTitle || '').toUpperCase() + '</span>' +
+        '</div>' +
+        '<div class="ms-progress-bar"><div class="ms-progress-fill" style="width:' + pct + '%"></div></div>' +
+        '<div class="ms-next">' + toGo + ' more ' + (toGo === 1 ? 'claim' : 'claims') + ' to rank up</div>' +
+      '</div>';
+  } else if (!rank.isRecruit) {
+    progressHtml = '<div class="ms-next" style="color:var(--gold);margin-top:1rem">★ MAXIMUM RANK ACHIEVED ★</div>';
+  } else {
+    const toGo = 5 - claimed;
+    progressHtml =
+      '<div class="ms-next">' + toGo + ' more ' + (toGo === 1 ? 'claim' : 'claims') + ' to earn your first rank</div>';
+  }
+
+  // Tier track pips
+  const tierOrder = ['common','uncommon','rare','epic','legendary','mythic'];
+  const tierColors = {
+    common:'#9aa0b0', uncommon:'#4ade80', rare:'#3b9df0',
+    epic:'#a855f7', legendary:'#f39c12', mythic:'#c8a84b'
+  };
+  const reachedTier = rank.tier;
+  const reachedIdx  = tierOrder.indexOf(reachedTier);
+  const pips = tierOrder.map(function(tn, i) {
+    const reached = i <= reachedIdx && reachedIdx >= 0;
+    return '<span class="ms-tier-pip' + (reached ? ' reached' : '') + '"' +
+           (reached ? ' style="border-color:' + tierColors[tn] + ';color:' + tierColors[tn] + '"' : '') +
+           '>' + tn.toUpperCase() + '</span>';
+  }).join('');
+
+  el.innerHTML =
+    '<div class="ms-hero">' +
+      '<div class="ms-hero-name">' + currentUser.username.toUpperCase() + '</div>' +
+      '<div class="ms-hero-rank">' + rankBadgeHtml(claimed, 'big') + '</div>' +
+      '<div class="ms-centerpiece"><span class="ms-bignum">' + claimed + '</span></div>' +
+      '<div class="ms-bignum-label">' + t('mystats.landsClaimed') + '</div>' +
+      progressHtml +
+    '</div>' +
+    '<div class="ms-grid">' +
+      '<div class="ms-stat"><div class="ms-stat-num" style="color:var(--green2)">' + claimed + '</div><div class="ms-stat-label">' + t('mystats.claimed') + '</div></div>' +
+      '<div class="ms-stat"><div class="ms-stat-num" style="color:var(--red2)">' + lost + '</div><div class="ms-stat-label">' + t('mystats.lost') + '</div></div>' +
+      '<div class="ms-stat"><div class="ms-stat-num" style="color:var(--gold)">' + contested + '</div><div class="ms-stat-label">' + t('mystats.contested') + '</div></div>' +
+    '</div>' +
+    '<div class="ms-tiers">' +
+      '<div class="ms-tiers-title">' + t('mystats.progression') + '</div>' +
+      '<div class="ms-tier-track">' + pips + '</div>' +
+    '</div>';
+}
+
+async function loadIntel() {
+  const { ok, data } = await api('activity?period=' + intelPeriod);
+  if (!ok) { return; }
+  renderLeaderboard(data.leaderboard || []);
+  renderFeed(data.feed || []);
+  intelLoaded = true;
+}
+
+function renderLeaderboard(rows) {
+  const body = $('lb-body');
+  if (!rows.length) {
+    body.innerHTML = '<div class="intel-empty">No activity recorded yet.<br>Start claiming lands with the HUD!</div>';
+    return;
+  }
+
+  const maxClaims = Math.max(...rows.map(r => r.claimed), 1);
+  const rankClass = ['gold', 'silver', 'bronze'];
+
+  body.innerHTML = rows.map((r, i) => {
+    const pct = Math.round((r.claimed / maxClaims) * 100);
+    return `
+      <div class="lb-row">
+        <div class="lb-rank ${rankClass[i] || ''}">${i + 1}</div>
+        <div class="lb-info">
+          <div class="lb-name">${r.member}</div>
+          <div class="lb-rank-badge">${rankBadgeHtml(r.claimed, '')}</div>
+          <div class="lb-bar-wrap">
+            <div class="lb-bar" style="width:${pct}%"></div>
+          </div>
+        </div>
+        <div class="lb-stats">
+          <div class="lb-stat">
+            <span class="n" style="color:var(--green2)">${r.claimed}</span>
+            <span class="l">Claimed</span>
+          </div>
+          <div class="lb-stat">
+            <span class="n" style="color:var(--red2)">${r.lost}</span>
+            <span class="l">Lost</span>
+          </div>
+          <div class="lb-stat">
+            <span class="n" style="color:var(--gold)">${r.contested}</span>
+            <span class="l">Contd</span>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderFeed(events) {
+  const body = $('feed-body');
+
+  // Shield verification is admin-only — strip shield events for everyone else
+  if (!currentUser || !currentUser.is_admin) {
+    events = events.filter(function(ev) { return ev.event !== 'shield'; });
+  }
+
+  $('feed-count').textContent = events.length + ' events';
+
+  if (!events.length) {
+    body.innerHTML = '<div class="intel-empty">No events yet. Activity from the HUD will appear here.</div>';
+    return;
+  }
+
+  const icons = { claimed: '🟢', lost: '🔴', contested: '⚔️', shield: '🛡' };
+
+  body.innerHTML = events.map(function(ev) {
+    var icon      = icons[ev.event] || '◈';
+    var timeAgo   = formatTimeAgo(ev.created_at);
+    var reporter  = ev.reported_by || 'Unknown operative';
+    var region    = ev.region      || 'Unknown region';
+    var landExtra = ev.land_name   ? ' (' + ev.land_name + ')' : '';
+    var linkTag   = ev.slurl
+      ? '<a class="feed-link" href="' + ev.slurl + '" target="_blank">↗ TP</a>'
+      : '';
+
+    var headline = '';
+    if (ev.event === 'claimed') {
+      headline = '<strong>' + reporter + '</strong> claimed <span class="region">' + region + '</span>' + landExtra;
+    } else if (ev.event === 'lost') {
+      var clan = ev.enemy_clan ? ' to <span class="enemy">' + ev.enemy_clan + '</span>' : '';
+      headline = '<strong>' + reporter + '</strong> reported <span class="region">' + region + '</span> lost' + clan;
+    } else if (ev.event === 'contested') {
+      headline = '<strong>' + reporter + '</strong> called for assistance at <span class="region">' + region + '</span>';
+    } else if (ev.event === 'shield') {
+      headline = '<strong>' + reporter + '</strong> verified shield on <span class="region">' + region + '</span>';
+    } else {
+      headline = '<strong>' + reporter + '</strong> logged event at <span class="region">' + region + '</span>';
+    }
+
+    return '<div class="feed-item">'
+      + '<div class="feed-icon">' + icon + '</div>'
+      + '<div class="feed-body">'
+      + '<div class="feed-headline">' + headline + linkTag + '</div>'
+      + '<div class="feed-meta">' + timeAgo + '</div>'
+      + '</div></div>';
+  }).join('');
+}
+
+function formatTimeAgo(ts) {
+  if (!ts) return '—';
+  const diff = Date.now() - new Date(ts).getTime();
+  const mins  = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days  = Math.floor(diff / 86400000);
+  if (mins < 1)   return 'just now';
+  if (mins < 60)  return mins + 'm ago';
+  if (hours < 24) return hours + 'h ago';
+  if (days < 7)   return days + 'd ago';
+  return new Date(ts).toLocaleDateString();
+}
+
+function initIntelPage() {
+  // Period toggle buttons
+  document.querySelectorAll('.period-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      intelPeriod = btn.dataset.period;
+      loadIntel();
+    });
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+//  SYNC PAGE
+// ════════════════════════════════════════════════════════════
+function initSyncPage() {
+  const dropzone  = $('sync-dropzone');
+  const fileInput = $('sync-file-input');
+
+  // Click to browse
+  dropzone.addEventListener('click', () => fileInput.click());
+
+  // Drag and drop
+  dropzone.addEventListener('dragover', e => {
+    e.preventDefault();
+    dropzone.classList.add('dragover');
+  });
+
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+
+  dropzone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropzone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) handleSyncFile(file);
+  });
+
+  fileInput.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (file) handleSyncFile(file);
+    fileInput.value = ''; // reset so same file can be re-uploaded
+  });
+}
+
+async function handleSyncFile(file) {
+  if (!file.name.endsWith('.json')) {
+    toast('Please upload a .json file.', 'error'); return;
+  }
+
+  const progress     = $('sync-progress');
+  const progressText = $('sync-progress-text');
+  const results      = $('sync-results');
+
+  results.classList.remove('visible');
+  progress.classList.add('visible');
+  progressText.textContent = 'Reading file...';
+
+  let jsonText;
+  try {
+    jsonText = await file.text();
+    JSON.parse(jsonText); // validate before sending
+  } catch (e) {
+    progress.classList.remove('visible');
+    toast('Invalid JSON file: ' + e.message, 'error');
+    return;
+  }
+
+  progressText.textContent = 'Syncing with database...';
+
+  const { ok, data } = await api('euphoria-sync', {
+    method: 'POST',
+    body: { json: jsonText },
+  });
+
+  progress.classList.remove('visible');
+
+  if (!ok) {
+    toast((data && data.error) || 'Sync failed.', 'error');
+    return;
+  }
+
+  // ── Populate results ──────────────────────────────────────
+  $('sync-stat-parsed').textContent   = data.parsed   || 0;
+  $('sync-stat-inserted').textContent = data.inserted || 0;
+  $('sync-stat-updated').textContent  = data.updated  || 0;
+  $('sync-stat-skipped').textContent  = data.skipped  || 0;
+  $('sync-stat-evw').textContent      = data.evwOwned || 0;
+
+  const details = data.details || {};
+
+  function populateList(containerId, listId, items, cssClass) {
+    const container = $(containerId);
+    const list      = $(listId);
+    if (items && items.length) {
+      list.innerHTML = items.map(r =>
+        `<div class="sync-detail-item ${cssClass}">${r}</div>`
+      ).join('');
+      container.style.display = '';
+    } else {
+      container.style.display = 'none';
+    }
+  }
+
+  populateList('sync-detail-new',     'sync-list-new',     details.new_regions,     'new');
+  populateList('sync-detail-updated', 'sync-list-updated', details.updated_regions, 'updated');
+
+  if (data.errors && data.errors.length) {
+    populateList('sync-detail-errors', 'sync-list-errors', data.errors, 'error');
+    $('sync-detail-errors').style.display = '';
+  } else {
+    $('sync-detail-errors').style.display = 'none';
+  }
+
+  $('sync-timestamp').textContent = 'Synced at ' + new Date().toLocaleTimeString();
+  results.classList.add('visible');
+
+  // Refresh the lands table silently so new data shows immediately
+  const landsRes = await api('lands');
+  if (landsRes.ok) {
+    allLands = landsRes.data.lands;
+    updateStats();
+    renderLands();
+  }
+
+  const added = data.inserted || 0;
+  const upd   = data.updated  || 0;
+  toast(
+    added || upd
+      ? `✔ Sync complete: ${added} new, ${upd} updated.`
+      : '✔ Sync complete: database already up to date.',
+    'success'
+  );
+}
+
+
+// ════════════════════════════════════════════════════════════
+//  CRYSTAL TRACKER
+// ════════════════════════════════════════════════════════════
+let crystalMembers = [];
+
+async function loadCrystals() {
+  var res = await api('crystals');
+  if (!res.ok) return;
+  crystalMembers = res.data.members || [];
+  renderCrystals();
+}
+
+function renderCrystals() {
+  var body = $('crystal-body');
+  if (!crystalMembers.length) {
+    body.innerHTML = '<div class="intel-empty">No members found.</div>';
+    return;
+  }
+
+  body.innerHTML = crystalMembers.map(function(m) {
+    var isSelf   = currentUser && m.id === currentUser.id;
+    var isAdmin  = currentUser && currentUser.is_admin;
+    var canEdit  = isSelf || isAdmin;
+    var maxCryst = m.is_elite ? 5 : 3;
+    var count    = Math.min(m.crystals || 0, maxCryst);
+    var isEmpty  = count === 0;
+
+    // Build gem indicators
+    var gems = '';
+    for (var i = 0; i < maxCryst; i++) {
+      gems += '<div class="gem' + (i < count ? ' full' : '') + '"></div>';
+    }
+
+    var eliteToggle = isAdmin
+      ? '<button class="elite-toggle' + (m.is_elite ? ' active' : '') + '"'
+        + ' onclick="toggleElite(\'' + m.id + '\',' + !m.is_elite + ')">'
+        + (m.is_elite ? '★ ELITE' : '☆ ELITE') + '</button>'
+      : (m.is_elite ? '<span class="elite-badge">ELITE</span>' : '');
+
+    var minusBtn = canEdit
+      ? '<button class="btn-crystal" onclick="adjustCrystal(\'' + m.id + '\',' + (count - 1) + ')" '
+        + (count <= 0 ? 'disabled' : '') + '>−</button>'
+      : '';
+
+    var plusBtn = canEdit
+      ? '<button class="btn-crystal" onclick="adjustCrystal(\'' + m.id + '\',' + (count + 1) + ')" '
+        + (count >= maxCryst ? 'disabled' : '') + '>+</button>'
+      : '';
+
+    return '<div class="crystal-row' + (isSelf ? ' is-self' : '') + '" id="crystal-row-' + m.id + '">'
+      + '<div class="crystal-name">' + m.username
+        + (m.is_elite ? '<span class="elite-badge">ELITE</span>' : '') + '</div>'
+      + '<div class="crystal-counter">'
+        + '<div class="crystal-gems">' + gems + '</div>'
+        + minusBtn
+        + '<div class="crystal-num' + (isEmpty ? ' empty' : '') + '">' + count + '</div>'
+        + '<span class="crystal-max">/ ' + maxCryst + '</span>'
+        + plusBtn
+      + '</div>'
+      + (isAdmin ? '<div>' + eliteToggle + '</div>' : '')
+      + '</div>';
+  }).join('');
+}
+
+window.adjustCrystal = async function(id, newCount) {
+  var res = await api('crystals', { method: 'PATCH', body: { id: id, crystals: newCount } });
+  if (!res.ok) { toast('Failed to update crystals.', 'error'); return; }
+  var m = crystalMembers.find(function(x) { return x.id === id; });
+  if (m) {
+    m.crystals = res.data.updates.crystals !== undefined ? res.data.updates.crystals : newCount;
+  }
+  renderCrystals();
+};
+
+window.toggleElite = async function(id, makeElite) {
+  var res = await api('crystals', { method: 'PATCH', body: { id: id, is_elite: makeElite } });
+  if (!res.ok) { toast('Failed to update Elite status.', 'error'); return; }
+  var m = crystalMembers.find(function(x) { return x.id === id; });
+  if (m) {
+    m.is_elite = makeElite;
+    if (res.data.updates.crystals !== undefined) m.crystals = res.data.updates.crystals;
+  }
+  renderCrystals();
+  toast(makeElite ? '★ Member set to Elite (5 crystals)' : '☆ Member set to Standard (3 crystals)', 'success');
+};
+
+
+// ════════════════════════════════════════════════════════════
+//  MAINTENANCE MODE
+// ════════════════════════════════════════════════════════════
+let maintenanceOn = false;
+
+async function checkMaintenance() {
+  var res = await fetch('/api/maintenance');
+  var d   = await res.json();
+  maintenanceOn = d.maintenance || false;
+  updateMaintenanceUI();
+  if (d.message) {
+    var inp = document.getElementById('maintenance-msg-input');
+    if (inp) inp.value = d.message;
+  }
+}
+
+function updateMaintenanceUI() {
+  var label = document.getElementById('maintenance-status-label');
+  var btn   = document.getElementById('btn-maintenance');
+  if (!label || !btn) return;
+  if (maintenanceOn) {
+    label.textContent = 'ONLINE — MAINTENANCE MODE';
+    label.style.color = 'var(--red2)';
+    btn.textContent   = 'DISABLE';
+    btn.style.borderColor = 'var(--red2)';
+    btn.style.color       = 'var(--red2)';
+  } else {
+    label.textContent = 'OFFLINE — NORMAL OPERATION';
+    label.style.color = 'var(--green2)';
+    btn.textContent   = 'ENABLE';
+    btn.style.borderColor = 'var(--green2)';
+    btn.style.color       = 'var(--green2)';
+  }
+}
+
+window.toggleMaintenance = async function() {
+  var newState = !maintenanceOn;
+  var confirmed = confirm(newState
+    ? 'Enable maintenance mode? All visitors will see the offline screen.'
+    : 'Disable maintenance mode? The site will go live again.');
+  if (!confirmed) return;
+
+  var res = await api('maintenance', { method: 'POST', body: { enabled: newState } });
+  if (res.ok) {
+    maintenanceOn = newState;
+    updateMaintenanceUI();
+    toast(newState ? '🔴 Maintenance mode ENABLED' : '🟢 Maintenance mode DISABLED',
+          newState ? 'error' : 'success');
+  } else {
+    toast('Failed to update maintenance mode.', 'error');
+  }
+};
+
+window.saveMaintenanceMessage = async function() {
+  var msg = document.getElementById('maintenance-msg-input').value.trim();
+  var res = await api('maintenance', { method: 'POST', body: { enabled: maintenanceOn, message: msg } });
+  if (res.ok) toast('Message saved.', 'success');
+  else toast('Failed to save message.', 'error');
+};
+
+
+// ── Sync history ─────────────────────────────────────────────
+async function loadSyncHistory() {
+  var res = await api('sync-log');
+  if (!res.ok) {
+    document.getElementById('sync-history-list').innerHTML =
+      '<div style="font-family:var(--mono);font-size:0.72rem;color:var(--muted);padding:1rem">Could not load sync history.</div>';
+    return;
+  }
+  renderSyncHistory(res.data.logs || []);
+}
+
+function renderSyncHistory(logs) {
+  var el = document.getElementById('sync-history-list');
+  if (!logs.length) {
+    el.innerHTML = '<div style="font-family:var(--mono);font-size:0.72rem;color:var(--muted);padding:1rem">No sync runs recorded yet.</div>';
+    return;
+  }
+  el.innerHTML = logs.map(function(l) {
+    var date = l.ran_at ? new Date(l.ran_at).toLocaleString() : '—';
+    var srcClass = l.source === 'scheduled' ? 'auto' : 'manual';
+    var srcLabel = l.source === 'scheduled' ? 'AUTO' : 'MANUAL';
+    var errHtml  = l.errors ? '<div class="sh-err">⚠ ' + l.errors + '</div>' : '';
+    return '<div class="sync-history-row">'
+      + '<span class="sh-time">' + date + '</span>'
+      + '<span class="sh-by">' + (l.ran_by || '—') + '</span>'
+      + '<span class="sh-src ' + srcClass + '">' + srcLabel + '</span>'
+      + '<div class="sh-stats">'
+      +   '<div class="sh-stat"><span class="n gold">' + (l.parsed||0) + '</span><span class="l">PARSED</span></div>'
+      +   '<div class="sh-stat"><span class="n" style="color:var(--cyan2)">' + (l.inserted||0) + '</span><span class="l">NEW</span></div>'
+      +   '<div class="sh-stat"><span class="n" style="color:var(--gold)">' + (l.updated||0) + '</span><span class="l">UPDATED</span></div>'
+      +   '<div class="sh-stat"><span class="n" style="color:var(--muted)">' + (l.skipped||0) + '</span><span class="l">SKIPPED</span></div>'
+      + '</div>'
+      + errHtml
+      + '</div>';
+  }).join('');
+}
+
+
+// ── User menu + change password ──────────────────────────────
+window.toggleUserMenu = function() {
+  var dd = document.getElementById('user-dropdown');
+  if (dd) dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+};
+
+// Close dropdown when clicking elsewhere
+document.addEventListener('click', function(e) {
+  var menu = document.getElementById('user-info-menu');
+  var dd   = document.getElementById('user-dropdown');
+  if (dd && menu && !menu.contains(e.target)) dd.style.display = 'none';
+});
+
+window.openChangePassword = function() {
+  var dd = document.getElementById('user-dropdown');
+  if (dd) dd.style.display = 'none';
+  document.getElementById('cpw-current').value = '';
+  document.getElementById('cpw-new').value     = '';
+  document.getElementById('cpw-confirm').value = '';
+  document.getElementById('cpw-msg').textContent = '';
+  document.getElementById('change-pw-modal').style.display = 'flex';
+};
+
+window.closeChangePassword = function() {
+  document.getElementById('change-pw-modal').style.display = 'none';
+};
+
+window.submitChangePassword = async function() {
+  var cur     = document.getElementById('cpw-current').value;
+  var nw      = document.getElementById('cpw-new').value;
+  var confirm = document.getElementById('cpw-confirm').value;
+  var msg     = document.getElementById('cpw-msg');
+
+  if (!cur || !nw || !confirm) {
+    msg.style.color = 'var(--red2)';
+    msg.textContent = 'All fields are required.';
+    return;
+  }
+  if (nw.length < 6) {
+    msg.style.color = 'var(--red2)';
+    msg.textContent = 'New password must be at least 6 characters.';
+    return;
+  }
+  if (nw !== confirm) {
+    msg.style.color = 'var(--red2)';
+    msg.textContent = 'New passwords do not match.';
+    return;
+  }
+
+  var res = await api('auth?action=change-password', {
+    method: 'POST',
+    body: { current_password: cur, new_password: nw }
+  });
+
+  if (res.ok) {
+    msg.style.color = 'var(--green2)';
+    msg.textContent = 'Password changed successfully!';
+    setTimeout(closeChangePassword, 1200);
+  } else {
+    msg.style.color = 'var(--red2)';
+    msg.textContent = res.data.error || 'Failed to change password.';
+  }
+};
+
+
+// ════════════════════════════════════════════════════════════
+//  RANK SYSTEM
+// ════════════════════════════════════════════════════════════
+// 43 ranks across 6 rarity tiers, unlocked by all-time lands claimed.
+const RANK_TIERS = {
+  common:    { label: 'COMMON',    color: '#9aa0b0' },
+  uncommon:  { label: 'UNCOMMON',  color: '#4ade80' },
+  rare:      { label: 'RARE',      color: '#3b9df0' },
+  epic:      { label: 'EPIC',      color: '#a855f7' },
+  legendary: { label: 'LEGENDARY', color: '#f39c12' },
+  mythic:    { label: 'MYTHIC',    color: '#c8a84b' },
+};
+
+// [minClaims, title, tier]
+const RANKS = [
+  [5,   'Marked by the Abyss',          'common'],
+  [10,  'Hellbound Scout',              'common'],
+  [20,  'Soul Collector',               'common'],
+  [35,  'Infernal Reaver',              'common'],
+  [50,  'Abyssal Warden',               'common'],
+  [75,  'Harbinger of Ruin',            'common'],
+  [100, 'Kingslayer',                   'common'],
+  [125, 'Thronebreaker',                'uncommon'],
+  [150, 'Lord of Ashes',                'uncommon'],
+  [175, 'Hellfire Conqueror',           'uncommon'],
+  [200, 'Tyrant of the Damned',         'uncommon'],
+  [225, 'Crown Hunter',                 'uncommon'],
+  [250, 'Prince of Ruin',               'uncommon'],
+  [275, 'Archfiend Commander',          'uncommon'],
+  [300, 'Dread Sovereign',              'rare'],
+  [325, 'Infernal Overlord',            'rare'],
+  [350, 'Crownbreaker',                 'rare'],
+  [375, 'Throne Reaper',                'rare'],
+  [400, 'Demon Kingmaker',              'rare'],
+  [425, 'Void Tyrant',                  'rare'],
+  [450, 'Destroyer of Crowns',          'rare'],
+  [475, 'Emperor of the Abyss',         'epic'],
+  [500, 'Devourer of Kingdoms',         'epic'],
+  [525, 'Uncrowned King',               'epic'],
+  [550, 'Fallen Sovereign',             'epic'],
+  [575, 'Black Monarch',                'epic'],
+  [600, 'Lord of Endless Night',        'epic'],
+  [625, 'King of Ashes',                'epic'],
+  [650, 'Worldbreaker',                 'legendary'],
+  [675, 'Infernal Regent',              'legendary'],
+  [700, 'Crimson Emperor',              'legendary'],
+  [725, 'Sovereign of Ruin',            'legendary'],
+  [750, 'Eternal Kingslayer',           'legendary'],
+  [775, 'Scourge of Empires',           'legendary'],
+  [800, 'First Archdemon',              'legendary'],
+  [825, 'Throne Devourer',              'mythic'],
+  [850, 'Master of the Nine Hells',     'mythic'],
+  [875, 'Crownless God',                'mythic'],
+  [900, 'Infernal Ascendant',           'mythic'],
+  [925, 'End of Kings',                 'mythic'],
+  [950, 'Lord of Dominion',             'mythic'],
+  [975, 'Eternal Tyrant',               'mythic'],
+  [1000,'Project Kingslayer: Ascended', 'mythic'],
+];
+
+// Returns the rank object for a given all-time claim count.
+function getRank(claims) {
+  claims = claims || 0;
+  if (claims < 5) {
+    return { title: 'Recruit', tier: 'unranked', color: '#9aa0b0',
+             min: 0, next: 5, isRecruit: true };
+  }
+  let current = RANKS[0];
+  for (let i = 0; i < RANKS.length; i++) {
+    if (claims >= RANKS[i][0]) current = RANKS[i];
+    else break;
+  }
+  const idx  = RANKS.indexOf(current);
+  const next = RANKS[idx + 1] || null;
+  return {
+    title: current[1],
+    tier:  current[2],
+    color: RANK_TIERS[current[2]].color,
+    tierLabel: RANK_TIERS[current[2]].label,
+    min:   current[0],
+    next:  next ? next[0] : null,
+    nextTitle: next ? next[1] : null,
+    isMax: !next,
+  };
+}
+
+// Renders an animated gradient-sweep rank badge.
+function rankBadgeHtml(claims, size) {
+  const r = getRank(claims);
+  const cls = 'rank-badge rank-' + (r.tier || 'unranked') + (size ? ' rank-' + size : '');
+  return '<span class="' + cls + '" title="' +
+         (r.isRecruit ? 'Claim 5 lands to earn your first rank' : r.tierLabel + ' rank') +
+         '">' + r.title + '</span>';
+}
+
+
+// ── HUD Authorization (admin) ────────────────────────────────
+function hudAuthEsc(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+async function loadHudAuth() {
+  const pend = $('hudauth-pending');
+  const appr = $('hudauth-approved');
+  const deni = $('hudauth-denied');
+
+  const { ok, data } = await api('auth?action=hud-list', { method: 'POST' });
+  if (!ok) {
+    pend.innerHTML = '<div style="font-family:var(--mono);font-size:0.7rem;color:var(--red2);padding:0.5rem 0">Could not load HUD authorizations.</div>';
+    appr.innerHTML = '';
+    deni.innerHTML = '';
+    return;
+  }
+
+  const entries  = data.entries || [];
+  const pending  = entries.filter(e => e.status === 'pending');
+  const approved = entries.filter(e => e.status === 'approved');
+  const denied   = entries.filter(e => e.status === 'denied');
+  const fmt = d => d ? new Date(d).toLocaleString() : '—';
+  const btnStyle = 'font-size:0.6rem;padding:0.2rem 0.5rem';
+
+  if (!pending.length) {
+    pend.innerHTML = '<div style="font-family:var(--mono);font-size:0.7rem;color:var(--muted);padding:0.5rem 0">' + t('hudauth.none') + '</div>';
+  } else {
+    pend.innerHTML = '<table class="members-table"><thead><tr>'
+      + '<th>' + t('hudauth.slUsername') + '</th><th>' + t('hudauth.displayName') + '</th><th>' + t('hudauth.requested') + '</th><th>' + t('hudauth.actions') + '</th>'
+      + '</tr></thead><tbody>'
+      + pending.map(e =>
+          '<tr><td style="color:#fff">' + hudAuthEsc(e.username) + '</td>'
+        + '<td>' + hudAuthEsc(e.display_name || '—') + '</td>'
+        + '<td style="font-family:var(--mono);font-size:0.68rem">' + fmt(e.requested_at) + '</td>'
+        + '<td><button class="btn-approve" style="' + btnStyle + '" onclick="hudAuthAction(\'' + e.username + '\',\'approve\')">✔ ' + t('hudauth.approve') + '</button> '
+        + '<button class="btn-reject" style="' + btnStyle + '" onclick="hudAuthAction(\'' + e.username + '\',\'deny\')">✖ ' + t('hudauth.deny') + '</button></td></tr>'
+        ).join('')
+      + '</tbody></table>';
+  }
+
+  if (!approved.length) {
+    appr.innerHTML = '<div style="font-family:var(--mono);font-size:0.7rem;color:var(--muted);padding:0.5rem 0">—</div>';
+  } else {
+    appr.innerHTML = '<table class="members-table"><thead><tr>'
+      + '<th>' + t('hudauth.slUsername') + '</th><th>' + t('hudauth.decidedBy') + '</th><th>' + t('hudauth.date') + '</th><th>' + t('hudauth.actions') + '</th>'
+      + '</tr></thead><tbody>'
+      + approved.map(e =>
+          '<tr><td style="color:#fff">' + hudAuthEsc(e.username) + '</td>'
+        + '<td style="font-family:var(--mono);font-size:0.68rem">' + hudAuthEsc(e.decided_by || '—') + '</td>'
+        + '<td style="font-family:var(--mono);font-size:0.68rem">' + fmt(e.decided_at) + '</td>'
+        + '<td><button class="btn-reject" style="' + btnStyle + '" onclick="hudAuthAction(\'' + e.username + '\',\'deny\')">✖ ' + t('hudauth.revoke') + '</button></td></tr>'
+        ).join('')
+      + '</tbody></table>';
+  }
+
+  if (!denied.length) {
+    deni.innerHTML = '<div style="font-family:var(--mono);font-size:0.7rem;color:var(--muted);padding:0.5rem 0">—</div>';
+  } else {
+    deni.innerHTML = '<table class="members-table"><thead><tr>'
+      + '<th>' + t('hudauth.slUsername') + '</th><th>' + t('hudauth.decidedBy') + '</th><th>' + t('hudauth.date') + '</th><th>' + t('hudauth.actions') + '</th>'
+      + '</tr></thead><tbody>'
+      + denied.map(e =>
+          '<tr><td style="color:#fff">' + hudAuthEsc(e.username) + '</td>'
+        + '<td style="font-family:var(--mono);font-size:0.68rem">' + hudAuthEsc(e.decided_by || '—') + '</td>'
+        + '<td style="font-family:var(--mono);font-size:0.68rem">' + fmt(e.decided_at) + '</td>'
+        + '<td><button class="btn-approve" style="' + btnStyle + '" onclick="hudAuthAction(\'' + e.username + '\',\'approve\')">✔ ' + t('hudauth.approve') + '</button> '
+        + '<button class="btn-reject" style="' + btnStyle + '" onclick="hudAuthAction(\'' + e.username + '\',\'remove\')">🗑 ' + t('hudauth.remove') + '</button></td></tr>'
+        ).join('')
+      + '</tbody></table>';
+  }
+}
+
+window.hudAuthAction = async function(username, op) {
+  if (op === 'deny' && !confirm('Block "' + username + '" from attaching the HUD?')) return;
+  if (op === 'remove' && !confirm('Remove "' + username + '" from the list entirely?\n\nTheir next attach will file a fresh pending request.')) return;
+  const res = await api('auth?action=hud-manage', { method: 'POST', body: { username: username, op: op } });
+  if (res.ok) {
+    toast('🔐 ' + (res.data.message || 'Updated.'), 'success');
+    loadHudAuth();
+  } else {
+    toast(res.data.error || 'Action failed.', 'error');
+  }
+};
+
+window.addHudAuth = async function() {
+  const input = $('hudauth-username-input');
+  const uname = (input.value || '').trim();
+  if (!uname) { toast(t('hudauth.enterName'), 'error'); return; }
+  const res = await api('auth?action=hud-manage', { method: 'POST', body: { username: uname, op: 'add' } });
+  if (res.ok) {
+    input.value = '';
+    toast('🔐 ' + uname + ' authorized.', 'success');
+    loadHudAuth();
+  } else {
+    toast(res.data.error || 'Failed to authorize.', 'error');
+  }
+};
+
+// ════════════════════════════════════════════════════════════
+//  INTERNATIONALIZATION (i18n)
+// ════════════════════════════════════════════════════════════
+const TRANSLATIONS = {
+  en: {
+    'nav.lands': '⚔ Lands', 'nav.intel': '◈ Intel', 'nav.admin': '⬡ Admin',
+    'nav.crystals': '💎 Crystals', 'nav.sync': '⇅ Sync', 'nav.mystats': '★ My Stats', 'nav.hudauth': '🔐 HUD Auth',
+    'hudauth.title': '🔐 HUD Authorization',
+    'hudauth.addDesc': 'Authorize an operative by SL username. Authorized members can attach the Territory HUD; everyone else is detached on sight.',
+    'hudauth.ph': 'SL username (e.g. noa.nightfall)', 'hudauth.authorize': '✔ Authorize',
+    'hudauth.pending': '⏳ Pending HUD Requests', 'hudauth.approved': '✅ Authorized Operatives', 'hudauth.deniedTitle': '⛔ Denied',
+    'hudauth.none': 'No pending requests.', 'hudauth.slUsername': 'SL Username', 'hudauth.displayName': 'Display Name',
+    'hudauth.requested': 'Requested', 'hudauth.decidedBy': 'Decided By', 'hudauth.date': 'Date', 'hudauth.actions': 'Actions',
+    'hudauth.approve': 'Approve', 'hudauth.deny': 'Deny', 'hudauth.revoke': 'Revoke', 'hudauth.remove': 'Remove',
+    'hudauth.enterName': 'Enter an SL username first.',
+    'mystats.landsClaimed': 'LANDS CLAIMED', 'mystats.claimed': 'Claimed', 'mystats.lost': 'Lost', 'mystats.contested': 'Contested', 'mystats.progression': 'RANK PROGRESSION',
+    'topbar.logout': '[ LOGOUT ]', 'topbar.changePw': '🔑 Change Password',
+    'topbar.admin': '★ ADMIN', 'topbar.operative': 'OPERATIVE',
+    'auth.tagline': 'TERRITORY COMMAND SYSTEM // EUPHORIA',
+    'auth.login': 'Login', 'auth.request': 'Request Access',
+    'auth.username': 'Username', 'auth.password': 'Password',
+    'auth.authenticate': 'AUTHENTICATE', 'auth.slUsername': 'Second Life Username',
+    'auth.submitRequest': 'SUBMIT REQUEST',
+    'lands.status': 'Status', 'lands.region': 'Region', 'lands.landName': 'Land Name',
+    'lands.enemyClaimer': 'Enemy Claimer', 'lands.claimedBy': 'Claimed By (EVW)',
+    'lands.firstSeen': 'First Seen', 'lands.teleport': 'Teleport', 'lands.shield': 'Shield',
+    'lands.action': 'Action', 'lands.claimed': 'CLAIMED', 'lands.unclaimed': 'UNCLAIMED',
+    'lands.claimable': '✅ Claimable', 'lands.searchPlaceholder': 'Search regions...',
+    'stats.totalRegions': 'TOTAL REGIONS', 'stats.underControl': 'UNDER EVW CONTROL',
+    'stats.enemyUnclaimed': 'ENEMY / UNCLAIMED', 'stats.control': 'CONTROL',
+    'intel.leaderboard': '★ OPERATIVE LEADERBOARD', 'intel.recentActivity': '⚡ RECENT ACTIVITY',
+    'intel.allTime': 'ALL TIME', 'intel.30days': '30 DAYS',
+    'intel.claimed': 'CLAIMED', 'intel.lost': 'LOST', 'intel.conto': 'CONTD',
+    'intel.events': 'events', 'intel.noActivity': 'No activity recorded yet.',
+    'crystals.title': '💎 CRYSTAL TRACKER', 'crystals.resets': 'Resets 12AM PST daily',
+    'admin.systemControl': '⚙ System Control', 'admin.maintenanceMode': 'Maintenance Mode',
+    'admin.maintenanceDesc': 'Redirects all visitors to the maintenance screen. Admins can still log in.',
+    'admin.pendingRequests': '⏳ Pending Access Requests', 'admin.allMembers': '👥 All Members',
+    'admin.username': 'Username', 'admin.slUsername': 'SL Username', 'admin.role': 'Role',
+    'admin.joined': 'Joined', 'admin.actions': 'Actions',
+    'sync.title': '⇅ Euphoria Channel Sync', 'sync.report': 'Sync Report',
+    'sync.history': '📋 SYNC HISTORY',
+    'cpw.title': 'CHANGE PASSWORD', 'cpw.current': 'Current password',
+    'cpw.new': 'New password (min 6 chars)', 'cpw.confirm': 'Confirm new password',
+    'cpw.update': 'UPDATE', 'cpw.cancel': 'CANCEL',
+  },
+  es: {
+    'nav.lands': '⚔ Tierras', 'nav.intel': '◈ Intel', 'nav.admin': '⬡ Admin',
+    'nav.crystals': '💎 Cristales', 'nav.sync': '⇅ Sinc.', 'nav.mystats': '★ Mis Estadísticas', 'nav.hudauth': '🔐 Aut. HUD',
+    'hudauth.title': '🔐 Autorización del HUD',
+    'hudauth.addDesc': 'Autoriza a un operativo por su usuario de SL. Los miembros autorizados pueden ponerse el HUD Territorial; los demás son desconectados al instante.',
+    'hudauth.ph': 'Usuario SL (ej. noa.nightfall)', 'hudauth.authorize': '✔ Autorizar',
+    'hudauth.pending': '⏳ Solicitudes de HUD Pendientes', 'hudauth.approved': '✅ Operativos Autorizados', 'hudauth.deniedTitle': '⛔ Denegados',
+    'hudauth.none': 'No hay solicitudes pendientes.', 'hudauth.slUsername': 'Usuario SL', 'hudauth.displayName': 'Nombre',
+    'hudauth.requested': 'Solicitado', 'hudauth.decidedBy': 'Decidido Por', 'hudauth.date': 'Fecha', 'hudauth.actions': 'Acciones',
+    'hudauth.approve': 'Aprobar', 'hudauth.deny': 'Denegar', 'hudauth.revoke': 'Revocar', 'hudauth.remove': 'Eliminar',
+    'hudauth.enterName': 'Escribe primero un usuario de SL.',
+    'mystats.landsClaimed': 'TIERRAS RECLAMADAS', 'mystats.claimed': 'Reclamadas', 'mystats.lost': 'Perdidas', 'mystats.contested': 'Disputadas', 'mystats.progression': 'PROGRESIÓN DE RANGO',
+    'topbar.logout': '[ SALIR ]', 'topbar.changePw': '🔑 Cambiar Contraseña',
+    'topbar.admin': '★ ADMIN', 'topbar.operative': 'OPERATIVO',
+    'auth.tagline': 'SISTEMA DE COMANDO TERRITORIAL // EUPHORIA',
+    'auth.login': 'Iniciar Sesión', 'auth.request': 'Solicitar Acceso',
+    'auth.username': 'Usuario', 'auth.password': 'Contraseña',
+    'auth.authenticate': 'AUTENTICAR', 'auth.slUsername': 'Usuario de Second Life',
+    'auth.submitRequest': 'ENVIAR SOLICITUD',
+    'lands.status': 'Estado', 'lands.region': 'Región', 'lands.landName': 'Nombre',
+    'lands.enemyClaimer': 'Reclamante Enemigo', 'lands.claimedBy': 'Reclamado Por (EVW)',
+    'lands.firstSeen': 'Visto Primero', 'lands.teleport': 'Teleporte', 'lands.shield': 'Escudo',
+    'lands.action': 'Acción', 'lands.claimed': 'RECLAMADO', 'lands.unclaimed': 'SIN RECLAMAR',
+    'lands.claimable': '✅ Disponible', 'lands.searchPlaceholder': 'Buscar regiones...',
+    'stats.totalRegions': 'REGIONES TOTALES', 'stats.underControl': 'BAJO CONTROL EVW',
+    'stats.enemyUnclaimed': 'ENEMIGO / SIN RECLAMAR', 'stats.control': 'CONTROL',
+    'intel.leaderboard': '★ TABLA DE OPERATIVOS', 'intel.recentActivity': '⚡ ACTIVIDAD RECIENTE',
+    'intel.allTime': 'HISTÓRICO', 'intel.30days': '30 DÍAS',
+    'intel.claimed': 'RECLAM.', 'intel.lost': 'PERD.', 'intel.conto': 'DISP.',
+    'intel.events': 'eventos', 'intel.noActivity': 'No hay actividad registrada todavía.',
+    'crystals.title': '💎 RASTREADOR DE CRISTALES', 'crystals.resets': 'Se reinicia a las 12AM PST',
+    'admin.systemControl': '⚙ Control del Sistema', 'admin.maintenanceMode': 'Modo Mantenimiento',
+    'admin.maintenanceDesc': 'Redirige a todos los visitantes a la pantalla de mantenimiento. Los admins aún pueden entrar.',
+    'admin.pendingRequests': '⏳ Solicitudes Pendientes', 'admin.allMembers': '👥 Todos los Miembros',
+    'admin.username': 'Usuario', 'admin.slUsername': 'Usuario SL', 'admin.role': 'Rol',
+    'admin.joined': 'Se Unió', 'admin.actions': 'Acciones',
+    'sync.title': '⇅ Sincronización de Euphoria', 'sync.report': 'Reporte de Sinc.',
+    'sync.history': '📋 HISTORIAL DE SINC.',
+    'cpw.title': 'CAMBIAR CONTRASEÑA', 'cpw.current': 'Contraseña actual',
+    'cpw.new': 'Nueva contraseña (mín 6)', 'cpw.confirm': 'Confirmar nueva contraseña',
+    'cpw.update': 'ACTUALIZAR', 'cpw.cancel': 'CANCELAR',
+  }
+};
+
+let currentLang = 'en';
+
+function t(key) {
+  const dict = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
+  return dict[key] || TRANSLATIONS.en[key] || key;
+}
+
+function applyLanguage(lang) {
+  currentLang = (lang === 'es') ? 'es' : 'en';
+  try { localStorage.setItem('ks_lang', currentLang); } catch(e) {}
+
+  document.querySelectorAll('[data-i18n]').forEach(function(el) {
+    el.textContent = t(el.getAttribute('data-i18n'));
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el) {
+    el.placeholder = t(el.getAttribute('data-i18n-ph'));
+  });
+
+  var toggle = document.getElementById('lang-toggle');
+  if (toggle) toggle.textContent = currentLang === 'en' ? 'ES' : 'EN';
+
+  if (typeof allLands !== 'undefined' && allLands.length && typeof renderLands === 'function') renderLands();
+  var role = document.getElementById('topbar-role');
+  if (role && typeof currentUser !== 'undefined' && currentUser) {
+    role.textContent = currentUser.is_admin ? t('topbar.admin') : t('topbar.operative');
+  }
+}
+
+window.toggleLanguage = function() {
+  applyLanguage(currentLang === 'en' ? 'es' : 'en');
+};
+
+
+// ════════════════════════════════════════════════════════════
+//  INIT — check for existing session
+// ════════════════════════════════════════════════════════════
+(async function init() {
+  // Apply saved language preference
+  try {
+    var savedLang = localStorage.getItem('ks_lang');
+    if (savedLang) applyLanguage(savedLang);
+    else applyLanguage('en');
+  } catch(e) { applyLanguage('en'); }
+
+  // Check maintenance mode first
+  try {
+    var mRes = await fetch('/api/maintenance');
+    var mData = await mRes.json();
+    if (mData.maintenance) {
+      // Check if current user is admin before redirecting
+      var maintSavedUser = localStorage.getItem('ks_user');
+      var isAdmin = maintSavedUser ? JSON.parse(maintSavedUser).is_admin : false;
+      if (!isAdmin) {
+        window.location.href = '/maintenance.html';
+        return;
+      }
+    }
+  } catch(e) {}
+
+  const savedToken = localStorage.getItem('ks_token');
+  const savedUser  = localStorage.getItem('ks_user');
+  if (savedToken && savedUser) {
+    sessionToken = savedToken;
+    currentUser  = JSON.parse(savedUser);
+    // Verify token still valid
+    const { ok } = await api('lands');
+    if (ok) {
+      enterApp();
+      if (currentUser.is_admin) checkMaintenance();
+      return;
+    }
+    stopPolling();
+    clearSession();
+  }
+  showScreen('screen-auth');
+})();
 </script>
+
+  <!-- Change Password Modal -->
+  <div id="change-pw-modal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.7);align-items:center;justify-content:center">
+    <div style="background:var(--bg2);border:1px solid var(--border);padding:2rem;width:340px;max-width:90vw;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px))">
+      <div style="font-family:var(--display);font-size:1.4rem;letter-spacing:0.06em;color:#fff;margin-bottom:1.25rem" data-i18n="cpw.title">CHANGE PASSWORD</div>
+      <div style="display:flex;flex-direction:column;gap:0.75rem">
+        <input id="cpw-current" type="password" placeholder="Current password" data-i18n-ph="cpw.current" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:0.8rem;padding:0.5rem 0.7rem;outline:none">
+        <input id="cpw-new" type="password" placeholder="New password (min 6 chars)" data-i18n-ph="cpw.new" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:0.8rem;padding:0.5rem 0.7rem;outline:none">
+        <input id="cpw-confirm" type="password" placeholder="Confirm new password" data-i18n-ph="cpw.confirm" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:0.8rem;padding:0.5rem 0.7rem;outline:none">
+      </div>
+      <div id="cpw-msg" style="font-family:var(--mono);font-size:0.68rem;margin-top:0.75rem;min-height:1rem"></div>
+      <div style="display:flex;gap:0.5rem;margin-top:1rem">
+        <button onclick="submitChangePassword()" style="flex:1;background:var(--gold);color:#000;border:none;font-family:var(--display);font-size:1rem;letter-spacing:0.1em;padding:0.5rem;cursor:pointer" data-i18n="cpw.update">UPDATE</button>
+        <button onclick="closeChangePassword()" style="flex:1;background:none;border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:0.72rem;padding:0.5rem;cursor:pointer" data-i18n="cpw.cancel">CANCEL</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
